@@ -81,17 +81,28 @@
         </div>
     </section>
 
-    {{-- Estilo del perfil seleccionado --}}
+    {{-- Diseño y estilo del perfil seleccionado --}}
     <template x-if="actual">
     <section class="dt-panel" aria-labelledby="h-estilo">
         <div class="dt-panel-h">
-            <h2 id="h-estilo">Estilo de <span x-text="actual.nombrePerfil"></span></h2>
-            <div class="dt-seg" role="group" aria-label="Estructura">
-                <button :class="actual.estructura !== 'feria' ? 'on' : ''" @click="cambiar({ layout_estructura: 'clasica' }, 'estructura', 'clasica')">Clásica</button>
-                <button :class="actual.estructura === 'feria' ? 'on' : ''" @click="cambiar({ layout_estructura: 'feria' }, 'estructura', 'feria')">Feria</button>
-            </div>
+            <h2 id="h-estilo">Diseño de <span x-text="actual.nombrePerfil"></span></h2>
+            <span class="dt-chip">Se guarda solo</span>
         </div>
 
+        <span class="dt-label">Diseño de la tarjeta</span>
+        <div class="dt-styles" style="margin-bottom:24px">
+            <template x-for="d in disenos" :key="d.id">
+                <div class="dt-tile" :class="(actual.estructura || 'clasica') === d.id ? 'sel' : ''">
+                    <button class="dt-thumb" @click="cambiar({ layout_estructura: d.id }, 'estructura', d.id)" :aria-label="'Diseño ' + d.nombre">
+                        <x-mini-perfil var="({ ...actual, estructura: d.id })" :solo="true" />
+                        <span class="dt-check" x-show="(actual.estructura || 'clasica') === d.id"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span>
+                    </button>
+                    <div><b style="font-size:13px" x-text="d.nombre"></b><small style="display:block;color:var(--muted);font-size:11.5px" x-text="d.desc"></small></div>
+                </div>
+            </template>
+        </div>
+
+        <span class="dt-label">Estilo de color</span>
         <div class="dt-styles">
             <template x-for="e in estilos" :key="e.id">
                 <div class="dt-tile" :class="actual.tema === e.id ? 'sel' : ''">
@@ -130,34 +141,6 @@
     </section>
     </template>
 
-    {{-- Apariencia del panel --}}
-    <section class="dt-panel" aria-labelledby="h-ap">
-        <div class="dt-panel-h">
-            <h2 id="h-ap">Apariencia del panel</h2>
-            <div class="dt-seg" role="group" aria-label="Modo">
-                <button :class="modo === 'auto' ? 'on' : ''" @click="ponerModo('auto')">Automático</button>
-                <button :class="modo === 'light' ? 'on' : ''" @click="ponerModo('light')">Claro</button>
-                <button :class="modo === 'dark' ? 'on' : ''" @click="ponerModo('dark')">Oscuro</button>
-            </div>
-        </div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px">
-            <template x-for="t in temas" :key="t.id">
-                <button style="border:0;background:none;padding:0;text-align:left;display:flex;flex-direction:column;gap:6px;cursor:pointer;color:inherit" @click="ponerTema(t.id)">
-                    <span style="aspect-ratio:16/10;border-radius:10px;display:flex;gap:6px;padding:9px;position:relative;border:2px solid transparent;width:100%" :style="`background:${t.bg};` + (tema === t.id ? 'border-color:var(--text)' : '')">
-                        <span style="display:flex;flex-direction:column;gap:5px;padding-top:2px"><i style="width:7px;height:7px;border-radius:50%" :style="'background:' + t.dk"></i><i style="width:7px;height:7px;border-radius:50%;background:#fbc9a6"></i><i style="width:7px;height:7px;border-radius:50%;background:#d9d4fb"></i></span>
-                        <span style="flex:1;background:#fff;border-radius:6px;padding:6px;display:flex;flex-direction:column;gap:5px">
-                            <i style="height:3px;width:60%;border-radius:3px" :style="'background:' + t.dk"></i>
-                            <span style="flex:1;display:flex;gap:5px"><span style="flex:1;border-radius:4px" :style="'background:' + t.dk"></span><span style="flex:1;border-radius:4px" :style="'background:' + t.bg"></span></span>
-                        </span>
-                        <span class="dt-check" style="width:20px;height:20px" x-show="tema === t.id"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span>
-                    </span>
-                    <span><b style="font-size:13px" x-text="t.nombre"></b><small style="display:block;color:var(--muted);font-size:11.5px" x-text="t.desc"></small></span>
-                </button>
-            </template>
-        </div>
-        <p class="dt-sub" style="margin-top:14px;font-size:12.5px">Solo cambia cómo ves tu panel en este dispositivo. Tus perfiles públicos mantienen su propio estilo.</p>
-    </section>
-
     {{-- Confirmación de borrado --}}
     <div x-show="aEliminar" x-cloak style="position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:80;display:grid;place-items:center;padding:16px">
         <div class="dt-panel" style="max-width:400px;width:100%" @click.away="aEliminar = null">
@@ -180,7 +163,6 @@
             sel: null,
             aEliminar: null,
             toast: '', toastError: false, toastT: null, guardarT: null,
-            modo: 'auto', tema: '',
             estilos: [
                 { id: 'crystal', nombre: 'Crystal', desc: 'Vidrio sobre noche' },
                 { id: 'matte', nombre: 'Mate', desc: 'Negro sin brillo' },
@@ -189,22 +171,19 @@
                 { id: 'sport', nombre: 'Sport', desc: 'Energía y trama' },
                 { id: 'minimalista', nombre: 'Minimal', desc: 'Blanco limpio' },
             ],
-            colores: ['#3b82f6', '#38bdf8', '#2eaa6e', '#d4af37', '#e4572e', '#d6336c', '#7a3fd6', '#111111'],
-            temas: [
-                { id: '', nombre: 'Grafito', desc: 'Gris neutro', bg: '#f4f5f7', dk: '#1e1f21' },
-                { id: 'paper', nombre: 'Papel', desc: 'Crema cálido', bg: '#f6f1e7', dk: '#2b241b' },
-                { id: 'sage', nombre: 'Salvia', desc: 'Verde gris', bg: '#eef2ec', dk: '#1f2a22' },
-                { id: 'tide', nombre: 'Marea', desc: 'Azul de agua', bg: '#eaf2f8', dk: '#102230' },
-                { id: 'plum', nombre: 'Ciruela', desc: 'Malva suave', bg: '#f5edf2', dk: '#2a1b25' },
-                { id: 'clay', nombre: 'Arcilla', desc: 'Terracota tostada', bg: '#f7ece4', dk: '#2d1d14' },
-                { id: 'wisteria', nombre: 'Glicina', desc: 'Violeta azulado', bg: '#efeff9', dk: '#1d1c2e' },
+            disenos: [
+                { id: 'clasica', nombre: 'Clásico', desc: 'Todo en una tarjeta' },
+                { id: 'moderna', nombre: 'Moderno', desc: 'Secciones y acciones arriba' },
+                { id: 'feria', nombre: 'Feria', desc: 'Tu foto en grande' },
+                { id: 'enlaces', nombre: 'Enlaces', desc: 'Botones para tu bio' },
+                { id: 'ejecutiva', nombre: 'Ejecutivo', desc: 'Tarjeta de presentación' },
             ],
+            colores: ['#3b82f6', '#38bdf8', '#2eaa6e', '#d4af37', '#e4572e', '#d6336c', '#7a3fd6', '#111111'],
 
             get actual() { return this.fichas.find(p => p.id === this.sel) || null; },
 
             iniciar() {
                 this.sel = this.fichas[0]?.id ?? null;
-                try { this.modo = localStorage.getItem('dt-mode') || 'auto'; this.tema = localStorage.getItem('dt-theme') || ''; } catch (e) {}
             },
             nombreEstilo(id) { return (this.estilos.find(e => e.id === id) || { nombre: id }).nombre; },
             avisar(m, error = false) {
@@ -270,19 +249,6 @@
                 } catch (e) { this.avisar('Sin conexión con el servidor.', true); }
             },
 
-            ponerModo(m) {
-                this.modo = m;
-                try { localStorage.setItem('dt-mode', m); } catch (e) {}
-                const oscuro = m === 'dark' || (m === 'auto' && matchMedia('(prefers-color-scheme: dark)').matches);
-                oscuro ? document.documentElement.dataset.mode = 'dark' : delete document.documentElement.dataset.mode;
-                this.avisar('Apariencia guardada');
-            },
-            ponerTema(t) {
-                this.tema = t;
-                try { localStorage.setItem('dt-theme', t); } catch (e) {}
-                t ? document.documentElement.dataset.theme = t : delete document.documentElement.dataset.theme;
-                this.avisar('Apariencia guardada');
-            },
         };
     }
 </script>

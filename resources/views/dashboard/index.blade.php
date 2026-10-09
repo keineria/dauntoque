@@ -17,10 +17,22 @@
     </div>
 
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:18px">
-        <div class="dt-stat"><b>{{ $fmt($stats['vistas']) }}</b><span>Vistas de perfil</span></div>
-        <div class="dt-stat"><b>{{ $fmt($stats['vcf']) }}</b><span>Contactos guardados</span></div>
-        <div class="dt-stat"><b>{{ $fmt($stats['whatsapp']) }}</b><span>Chats de WhatsApp</span></div>
-        <div class="dt-stat"><b>{{ $fmt($stats['pagos']) }}</b><span>Clics en pagos</span></div>
+        <div class="dt-stat">
+            <div class="ic" style="background:rgba(59,130,246,.18);color:#60a5fa"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></div>
+            <b>{{ $fmt($stats['vistas']) }}</b><span>Vistas de perfil</span>
+        </div>
+        <div class="dt-stat">
+            <div class="ic" style="background:rgba(139,92,246,.18);color:#a78bfa"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg></div>
+            <b>{{ $fmt($stats['vcf']) }}</b><span>Contactos guardados</span>
+        </div>
+        <div class="dt-stat">
+            <div class="ic" style="background:rgba(37,211,102,.16);color:#4ade80"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.4 8.4 0 0 1-12.5 7.3L3 21l2.2-5.3A8.4 8.4 0 1 1 21 11.5z"/></svg></div>
+            <b>{{ $fmt($stats['whatsapp']) }}</b><span>Chats de WhatsApp</span>
+        </div>
+        <div class="dt-stat">
+            <div class="ic" style="background:rgba(168,85,247,.18);color:#c084fc"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/></svg></div>
+            <b>{{ $fmt($stats['pagos']) }}</b><span>Clics en pagos</span>
+        </div>
     </div>
 
     @if(!$publico)

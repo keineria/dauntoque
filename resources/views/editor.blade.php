@@ -15,8 +15,8 @@
 
     <style>
         /* Editor: formulario a la izquierda con el estilo del panel, vista previa del perfil a la derecha */
-        .ed-app { display:flex; height:100vh; overflow:hidden; }
-        .ed-form { width:50%; min-width:0; display:flex; flex-direction:column; background:var(--bg); }
+        .ed-app { position:relative; z-index:1; display:flex; height:100vh; overflow:hidden; }
+        .ed-form { width:50%; min-width:0; display:flex; flex-direction:column; }
         .ed-top { height:56px; flex:none; display:flex; align-items:center; justify-content:space-between; gap:12px; padding:0 24px; border-bottom:1px solid var(--border); }
         .ed-back { display:inline-flex; align-items:center; gap:6px; color:var(--muted); text-decoration:none; font-size:13.5px; font-weight:600; }
         .ed-back:hover { color:var(--text); }
@@ -160,7 +160,7 @@
                             <label class="dt-label" for="ed-bio">Descripción del perfil</label>
                             <textarea id="ed-bio" x-model="bio" rows="5" class="dt-input" placeholder="Escribe a qué te dedicas o deja que la IA lo redacte."></textarea>
                             <div style="display:flex;justify-content:flex-end;margin-top:10px">
-                                <button @click="mejorarConIA" :disabled="generandoIA" class="dt-btn" style="border-color:#c9b8f5;background:#f4effe;color:#6b3fd6">
+                                <button @click="mejorarConIA" :disabled="generandoIA" class="dt-btn" style="border-color:rgba(139,92,246,.5);background:linear-gradient(90deg,#7c3aed,#2563eb);color:#fff;box-shadow:0 0 18px rgba(124,58,237,.35)">
                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg>
                                     <span x-show="!generandoIA">Mejorar con IA</span><span x-show="generandoIA">Redactando…</span>
                                 </button>
@@ -224,13 +224,26 @@
 
                         {{-- PASO 8: diseño --}}
                         <div x-show="paso === 8" x-cloak>
-                            <span class="dt-label">Estilo</span>
+                            <span class="dt-label">Diseño de la tarjeta</span>
+                            <div class="dt-styles" style="grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px;margin-bottom:22px">
+                                <template x-for="d in disenosEditor" :key="d.id">
+                                    <div class="dt-tile" :class="(config.layout_estructura || 'clasica') === d.id ? 'sel' : ''">
+                                        <button class="dt-thumb" @click="config.layout_estructura = d.id" :aria-label="'Diseño ' + d.nombre">
+                                            <x-mini-perfil var="({ tema: config.tema_base, color: config.color_primario, forma: config.forma_botones, estructura: d.id, foto: fotoPreview, inicial: (nombre || '?').charAt(0).toUpperCase() })" :solo="true" />
+                                            <span class="dt-check" x-show="(config.layout_estructura || 'clasica') === d.id"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span>
+                                        </button>
+                                        <b style="font-size:12.5px" x-text="d.nombre"></b>
+                                    </div>
+                                </template>
+                            </div>
+
+                            <span class="dt-label">Estilo de color</span>
                             <div class="dt-styles" style="grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px;margin-bottom:20px">
                                 <template x-for="e in estilosEditor" :key="e.id">
-                                    <div class="dt-tile" :class="presetActivo() === e.id ? 'sel' : ''">
-                                        <button class="dt-thumb" @click="aplicarPreset(e.id)" :aria-label="'Estilo ' + e.nombre">
-                                            <x-mini-perfil var="({ tema: presets[e.id].tema_base, color: presets[e.id].color_primario, forma: presets[e.id].forma_botones, estructura: presets[e.id].layout_estructura, foto: fotoPreview, inicial: (nombre || '?').charAt(0).toUpperCase() })" :solo="true" />
-                                            <span class="dt-check" x-show="presetActivo() === e.id"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span>
+                                    <div class="dt-tile" :class="config.tema_base === e.id ? 'sel' : ''">
+                                        <button class="dt-thumb" @click="aplicarTema(e.id)" :aria-label="'Estilo ' + e.nombre">
+                                            <x-mini-perfil var="({ tema: presets[e.id].tema_base, color: presets[e.id].color_primario, forma: presets[e.id].forma_botones, estructura: config.layout_estructura, foto: fotoPreview, inicial: (nombre || '?').charAt(0).toUpperCase() })" :solo="true" />
+                                            <span class="dt-check" x-show="config.tema_base === e.id"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span>
                                         </button>
                                         <b style="font-size:12.5px" x-text="e.nombre"></b>
                                     </div>
@@ -381,9 +394,14 @@
                 nombrePerfil: 'Mi Tarjeta Principal',
                 config: { tema_base: 'crystal', color_fondo: 'transparent', color_primario: '#3b82f6', alineacion: 'centro', forma_botones: 'rounded-2xl', layout_estructura: 'clasica' },
                 presets: { luxury: { tema_base: 'luxury', color_fondo: '#050505', color_primario: '#D4AF37', alineacion: 'centro', forma_botones: 'rounded-none', layout_estructura: 'clasica' }, sport: { tema_base: 'sport', color_fondo: '#000000', color_primario: '#ccff00', alineacion: 'izquierda', forma_botones: '-skew-x-12', layout_estructura: 'clasica' }, corporativo: { tema_base: 'corporativo', color_fondo: '#f8fafc', color_primario: '#0f172a', alineacion: 'izquierda', forma_botones: 'rounded-md', layout_estructura: 'clasica' }, crystal: { tema_base: 'crystal', color_fondo: 'transparent', color_primario: '#3b82f6', alineacion: 'centro', forma_botones: 'rounded-2xl', layout_estructura: 'clasica' }, minimalista: { tema_base: 'minimalista', color_fondo: '#ffffff', color_primario: '#000000', alineacion: 'centro', forma_botones: 'rounded-full', layout_estructura: 'clasica' }, feria: { tema_base: 'matte', color_fondo: '#09090b', color_primario: '#ff3b30', alineacion: 'centro', forma_botones: 'rounded-xl', layout_estructura: 'feria' } },
-                estilosEditor: [ { id: 'crystal', nombre: 'Crystal' }, { id: 'feria', nombre: 'Modo Feria' }, { id: 'luxury', nombre: 'Luxury' }, { id: 'sport', nombre: 'Sport' }, { id: 'corporativo', nombre: 'Corporativo' }, { id: 'minimalista', nombre: 'Minimal' } ],
-                // Estilo marcado en las fichas del paso 8 (el modo Feria manda sobre el tema)
-                presetActivo() { return this.config.layout_estructura === 'feria' ? 'feria' : this.config.tema_base; },
+                disenosEditor: [ { id: 'clasica', nombre: 'Clásico' }, { id: 'moderna', nombre: 'Moderno' }, { id: 'feria', nombre: 'Feria' }, { id: 'enlaces', nombre: 'Enlaces' }, { id: 'ejecutiva', nombre: 'Ejecutivo' } ],
+                estilosEditor: [ { id: 'crystal', nombre: 'Crystal' }, { id: 'matte', nombre: 'Mate' }, { id: 'luxury', nombre: 'Luxury' }, { id: 'sport', nombre: 'Sport' }, { id: 'corporativo', nombre: 'Corporativo' }, { id: 'minimalista', nombre: 'Minimal' } ],
+                // Cambia colores y botones del estilo sin tocar el diseño elegido
+                aplicarTema(id) {
+                    const diseno = this.config.layout_estructura || 'clasica';
+                    this.aplicarPreset(id === 'matte' ? 'feria' : id);
+                    this.config.layout_estructura = diseno;
+                },
 
                 aplicarPreset(nombre) { 
                     this.config = { ...this.presets[nombre] }; 
