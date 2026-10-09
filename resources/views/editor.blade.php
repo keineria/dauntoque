@@ -2,46 +2,58 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DaUnToque - Creador de Perfil IA</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor de perfil · DaUnToque</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    
+
+    @include('partials.panel-estilos')
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
-    
-    <style>
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background-color: #050505; 
-            color: #ffffff; 
-            overflow: hidden; 
-            overscroll-behavior: none; 
-        }
-        .glass-panel { 
-            background: rgba(20, 20, 25, 0.7); 
-            backdrop-filter: blur(25px); 
-            -webkit-backdrop-filter: blur(25px); 
-            border: 1px solid rgba(255, 255, 255, 0.05); 
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); 
-        }
-        .glow-accent { 
-            box-shadow: 0 0 20px rgba(37, 99, 235, 0.3); 
-        }
-        
-        /* 📱 AJUSTES EXCLUSIVOS PARA MÓVIL */
-        @media (max-width: 768px) {
-            .mobile-fullscreen { height: 100dvh; display: flex; flex-direction: column; }
-            .mobile-content-area { flex: 1; overflow-y: auto; padding-bottom: 100px; }
-            .mobile-fixed-bottom { 
-                position: fixed; bottom: 0; left: 0; width: 100%; 
-                background: #050505; border-top: 1px solid #1f2937; 
-                padding: 15px; z-index: 40; display: flex; gap: 10px; justify-content: space-between; 
-            }
-        }
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
 
+    <style>
+        /* Editor: formulario a la izquierda con el estilo del panel, vista previa del perfil a la derecha */
+        .ed-app { display:flex; height:100vh; overflow:hidden; }
+        .ed-form { width:50%; min-width:0; display:flex; flex-direction:column; background:var(--bg); }
+        .ed-top { height:56px; flex:none; display:flex; align-items:center; justify-content:space-between; gap:12px; padding:0 24px; border-bottom:1px solid var(--border); }
+        .ed-back { display:inline-flex; align-items:center; gap:6px; color:var(--muted); text-decoration:none; font-size:13.5px; font-weight:600; }
+        .ed-back:hover { color:var(--text); }
+        .ed-body { flex:1; overflow-y:auto; display:flex; }
+        .ed-steps { width:200px; flex:none; padding:24px 12px 24px 20px; display:flex; flex-direction:column; gap:2px; }
+        .ed-step { display:flex; align-items:center; gap:10px; padding:7px 10px; border-radius:6px; font-size:13px; color:var(--muted); border:0; background:none; text-align:left; width:100%; }
+        .ed-step i { width:20px; height:20px; border-radius:50%; border:1.5px solid var(--border); display:grid; place-items:center; font-style:normal; font-size:10.5px; font-weight:700; flex:none; }
+        .ed-step.on { background:var(--surface); color:var(--text); font-weight:600; }
+        .ed-step.on i { border-color:var(--primary); color:var(--primary); }
+        .ed-step.done { color:var(--text); cursor:pointer; }
+        .ed-step.done i { background:var(--primary); border-color:var(--primary); color:#fff; }
+        .ed-step.done:hover { background:var(--surface); }
+        .ed-main { flex:1; min-width:0; padding:28px 28px 120px; max-width:600px; }
+        .ed-bar { height:5px; border-radius:9px; background:var(--surface); overflow:hidden; margin:14px 0 22px; }
+        .ed-bar span { display:block; height:100%; background:var(--primary); transition:width .4s; }
+        .ed-foot { flex:none; border-top:1px solid var(--border); padding:12px 24px; display:flex; justify-content:space-between; gap:10px; background:var(--bg); }
+        .ed-opt { height:38px; border:1px solid var(--border); border-radius:7px; background:var(--card); color:var(--muted); font-size:13px; font-weight:600; cursor:pointer; }
+        .ed-opt.on { border-color:var(--primary); background:var(--primary-soft); color:var(--primary); }
+        .ed-drop { border:1.5px dashed var(--border); border-radius:10px; background:var(--surface); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; padding:18px; color:var(--muted); font-size:13px; cursor:pointer; position:relative; text-align:center; }
+        .ed-drop:hover { border-color:var(--primary); color:var(--text); }
+        .ed-red { border:1px solid var(--border); border-radius:8px; background:var(--card); padding:8px 4px; display:flex; flex-direction:column; align-items:center; gap:4px; font-size:10px; font-weight:600; color:var(--muted); cursor:pointer; text-transform:uppercase; letter-spacing:.04em; }
+        .ed-red:hover { border-color:var(--primary); color:var(--text); }
+        .ed-red svg, .ed-ico-red svg { width:18px; height:18px; }
+        .ed-preview { width:50%; display:flex; align-items:center; justify-content:center; background:var(--surface); border-left:1px solid var(--border); position:relative; }
+        .ed-preview-label { position:absolute; top:18px; left:24px; font-size:12px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; }
+
+        @media (max-width: 900px) {
+            .ed-steps { display:none; }
+        }
+        @media (max-width: 768px) {
+            .ed-app { height:100dvh; }
+            .ed-form { width:100%; }
+            .ed-main { padding:20px 16px 120px; }
+            .ed-top, .ed-foot { padding-left:16px; padding-right:16px; }
+            .ed-preview { display:none; }
+            .ed-preview.abierta { display:flex; position:fixed; inset:0; z-index:200; width:100%; flex-direction:column; }
+        }
         .phone-mockup { 
             width: 320px; height: 650px; border: 12px solid #1a1a1c; border-radius: 40px; 
             background-color: #09090b; position: relative; overflow: hidden; 
@@ -115,279 +127,218 @@
         .tpl-minimalista .avatar-ring { border-color: #cccccc; padding: 2px; }
     </style>
 </head>
-<body class="h-screen w-screen flex flex-col md:flex-row relative mobile-fullscreen" x-data="perfilDigital()">
+<body x-data="perfilDigital()">
 
-    <!-- NOTIFICACIÓN DE ERROR GENERAL (Fallos de servidor, etc) -->
-    <div x-show="toastError !== ''" x-transition.opacity style="display: none;" class="fixed top-6 left-1/2 transform -translate-x-1/2 z-[9999] bg-[#ffffff] rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.5)] p-5 w-[90%] max-w-sm border border-gray-300 flex flex-col gap-3">
-        <p class="text-black font-bold text-sm">portal.dauntoque.com dice</p>
-        <div class="flex items-start gap-2 text-gray-700 text-sm">
-            <span class="text-yellow-500 text-lg leading-none">⚠️</span>
-            <span x-text="toastError"></span>
-        </div>
-        <div class="flex justify-end mt-2">
-            <button @click="toastError = ''" class="bg-[#3b5998] hover:bg-[#2d4373] text-white font-bold py-2 px-6 rounded-full border-2 border-[#8b9dc3] shadow-md transition-colors">Aceptar</button>
-        </div>
+    {{-- Aviso de error (falta un dato, fallo del servidor) --}}
+    <div x-show="toastError !== ''" x-transition.opacity x-cloak class="dt-panel" role="alert" style="position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:9999;width:calc(100% - 32px);max-width:400px;box-shadow:0 12px 32px rgba(0,0,0,.18)">
+        <p style="margin:0 0 4px;font-weight:600;color:var(--danger)">Revisa este paso</p>
+        <p class="dt-sub" style="margin:0 0 14px" x-text="toastError"></p>
+        <div style="display:flex;justify-content:flex-end"><button @click="toastError = ''" class="dt-btn pri">Entendido</button></div>
     </div>
 
-    <!-- Luces de fondo -->
-    <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-blue-600 rounded-full mix-blend-multiply filter blur-[128px] opacity-20 animate-pulse pointer-events-none"></div>
-    <div class="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-purple-600 rounded-full mix-blend-multiply filter blur-[128px] opacity-20 animate-pulse pointer-events-none"></div>
+    <div class="ed-app">
+        <section class="ed-form">
+            <header class="ed-top">
+                <a href="/dashboard/perfiles" class="ed-back">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>Mis perfiles
+                </a>
+                <span class="dt-chip" x-text="modoActual === 'editar' ? 'Editando perfil' : 'Nuevo perfil'"></span>
+            </header>
 
-    <!-- MITAD IZQUIERDA: Formularios de Gestión -->
-    <div class="w-full md:w-1/2 h-full flex flex-col relative z-10 overflow-y-auto hide-scrollbar mobile-content-area pb-24 md:pb-0">
-        
-        <!-- CONTENEDOR AGRUPADO Y CENTRADO -->
-        <div class="w-full max-w-lg mx-auto my-auto py-10 px-6 md:px-8 flex flex-col gap-4 transition-all duration-500 relative">
-            
-            <!-- BARRA DE PROGRESO -->
-            <div class="w-full">
-                <div class="flex justify-between items-end mb-2">
-                    <h2 class="text-xl md:text-2xl font-black text-white" x-text="titulos[paso]"></h2>
-                    <span class="text-xl md:text-3xl font-black text-blue-500" x-text="`${progreso}%`"></span>
-                </div>
-                <p class="text-xs text-gray-400 mb-4" x-text="subtitulos[paso]"></p>
-                <div class="w-full h-1.5 bg-gray-800 rounded-full overflow-hidden">
-                    <div class="h-full bg-gradient-to-r from-blue-600 to-purple-500 transition-all duration-500" :style="`width: ${progreso}%`"></div>
+            <div class="ed-body">
+                {{-- Lista de pasos --}}
+                <nav class="ed-steps" aria-label="Pasos">
+                    <template x-for="n in totalPasos" :key="n">
+                        <button class="ed-step" x-show="!(n === 1 && modoActual === 'editar')"
+                                :class="n === paso ? 'on' : (n < paso ? 'done' : '')"
+                                @click="if (n < paso) paso = n" :aria-current="n === paso ? 'step' : null">
+                            <i x-text="n < paso ? '✓' : n"></i><span x-text="titulos[n]"></span>
+                        </button>
+                    </template>
+                </nav>
+
+                <div class="ed-main">
+                    <p class="dt-label" style="margin:0" x-text="`Paso ${paso} de ${totalPasos}`"></p>
+                    <h1 class="dt-h1" style="margin-top:2px" x-text="titulos[paso]"></h1>
+                    <p class="dt-sub" x-text="subtitulos[paso]"></p>
+                    <div class="ed-bar"><span :style="`width:${progreso}%`"></span></div>
+
+                    <div class="dt-panel">
+                        {{-- PASO 1: usuario (solo al crear) --}}
+                        <div x-show="paso === 1 && modoActual === 'crear'">
+                            <label class="dt-label" for="ed-nick">Tu usuario único</label>
+                            <div style="display:flex;gap:8px">
+                                <div class="dt-inline" style="flex:1"><span>portal.dauntoque.com/</span><input id="ed-nick" type="text" x-model="nickname" @input="nickValidado = false; nickError = ''" placeholder="carlos" style="text-transform:lowercase"></div>
+                                <button @click="validarNickname" class="dt-btn" style="height:40px">
+                                    <span x-show="!validandoNick">Validar</span><span x-show="validandoNick">…</span>
+                                </button>
+                            </div>
+                            <p x-show="nickValidado" style="margin:8px 0 0;font-size:12.5px;font-weight:600;color:var(--success)">✓ Usuario disponible</p>
+                            <p x-show="nickError !== ''" style="margin:8px 0 0;font-size:12.5px;font-weight:600;color:var(--danger)" x-text="nickError"></p>
+                        </div>
+
+                        {{-- PASO 2: tipo, foto y nombre --}}
+                        <div x-show="paso === 2" x-cloak>
+                            <span class="dt-label">¿Qué uso le darás a tu tarjeta?</span>
+                            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:18px">
+                                <button @click="tipoPerfil = 'corporativo'" class="ed-opt" :class="tipoPerfil === 'corporativo' ? 'on' : ''">Corporativo</button>
+                                <button @click="tipoPerfil = 'empresa'" class="ed-opt" :class="tipoPerfil === 'empresa' ? 'on' : ''">Empresa</button>
+                                <button @click="tipoPerfil = 'hobbies'" class="ed-opt" :class="tipoPerfil === 'hobbies' ? 'on' : ''">Hobbies</button>
+                            </div>
+                            <span class="dt-label">Foto de perfil</span>
+                            <label class="ed-drop" style="margin-bottom:18px">
+                                <input type="file" accept="image/*" @change="abrirRecorte" style="display:none">
+                                <template x-if="!fotoPreview"><span>Subir foto</span></template>
+                                <template x-if="fotoPreview"><img :src="fotoPreview" alt="" style="width:76px;height:76px;object-fit:cover;border-radius:50%;border:2px solid var(--primary)"></template>
+                                <template x-if="fotoPreview"><span style="font-size:12px">Cambiar foto</span></template>
+                            </label>
+                            <label class="dt-label" for="ed-nombre">Tu nombre público</label>
+                            <input id="ed-nombre" type="text" x-model="nombre" placeholder="Tu nombre completo" class="dt-input">
+                        </div>
+
+                        {{-- PASO 3: profesión --}}
+                        <div x-show="paso === 3" x-cloak>
+                            <label class="dt-label" for="ed-prof">Título o profesión</label>
+                            <input id="ed-prof" type="text" x-model="profesion" placeholder="ej. Consultor de negocios" class="dt-input">
+                        </div>
+
+                        {{-- PASO 4: biografía con IA --}}
+                        <div x-show="paso === 4" x-cloak>
+                            <label class="dt-label" for="ed-bio">Descripción del perfil</label>
+                            <textarea id="ed-bio" x-model="bio" rows="5" class="dt-input" placeholder="Escribe a qué te dedicas o deja que la IA lo redacte."></textarea>
+                            <div style="display:flex;justify-content:flex-end;margin-top:10px">
+                                <button @click="mejorarConIA" :disabled="generandoIA" class="dt-btn" style="border-color:#c9b8f5;background:#f4effe;color:#6b3fd6">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg>
+                                    <span x-show="!generandoIA">Mejorar con IA</span><span x-show="generandoIA">Redactando…</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        {{-- PASO 5: galería --}}
+                        <div x-show="paso === 5" x-cloak>
+                            <span class="dt-label">Portafolio o productos (máx. 4)</span>
+                            <div class="ed-drop" x-show="galeriaPreviews.length < 4" style="margin-bottom:12px">
+                                <input type="file" multiple accept="image/*" @change="procesarImagenesGaleria($event)" style="position:absolute;inset:0;opacity:0;cursor:pointer" aria-label="Cargar imágenes">
+                                <span>Cargar imágenes</span>
+                                <small><span x-text="4 - galeriaPreviews.length"></span> disponibles</small>
+                            </div>
+                            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px" x-show="galeriaPreviews.length > 0">
+                                <template x-for="(img, index) in galeriaPreviews" :key="index">
+                                    <div style="position:relative">
+                                        <img :src="img" alt="" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;border:1px solid var(--border)">
+                                        <button @click="eliminarImagenGaleria(index)" class="dt-ico" style="position:absolute;top:-8px;right:-8px;width:24px;height:24px;border-radius:50%" aria-label="Quitar imagen">&times;</button>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+
+                        {{-- PASO 6: contacto y redes --}}
+                        <div x-show="paso === 6" x-cloak>
+                            <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
+                                <div class="dt-inline"><span>Teléfono</span><input type="tel" x-model="telefono" placeholder="Teléfono / WhatsApp" aria-label="Teléfono"></div>
+                                <div class="dt-inline"><span>Correo</span><input type="email" x-model="correo" placeholder="Correo electrónico" aria-label="Correo"></div>
+                                <div class="dt-inline"><span>Dirección</span><input type="text" x-model="direccion" placeholder="Opcional" aria-label="Dirección"></div>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;align-items:center"><span class="dt-label">Redes sociales</span><span class="dt-chip" x-text="`${redesSeleccionadas.length}/4`"></span></div>
+                            <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-bottom:12px" :style="redesSeleccionadas.length >= 4 ? 'opacity:.5;pointer-events:none' : ''">
+                                <template x-for="red in opcionesRedes" :key="red.id">
+                                    <button @click="agregarRed(red)" x-show="!redesSeleccionadas.find(r => r.id === red.id)" class="ed-red">
+                                        <span x-html="red.svg"></span><span x-text="red.id === 'x' ? 'X' : red.nombre"></span>
+                                    </button>
+                                </template>
+                            </div>
+                            <p class="dt-sub" style="font-size:12px;margin:0 0 10px" x-show="redesSeleccionadas.length > 0">Escribe solo tu nombre de usuario (ej. carlos_123); el enlace se crea solo.</p>
+                            <div style="display:flex;flex-direction:column;gap:8px">
+                                <template x-for="(red, index) in redesSeleccionadas" :key="index">
+                                    <div class="dt-inline">
+                                        <span class="ed-ico-red" x-html="red.svg"></span>
+                                        <input type="text" x-model="red.usuario" :placeholder="'Tu usuario de ' + red.nombre" :aria-label="'Usuario de ' + red.nombre">
+                                        <button @click="quitarRed(index)" style="border:0;background:none;padding:0 12px;color:var(--danger);font-size:18px;cursor:pointer" aria-label="Quitar red">&times;</button>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+
+                        {{-- PASO 7: billeteras --}}
+                        <div x-show="paso === 7" x-cloak>
+                            <span class="dt-label">Billeteras digitales (opcional)</span>
+                            <div style="display:flex;flex-direction:column;gap:10px">
+                                <div class="dt-inline"><span style="color:#7a3fd6">Zelle</span><input type="text" x-model="zelle" placeholder="Correo o teléfono" aria-label="Zelle"></div>
+                                <div class="dt-inline"><span style="color:#1a9c3e">CashApp</span><input type="text" x-model="cashapp" placeholder="$Cashtag" aria-label="CashApp"></div>
+                                <div class="dt-inline"><span style="color:#008cff">Venmo</span><input type="text" x-model="venmo" placeholder="@usuario" aria-label="Venmo"></div>
+                            </div>
+                        </div>
+
+                        {{-- PASO 8: diseño --}}
+                        <div x-show="paso === 8" x-cloak>
+                            <span class="dt-label">Estilo</span>
+                            <div class="dt-styles" style="grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px;margin-bottom:20px">
+                                <template x-for="e in estilosEditor" :key="e.id">
+                                    <div class="dt-tile" :class="presetActivo() === e.id ? 'sel' : ''">
+                                        <button class="dt-thumb" @click="aplicarPreset(e.id)" :aria-label="'Estilo ' + e.nombre">
+                                            <x-mini-perfil var="({ tema: presets[e.id].tema_base, color: presets[e.id].color_primario, forma: presets[e.id].forma_botones, estructura: presets[e.id].layout_estructura, foto: fotoPreview, inicial: (nombre || '?').charAt(0).toUpperCase() })" :solo="true" />
+                                            <span class="dt-check" x-show="presetActivo() === e.id"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span>
+                                        </button>
+                                        <b style="font-size:12.5px" x-text="e.nombre"></b>
+                                    </div>
+                                </template>
+                            </div>
+
+                            <div style="display:flex;flex-wrap:wrap;gap:18px;align-items:flex-end">
+                                <div x-show="config.layout_estructura !== 'feria'">
+                                    <span class="dt-label">Alineación</span>
+                                    <div class="dt-seg">
+                                        <button :class="config.alineacion === 'centro' ? 'on' : ''" @click="config.alineacion = 'centro'; alineacion = 'centro';">Centro</button>
+                                        <button :class="config.alineacion === 'izquierda' ? 'on' : ''" @click="config.alineacion = 'izquierda'; alineacion = 'izquierda';">Izquierda</button>
+                                    </div>
+                                </div>
+                                <div>
+                                    <span class="dt-label">Botones</span>
+                                    <div class="dt-seg">
+                                        <button :class="config.forma_botones === 'rounded-none' ? 'on' : ''" @click="config.forma_botones = 'rounded-none'">Rectos</button>
+                                        <button :class="config.forma_botones === 'rounded-xl' ? 'on' : ''" @click="config.forma_botones = 'rounded-xl'">Suaves</button>
+                                        <button :class="config.forma_botones === 'rounded-full' ? 'on' : ''" @click="config.forma_botones = 'rounded-full'">Píldora</button>
+                                    </div>
+                                </div>
+                                <div>
+                                    <span class="dt-label">Color de acento</span>
+                                    <label class="dt-inline" style="height:38px;padding-right:6px;cursor:pointer">
+                                        <span x-text="config.color_primario"></span>
+                                        <input type="color" x-model="config.color_primario" style="width:30px;height:26px;padding:0;border:0;background:none;cursor:pointer" aria-label="Color de acento">
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- PASO 9: nombre del perfil --}}
+                        <div x-show="paso === 9" x-cloak>
+                            <label class="dt-label" for="ed-nperfil">Nombre de este perfil</label>
+                            <p class="dt-sub" style="margin:0 0 12px;font-size:12.5px">Solo lo ves tú en el panel (ej. «Perfil ejecutivo», «Fin de semana»).</p>
+                            <input id="ed-nperfil" type="text" x-model="nombrePerfil" placeholder="Mi Tarjeta Principal" class="dt-input">
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- GLASS PANEL (Formulario) -->
-            <div class="glass-panel p-6 md:p-8 rounded-3xl w-full relative">
-                
-                <!-- PASO 1: Nickname (SOLO CREACIÓN) -->
-                <div x-show="paso === 1 && modoActual === 'crear'" x-transition.opacity.duration.300ms>
-                    <label class="block text-sm font-semibold mb-2 text-gray-300">Crea tu usuario único</label>
-                    <div class="flex items-center gap-3 mb-2">
-                        <input type="text" x-model="nickname" @input="nickValidado = false; nickError = ''" placeholder="ej. carlos" class="w-full bg-black border border-gray-800 rounded-xl px-4 py-3 outline-none lowercase focus:border-blue-500 transition-colors">
-                        
-                        <button @click="validarNickname" class="bg-gray-800 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-xl transition-colors whitespace-nowrap flex items-center gap-2">
-                            <span x-show="!validandoNick">Validar</span>
-                            <span x-show="validandoNick" class="animate-pulse">...</span>
-                        </button>
-                    </div>
-                    <!-- Alertas silenciosas en línea -->
-                    <p x-show="nickValidado" class="text-green-400 text-xs font-bold ml-2 mb-2">✓ Usuario disponible</p>
-                    <p x-show="nickError !== ''" class="text-red-500 text-xs font-bold ml-2 mb-2" x-text="nickError"></p>
+            {{-- Botones de navegación --}}
+            <footer class="ed-foot">
+                <button x-show="paso > (modoActual === 'editar' ? 2 : 1)" @click="paso--" class="dt-btn" style="height:40px">Atrás</button>
+                <span x-show="!(paso > (modoActual === 'editar' ? 2 : 1))"></span>
+                <div style="display:flex;gap:8px">
+                    <button @click="modalPreviewMovil = true" class="dt-btn md:hidden" style="height:40px">Ver tarjeta</button>
+                    <button x-show="paso === 1 && modoActual === 'crear'" @click="avanzar(2)" :disabled="!nickValidado" class="dt-btn pri" style="height:40px">Continuar</button>
+                    <button x-show="paso >= 2 && paso < totalPasos" @click="avanzar(paso === 2 && tipoPerfil === 'empresa' ? 4 : paso + 1)" class="dt-btn pri" style="height:40px">Continuar</button>
+                    <button x-show="paso === totalPasos" @click="guardarPerfilCompleto" :disabled="guardando" class="dt-btn pri" style="height:40px">
+                        <span x-show="!guardando">Finalizar y guardar</span><span x-show="guardando">Guardando…</span>
+                    </button>
                 </div>
+            </footer>
+        </section>
 
-                <!-- PASO 2: Tipo y Foto -->
-                <div x-show="paso === 2" x-transition.opacity.duration.300ms style="display: none;">
-                    <label class="block text-sm font-semibold mb-2 text-gray-300">¿Qué uso le darás a tu tarjeta?</label>
-                    <div class="grid grid-cols-3 gap-3 mb-6">
-                        <button @click="tipoPerfil = 'corporativo'" :class="tipoPerfil === 'corporativo' ? 'bg-blue-600 text-white' : 'bg-gray-900 text-gray-400'" class="border border-gray-700 py-2 rounded-lg text-xs font-bold transition-colors">Corporativo</button>
-                        <button @click="tipoPerfil = 'empresa'" :class="tipoPerfil === 'empresa' ? 'bg-blue-600 text-white' : 'bg-gray-900 text-gray-400'" class="border border-gray-700 py-2 rounded-lg text-xs font-bold transition-colors">Empresa</button>
-                        <button @click="tipoPerfil = 'hobbies'" :class="tipoPerfil === 'hobbies' ? 'bg-blue-600 text-white' : 'bg-gray-900 text-gray-400'" class="border border-gray-700 py-2 rounded-lg text-xs font-bold transition-colors">Hobbies</button>
-                    </div>
-
-                    <label class="w-full border-2 border-dashed border-gray-700 rounded-xl p-4 flex flex-col items-center justify-center mb-6 cursor-pointer hover:border-blue-500 transition-colors relative overflow-hidden">
-                        <input type="file" accept="image/*" @change="abrirRecorte" class="hidden">
-                        <div x-show="!fotoPreview" class="flex flex-col items-center pointer-events-none">
-                            <svg class="w-6 h-6 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                            <span class="text-xs text-gray-400">Subir Foto</span>
-                        </div>
-                        <div x-show="fotoPreview" class="w-full flex justify-center pointer-events-none" style="display: none;">
-                            <img :src="fotoPreview" class="h-20 w-20 object-cover rounded-full border-2 border-blue-500">
-                        </div>
-                    </label>
-                    <label class="block text-sm font-semibold mb-2 text-gray-300">Tu Nombre Público</label>
-                    <input type="text" x-model="nombre" placeholder="Tu Nombre Completo" class="w-full bg-black border border-gray-800 rounded-xl px-4 py-3 mb-6 text-white outline-none focus:border-blue-500">
-                </div>
-
-                <!-- PASO 3: Profesión -->
-                <div x-show="paso === 3" x-transition.opacity.duration.300ms style="display: none;">
-                    <label class="block text-sm font-semibold mb-2 text-gray-300">Título o Profesión</label>
-                    <input type="text" x-model="profesion" placeholder="ej. Consultor de Negocios" class="w-full bg-black border border-gray-800 rounded-xl px-4 py-3 mb-6 text-white outline-none focus:border-blue-500">
-                </div>
-
-                <!-- PASO 4: Biografía + Inteligencia Artificial -->
-                <div x-show="paso === 4" x-transition.opacity.duration.300ms style="display: none;">
-                    <label class="block text-sm font-semibold mb-2 text-gray-300">Descripción del Perfil</label>
-                    <textarea x-model="bio" rows="4" class="w-full bg-black border border-gray-800 rounded-xl px-4 py-3 mb-4 text-white outline-none focus:border-blue-500 resize-none" placeholder="Escribe a qué te dedicas o usa la IA..."></textarea>
-                    
-                    <div class="flex justify-end">
-                        <button @click="mejorarConIA" :disabled="generandoIA" class="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white text-xs font-bold py-2 px-5 rounded-xl flex items-center gap-2 transition-all shadow-[0_0_15px_rgba(147,51,234,0.3)] disabled:opacity-50">
-                            <svg x-show="!generandoIA" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                            <span x-show="!generandoIA">✨ Mejorar con IA</span>
-                            <span x-show="generandoIA" class="animate-pulse">Pensando...</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- PASO 5: Galería -->
-                <div x-show="paso === 5" x-transition.opacity.duration.300ms style="display: none;">
-                    <label class="block text-sm font-semibold mb-2 text-gray-300">Portafolio / Productos (Máx 4)</label>
-                    <div class="w-full border-2 border-dashed border-gray-700 rounded-xl p-6 flex flex-col items-center justify-center mb-4 cursor-pointer hover:border-blue-500 relative" x-show="galeriaPreviews.length < 4">
-                        <input type="file" multiple accept="image/*" @change="procesarImagenesGaleria($event)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
-                        <svg class="w-8 h-8 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                        <span class="text-xs text-gray-400 text-center">Cargar imágenes<br>(<span x-text="4 - galeriaPreviews.length"></span> disponibles)</span>
-                    </div>
-                    <div class="grid grid-cols-4 gap-2 mb-6" x-show="galeriaPreviews.length > 0">
-                        <template x-for="(img, index) in galeriaPreviews" :key="index">
-                            <div class="relative group">
-                                <img :src="img" class="w-full aspect-square object-cover rounded-lg border border-gray-700">
-                                <button @click="eliminarImagenGaleria(index)" class="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100">&times;</button>
-                            </div>
-                        </template>
-                    </div>
-                </div>
-
-                <!-- PASO 6: Contacto y Redes -->
-                <div x-show="paso === 6" x-transition.opacity.duration.300ms style="display: none;">
-                    <div class="mb-6 space-y-3">
-                        <div class="flex items-center bg-black border border-gray-800 rounded-xl overflow-hidden focus-within:border-blue-500">
-                            <span class="pl-4 text-gray-500">📞</span>
-                            <input type="tel" x-model="telefono" placeholder="Teléfono / WhatsApp" class="w-full bg-transparent text-white px-4 py-3 outline-none">
-                        </div>
-                        <div class="flex items-center bg-black border border-gray-800 rounded-xl overflow-hidden focus-within:border-blue-500">
-                            <span class="pl-4 text-gray-500">✉️</span>
-                            <input type="email" x-model="correo" placeholder="Correo Electrónico" class="w-full bg-transparent text-white px-4 py-3 outline-none">
-                        </div>
-                        <div class="flex items-center bg-black border border-gray-800 rounded-xl overflow-hidden focus-within:border-blue-500">
-                            <span class="pl-4 text-gray-500">📍</span>
-                            <input type="text" x-model="direccion" placeholder="Dirección (Opcional)" class="w-full bg-transparent text-white px-4 py-3 outline-none">
-                        </div>
-                    </div>
-
-                    <label class="block text-sm font-semibold mb-2 text-gray-300 flex justify-between">
-                        Redes Sociales <span class="text-xs text-blue-400"><span x-text="redesSeleccionadas.length"></span>/4</span>
-                    </label>
-                    
-                    <div class="grid grid-cols-4 gap-2 mb-4" :class="redesSeleccionadas.length >= 4 ? 'opacity-50 pointer-events-none' : ''">
-                        <template x-for="red in opcionesRedes" :key="red.id">
-                            <button @click="agregarRed(red)" x-show="!redesSeleccionadas.find(r => r.id === red.id)" class="bg-gray-900 border border-gray-700 hover:border-blue-500 rounded-lg py-2 text-xs font-bold transition-all flex flex-col items-center gap-1 text-gray-400 hover:text-white">
-                                <div x-html="red.svg" class="w-5 h-5"></div>
-                                <span x-text="red.nombre" class="text-[9px] uppercase tracking-wider"></span>
-                            </button>
-                        </template>
-                    </div>
-                    
-                    <p class="text-[10px] text-gray-500 mb-3" x-show="redesSeleccionadas.length > 0">⚠️ Ingresa solo tu nombre de usuario (ej. carlos_123), el sistema creará el link automáticamente.</p>
-                    
-                    <div class="space-y-3 mb-6">
-                        <template x-for="(red, index) in redesSeleccionadas" :key="index">
-                            <div class="flex items-center bg-black border border-gray-800 rounded-xl overflow-hidden focus-within:border-blue-500">
-                                <div class="pl-4 text-gray-400" x-html="red.svg"></div>
-                                <input type="text" x-model="red.usuario" :placeholder="'Solo tu usuario de ' + red.nombre" class="w-full bg-transparent text-white px-4 py-3 outline-none text-sm">
-                                <button @click="quitarRed(index)" class="px-4 text-red-500 font-bold">&times;</button>
-                            </div>
-                        </template>
-                    </div>
-                </div>
-
-                <!-- PASO 7: Billeteras -->
-                <div x-show="paso === 7" x-transition.opacity.duration.300ms style="display: none;">
-                    <label class="block text-sm font-semibold mb-4 text-gray-300">Billeteras Digitales (Opcional)</label>
-                    <div class="space-y-4 mb-6">
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><div class="w-6 h-6 rounded bg-[#741b8c] flex items-center justify-center text-white font-bold text-xs">Z</div></div>
-                            <input type="text" x-model="zelle" placeholder="Correo o Teléfono de Zelle" class="w-full bg-black border border-gray-800 rounded-xl pl-12 pr-4 py-3 text-white outline-none focus:border-[#a855f7]">
-                        </div>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><div class="w-6 h-6 rounded bg-[#00D632] flex items-center justify-center text-black font-bold text-xs">$</div></div>
-                            <input type="text" x-model="cashapp" placeholder="$Cashtag de CashApp" class="w-full bg-black border border-gray-800 rounded-xl pl-12 pr-4 py-3 text-white outline-none focus:border-[#00D632]">
-                        </div>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><div class="w-6 h-6 rounded bg-[#008CFF] flex items-center justify-center text-white font-bold text-xs">V</div></div>
-                            <input type="text" x-model="venmo" placeholder="@Usuario de Venmo" class="w-full bg-black border border-gray-800 rounded-xl pl-12 pr-4 py-3 text-white outline-none focus:border-[#008CFF]">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- PASO 8: DISEÑO (Sistema Modular) -->
-                <div x-show="paso === 8" x-transition.opacity.duration.300ms style="display: none;">
-                    
-                    <label class="block text-xs font-bold mb-3 text-gray-400 uppercase tracking-widest">1. Estructura y Plantillas</label>
-                    <div class="flex overflow-x-auto gap-3 pb-4 hide-scrollbar mb-4">
-                        <button @click="aplicarPreset('crystal')" :class="config.tema_base === 'crystal' && config.layout_estructura !== 'feria' ? 'ring-2 ring-blue-500 scale-105' : 'opacity-70'" class="w-24 h-32 flex-shrink-0 bg-blue-900/40 border border-white/20 rounded-xl flex flex-col items-center justify-center backdrop-blur-md transition-all">
-                            <span class="text-white font-sans font-bold text-xs">CRYSTAL</span>
-                        </button>
-                        <button @click="aplicarPreset('feria')" :class="config.layout_estructura === 'feria' ? 'ring-2 ring-red-500 scale-105' : 'opacity-70'" class="w-24 h-32 flex-shrink-0 bg-black border border-red-500 rounded-xl flex flex-col items-center justify-center transition-all">
-                            <span class="text-red-500 font-sans font-black text-xs uppercase text-center leading-tight">MODO<br>FERIA</span>
-                        </button>
-                        <button @click="aplicarPreset('luxury')" :class="config.tema_base === 'luxury' && config.layout_estructura !== 'feria' ? 'ring-2 ring-yellow-500 scale-105' : 'opacity-70'" class="w-24 h-32 flex-shrink-0 bg-[#050505] border-2 border-[#D4AF37] rounded-xl flex flex-col items-center justify-center transition-all">
-                            <span class="text-[#D4AF37] font-serif font-bold text-xs">LUXURY</span>
-                        </button>
-                        <button @click="aplicarPreset('sport')" :class="config.tema_base === 'sport' && config.layout_estructura !== 'feria' ? 'ring-2 ring-green-500 scale-105' : 'opacity-70'" class="w-24 h-32 flex-shrink-0 bg-black border-l-4 border-[#ccff00] rounded-xl flex flex-col items-center justify-center transition-all">
-                            <span class="text-[#ccff00] font-mono font-bold text-xs uppercase italic">SPORT</span>
-                        </button>
-                        <button @click="aplicarPreset('corporativo')" :class="config.tema_base === 'corporativo' && config.layout_estructura !== 'feria' ? 'ring-2 ring-blue-400 scale-105' : 'opacity-70'" class="w-24 h-32 flex-shrink-0 bg-white border border-gray-300 rounded-xl flex flex-col items-center justify-center transition-all">
-                            <span class="text-slate-800 font-serif font-bold text-xs">CORP</span>
-                        </button>
-                    </div>
-
-                    <hr class="border-gray-800 mb-6">
-
-                    <label class="block text-xs font-bold mb-3 text-gray-400 uppercase tracking-widest">2. Ajuste Fino</label>
-                    <div class="space-y-4">
-                        <div class="flex gap-2 bg-black p-1 rounded-xl border border-gray-800" x-show="config.layout_estructura !== 'feria'">
-                            <button @click="config.alineacion = 'centro'; alineacion = 'centro';" :class="config.alineacion === 'centro' ? 'bg-gray-800 text-white' : 'text-gray-500 hover:text-gray-300'" class="flex-1 py-2 rounded-lg text-xs font-bold transition-all">
-                                Centro
-                            </button>
-                            <button @click="config.alineacion = 'izquierda'; alineacion = 'izquierda';" :class="config.alineacion === 'izquierda' ? 'bg-gray-800 text-white' : 'text-gray-500 hover:text-gray-300'" class="flex-1 py-2 rounded-lg text-xs font-bold transition-all">
-                                Izquierda
-                            </button>
-                        </div>
-
-                        <div class="flex items-center justify-between bg-black p-3 rounded-xl border border-gray-800">
-                            <span class="text-sm text-gray-300">Color Primario (Acentos)</span>
-                            <input type="color" x-model="config.color_primario" class="w-8 h-8 rounded cursor-pointer bg-transparent border-none">
-                        </div>
-
-                        <div class="flex gap-2 bg-black p-1 rounded-xl border border-gray-800">
-                            <button @click="config.forma_botones = 'rounded-none'" :class="config.forma_botones === 'rounded-none' ? 'bg-gray-800 text-white' : 'text-gray-500'" class="flex-1 py-2 rounded-lg text-xs">Cuadrado</button>
-                            <button @click="config.forma_botones = 'rounded-xl'" :class="config.forma_botones === 'rounded-xl' ? 'bg-gray-800 text-white' : 'text-gray-500'" class="flex-1 py-2 rounded-lg text-xs">Suave</button>
-                            <button @click="config.forma_botones = 'rounded-full'" :class="config.forma_botones === 'rounded-full' ? 'bg-gray-800 text-white' : 'text-gray-500'" class="flex-1 py-2 rounded-lg text-xs">Píldora</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- PASO 9: BAUTIZAR PERFIL -->
-                <div x-show="paso === 9" x-transition.opacity.duration.300ms style="display: none;">
-                    <label class="block text-sm font-semibold mb-2 text-gray-300">Bautiza esta configuración</label>
-                    <p class="text-xs text-gray-500 mb-6">Dale un nombre para identificar este diseño en tu panel (ej. "Perfil Fin de Semana", "Perfil Ejecutivo").</p>
-                    <div class="flex items-center mb-6 bg-black border border-gray-800 rounded-xl overflow-hidden focus-within:border-blue-500 transition-colors">
-                        <input type="text" x-model="nombrePerfil" placeholder="Mi Tarjeta Principal" class="w-full bg-transparent text-white px-4 py-3 outline-none text-sm">
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
-        <!-- 📱 BOTONERA INFERIOR FIJA (Móvil) / ESTÁNDAR (PC) -->
-        <div class="mobile-fixed-bottom md:static md:px-8 md:pb-8 md:pt-4 md:border-none flex justify-between w-full max-w-lg mx-auto bg-[#050505]">
-            
-            <button x-show="paso > (modoActual === 'editar' ? 2 : 1)" @click="paso--" class="w-1/3 md:w-auto bg-gray-800 text-white font-bold py-3 px-6 rounded-xl text-sm transition-colors">Atrás</button>
-            <div x-show="paso === 1" class="hidden md:block"></div>
-            
-            <button x-show="paso === 1 && modoActual === 'crear'" @click="avanzar(2)" :disabled="!nickValidado" :class="!nickValidado ? 'opacity-50 cursor-not-allowed bg-gray-800' : 'bg-blue-600 hover:bg-blue-500'" class="w-full md:w-auto text-white font-bold py-3 px-6 rounded-xl text-sm md:ml-auto transition-colors">
-                Continuar
-            </button>
-            
-            <button x-show="paso >= 2 && paso < totalPasos" @click="avanzar(paso === 2 && tipoPerfil === 'empresa' ? 4 : paso + 1)" class="w-2/3 md:w-auto bg-blue-600 text-white font-bold py-3 px-6 rounded-xl text-sm md:ml-auto">
-                Continuar
-            </button>
-
-            <button x-show="paso === totalPasos" @click="guardarPerfilCompleto" class="w-2/3 md:w-auto bg-green-600 text-white font-bold py-3 px-6 rounded-xl text-sm md:ml-auto flex items-center justify-center gap-2">
-                <span x-show="!guardando">Finalizar y Guardar</span>
-                <span x-show="guardando" class="animate-pulse">Guardando...</span>
-            </button>
-        </div>
-    </div>
-
-    <!-- 📱 BOTÓN FLOTANTE MÓVIL PARA VER PREVIEW -->
-    <button @click="modalPreviewMovil = true" class="md:hidden fixed bottom-24 right-4 z-40 bg-white text-black rounded-full h-12 px-5 flex items-center justify-center font-bold text-sm shadow-[0_10px_25px_rgba(255,255,255,0.2)] gap-2">
-        👀 Ver Tarjeta
-    </button>
-
-    <!-- MITAD DERECHA (PC) O MODAL FULLSCREEN (MÓVIL): Live Preview -->
-    <div :class="modalPreviewMovil ? 'fixed inset-0 z-[200] flex bg-black/95 backdrop-blur-md flex-col items-center justify-center p-4' : 'hidden md:flex w-1/2 h-full bg-[#0a0a0d] items-center justify-center relative border-l border-gray-800'">
-        
-        <!-- Botón cerrar solo visible en Modal Móvil -->
-        <button x-show="modalPreviewMovil" @click="modalPreviewMovil = false" class="md:hidden absolute top-6 right-6 w-10 h-10 bg-gray-800 rounded-full text-white font-bold z-50 flex items-center justify-center">&times;</button>
-        <span x-show="modalPreviewMovil" class="md:hidden absolute top-8 left-6 text-white font-bold tracking-widest text-sm uppercase">Previsualización</span>
-
-        <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] pointer-events-none md:block hidden"></div>
-        
+        {{-- Vista previa del perfil público (mantiene el estilo propio del perfil) --}}
+        <section class="ed-preview" :class="modalPreviewMovil ? 'abierta' : ''" aria-label="Vista previa">
+            <span class="ed-preview-label">Vista previa</span>
+            <button x-show="modalPreviewMovil" @click="modalPreviewMovil = false" class="dt-ico" style="position:absolute;top:14px;right:16px;width:36px;height:36px;border-radius:50%" aria-label="Cerrar vista previa">&times;</button>
         <div class="phone-mockup flex flex-col items-center pt-12 pb-2 relative scale-[0.95] md:scale-100">
             <div class="phone-notch"></div>
             
@@ -472,26 +423,24 @@
                 </div>
             </div>
         </div>
+        </section>
     </div>
 
-    <!-- MODAL CROPPER -->
-    <div x-show="cropperModalAbierto" class="fixed inset-0 bg-black/95 z-[9999] flex items-center justify-center p-4 backdrop-blur-md" style="display: none;">
-        <div class="bg-[#121214] border border-gray-800 rounded-3xl p-6 w-full max-w-md flex flex-col items-center shadow-2xl">
-            <h3 class="text-white font-bold mb-2">Ajusta tu foto de perfil</h3>
-            <p class="text-xs text-gray-400 mb-6 text-center">Usa los botones o tus dedos para acercar, alejar o mover la foto hasta que quede perfecta.</p>
-            
-            <div class="w-full max-w-[300px] aspect-square bg-black rounded-xl overflow-hidden mb-4 relative border border-gray-700 shadow-inner">
-                <img id="imagen-cropper" :src="imgParaRecortar" class="max-w-full block">
+    {{-- Recorte de la foto --}}
+    <div x-show="cropperModalAbierto" x-cloak style="position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;display:grid;place-items:center;padding:16px">
+        <div class="dt-panel" style="width:100%;max-width:420px;display:flex;flex-direction:column;align-items:center">
+            <h2 style="margin:0 0 4px;font-size:16px">Ajusta tu foto de perfil</h2>
+            <p class="dt-sub" style="margin:0 0 16px;text-align:center;font-size:12.5px">Acerca, aleja o mueve la foto hasta que quede como quieres.</p>
+            <div style="width:100%;max-width:300px;aspect-ratio:1;background:#000;border-radius:10px;overflow:hidden;margin-bottom:12px">
+                <img id="imagen-cropper" :src="imgParaRecortar" alt="" style="max-width:100%;display:block">
             </div>
-            
-            <div class="flex gap-4 mb-6">
-                <button type="button" @click="window.cropperInstancia.zoom(-0.1)" class="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center text-white font-bold hover:bg-gray-700 text-xl">-</button>
-                <button type="button" @click="window.cropperInstancia.zoom(0.1)" class="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center text-white font-bold hover:bg-gray-700 text-xl">+</button>
+            <div style="display:flex;gap:8px;margin-bottom:16px">
+                <button type="button" @click="window.cropperInstancia.zoom(-0.1)" class="dt-btn" style="width:40px;padding:0;font-size:18px" aria-label="Alejar">−</button>
+                <button type="button" @click="window.cropperInstancia.zoom(0.1)" class="dt-btn" style="width:40px;padding:0;font-size:18px" aria-label="Acercar">+</button>
             </div>
-
-            <div class="flex gap-4 w-full">
-                <button type="button" @click="cancelarRecorte" class="flex-1 bg-gray-800 text-white font-bold py-3 rounded-xl hover:bg-gray-700 transition-colors">Cancelar</button>
-                <button type="button" @click="aplicarRecorte" class="flex-1 bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.4)]">Aplicar Foto</button>
+            <div style="display:flex;gap:10px;width:100%">
+                <button type="button" @click="cancelarRecorte" class="dt-btn" style="flex:1;height:40px">Cancelar</button>
+                <button type="button" @click="aplicarRecorte" class="dt-btn pri" style="flex:1;height:40px">Aplicar foto</button>
             </div>
         </div>
     </div>
@@ -556,6 +505,9 @@
                 nombrePerfil: 'Mi Tarjeta Principal',
                 config: { tema_base: 'crystal', color_fondo: 'transparent', color_primario: '#3b82f6', alineacion: 'centro', forma_botones: 'rounded-2xl', layout_estructura: 'clasica' },
                 presets: { luxury: { tema_base: 'luxury', color_fondo: '#050505', color_primario: '#D4AF37', alineacion: 'centro', forma_botones: 'rounded-none', layout_estructura: 'clasica' }, sport: { tema_base: 'sport', color_fondo: '#000000', color_primario: '#ccff00', alineacion: 'izquierda', forma_botones: '-skew-x-12', layout_estructura: 'clasica' }, corporativo: { tema_base: 'corporativo', color_fondo: '#f8fafc', color_primario: '#0f172a', alineacion: 'izquierda', forma_botones: 'rounded-md', layout_estructura: 'clasica' }, crystal: { tema_base: 'crystal', color_fondo: 'transparent', color_primario: '#3b82f6', alineacion: 'centro', forma_botones: 'rounded-2xl', layout_estructura: 'clasica' }, minimalista: { tema_base: 'minimalista', color_fondo: '#ffffff', color_primario: '#000000', alineacion: 'centro', forma_botones: 'rounded-full', layout_estructura: 'clasica' }, feria: { tema_base: 'matte', color_fondo: '#09090b', color_primario: '#ff3b30', alineacion: 'centro', forma_botones: 'rounded-xl', layout_estructura: 'feria' } },
+                estilosEditor: [ { id: 'crystal', nombre: 'Crystal' }, { id: 'feria', nombre: 'Modo Feria' }, { id: 'luxury', nombre: 'Luxury' }, { id: 'sport', nombre: 'Sport' }, { id: 'corporativo', nombre: 'Corporativo' }, { id: 'minimalista', nombre: 'Minimal' } ],
+                // Estilo marcado en las fichas del paso 8 (el modo Feria manda sobre el tema)
+                presetActivo() { return this.config.layout_estructura === 'feria' ? 'feria' : this.config.tema_base; },
 
                 aplicarPreset(nombre) { 
                     this.config = { ...this.presets[nombre] }; 
