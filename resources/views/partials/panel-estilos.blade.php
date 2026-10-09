@@ -129,9 +129,17 @@
         .t-minimalista { background:#f4f4f4; color:#111; }
         .t-minimalista .card, .t-minimalista .sp { background:#fff; border:1px solid #eaeaea; }
 
+        /* Barra de pestañas inferior: navegación del panel en el celular */
+        .dt-tabbar { display:none; }
         @media (max-width: 860px) {
             .dt-side { display:none; }
-            .dt-page { padding:20px 16px 56px; }
+            .dt-page { padding:20px 16px 96px; }
             .dt-top { padding:0 16px; }
+            .dt-tabbar { display:grid; grid-template-columns:repeat(4, 1fr); position:fixed; left:0; right:0; bottom:0; z-index:50; background:var(--card); border-top:1px solid var(--border); padding:6px 4px calc(6px + env(safe-area-inset-bottom, 0px)); }
+            .dt-tabbar a { display:flex; flex-direction:column; align-items:center; gap:3px; padding:6px 2px; border-radius:8px; color:var(--muted); text-decoration:none; font-size:11px; font-weight:600; }
+            .dt-tabbar a svg { width:20px; height:20px; }
+            .dt-tabbar a.on { color:var(--primary); }
+            .dt-toast { bottom:84px; }
+            .dt-tiles { grid-template-columns:1fr; }
         }
     </style>

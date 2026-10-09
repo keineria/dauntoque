@@ -8,7 +8,7 @@
 
     @include('partials.panel-estilos')
 
-    <script src="https://cdn.tailwindcss.com"></script>
+    @vite('resources/css/panel.css')
     <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
@@ -81,6 +81,13 @@
             </div>
         </div>
     </div>
+
+    <nav class="dt-tabbar" aria-label="Menú">
+        <a href="/dashboard" class="{{ request()->is('dashboard') ? 'on' : '' }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Inicio</a>
+        <a href="/dashboard/perfiles" class="{{ request()->is('dashboard/perfiles') ? 'on' : '' }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="11" r="2.5"/><path d="M14 9h4M14 13h4M6 17h12"/></svg>Perfiles</a>
+        <a href="/dashboard/analiticas" class="{{ request()->is('dashboard/analiticas') ? 'on' : '' }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Analíticas</a>
+        <a href="/dashboard/configuracion" class="{{ request()->is('dashboard/configuracion') ? 'on' : '' }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>Datos</a>
+    </nav>
 
     @if (session('status'))
         <div x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 5000)" class="dt-toast" role="status">{{ session('status') }}</div>

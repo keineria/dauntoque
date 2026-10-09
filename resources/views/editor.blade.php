@@ -8,7 +8,7 @@
 
     @include('partials.panel-estilos')
 
-    <script src="https://cdn.tailwindcss.com"></script>
+    @vite('resources/css/panel.css')
     <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
@@ -54,77 +54,30 @@
             .ed-preview { display:none; }
             .ed-preview.abierta { display:flex; position:fixed; inset:0; z-index:200; width:100%; flex-direction:column; }
         }
-        .phone-mockup { 
-            width: 320px; height: 650px; border: 12px solid #1a1a1c; border-radius: 40px; 
-            background-color: #09090b; position: relative; overflow: hidden; 
-            box-shadow: 0 0 50px rgba(0, 0, 0, 0.8), inset 0 0 15px rgba(255,255,255,0.05); 
+        /* Teléfono de la vista previa: tamaño real en escritorio, miniatura flotante en el celular */
+        .ed-telefono { width:320px; height:650px; border:10px solid #18181b; border-radius:44px; overflow:hidden; position:relative; background:#000; flex:none;
+                       box-shadow:0 30px 60px -20px rgba(0,0,0,.45), inset 0 0 0 1px rgba(255,255,255,.06); transform-origin:center; }
+        .ed-notch { position:absolute; top:0; left:50%; transform:translateX(-50%); width:110px; height:22px; background:#18181b; border-radius:0 0 14px 14px; z-index:30; }
+        .ed-pantalla { position:absolute; inset:0; overflow-y:auto; scrollbar-width:none; }
+        .ed-pantalla::-webkit-scrollbar { display:none; }
+        .ed-pantalla .pp-wrap { padding-top:30px; }
+        .ed-tocar, .ed-cerrar { display:none; }
+        @media (max-height: 780px) and (min-width: 769px) { .ed-telefono { transform:scale(.86); } }
+        @media (max-height: 680px) and (min-width: 769px) { .ed-telefono { transform:scale(.74); } }
+        @media (max-width: 768px) {
+            .ed-preview { display:block; position:fixed; right:10px; bottom:76px; width:96px; height:196px; z-index:60; border:0; background:transparent; overflow:visible; }
+            .ed-preview .ed-preview-label { display:none; }
+            .ed-preview .ed-telefono { position:absolute; top:0; left:0; transform:scale(.3); transform-origin:top left; cursor:zoom-in; box-shadow:0 20px 40px rgba(0,0,0,.35); }
+            .ed-preview .ed-pantalla { pointer-events:none; }
+            .ed-tocar { display:block; position:absolute; left:50%; bottom:-4px; transform:translate(-50%, 100%); white-space:nowrap; font-size:10.5px; font-weight:600; color:var(--text); background:var(--card); border:1px solid var(--border); border-radius:999px; padding:2px 8px; }
+            .ed-preview.abierta { position:fixed; inset:0; width:auto; height:auto; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; background:var(--surface); padding:16px; }
+            .ed-preview.abierta .ed-telefono { position:relative; transform:scale(.9); transform-origin:center; cursor:default; }
+            .ed-preview.abierta .ed-pantalla { pointer-events:auto; }
+            .ed-preview.abierta .ed-cerrar { display:inline-flex; position:absolute; top:12px; left:50%; transform:translateX(-50%); z-index:5; }
+            .ed-foot { padding-right:120px; }
         }
-        .phone-notch { 
-            position: absolute; top: 0; left: 50%; transform: translateX(-50%); 
-            width: 120px; height: 25px; background-color: #1a1a1c; 
-            border-bottom-left-radius: 15px; border-bottom-right-radius: 15px; z-index: 50; 
-        }
-        
-        .hide-scrollbar::-webkit-scrollbar { display: none; }
-        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        .btn-zelle { background-image: linear-gradient(to bottom, #8621a1, #741b8c); border: 1px solid #9127ad; color: white;}
-        .btn-cashapp { background-color: #00D632; border: 1px solid #00ea36; color: black; }
-        .btn-venmo { background-color: #008CFF; border: 1px solid #009dff; color: white;}
-        
-        /* ====================================================
-           SISTEMA DE PLANTILLAS MODULARES (LIVE PREVIEW)
-        ==================================================== */
-        .tpl-crystal { 
-            background: rgba(20, 20, 25, 0.4); backdrop-filter: blur(15px); 
-            -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.05); 
-            border-radius: 24px; padding: 20px 15px; margin: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
-        }
-        .tpl-crystal .accent-text { color: var(--color-primario, #3b82f6); }
-        .tpl-crystal .avatar-ring { border-color: #121216; }
-
-        .tpl-matte { 
-            background-color: #0d0d0d; border: 1px solid rgba(255,255,255,0.03); 
-            border-radius: 24px; padding: 20px 15px; margin: 15px; box-shadow: inset 0 0 20px rgba(0,0,0,1); 
-        }
-        .tpl-matte .accent-text { color: var(--color-primario, #9ca3af); }
-        .tpl-matte .avatar-ring { border-color: #27272a; }
-
-        .tpl-luxury { 
-            background-color: #121212; border: 1px solid var(--color-primario, #D4AF37); 
-            border-radius: 24px; padding: 20px 15px; margin: 15px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8), inset 0 0 20px rgba(212, 175, 55, 0.05); 
-        }
-        .tpl-luxury .accent-text { color: var(--color-primario, #D4AF37); font-family: serif; }
-        .tpl-luxury .avatar-ring { border-color: var(--color-primario, #D4AF37); padding: 2px; }
-        .tpl-luxury h2 { font-family: serif; }
-
-        .tpl-corporativo { 
-            background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; 
-            padding: 20px 15px; margin: 15px; box-shadow: 0 20px 40px -15px rgba(0,0,0,0.05); 
-        }
-        .tpl-corporativo h2 { color: #0f172a; font-family: serif; font-weight: 700; }
-        .tpl-corporativo p { color: #475569; }
-        .tpl-corporativo .accent-text { color: var(--color-primario, #0f172a); }
-        .tpl-corporativo .avatar-ring { border-color: #e2e8f0; background: white; padding: 4px; }
-
-        .tpl-sport { 
-            background-color: #111; border-left: 4px solid var(--color-primario, #ccff00); 
-            border-radius: 12px; padding: 20px 15px; margin: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); 
-        }
-        .tpl-sport h2 { color: white; text-transform: uppercase; letter-spacing: 1px; font-weight: 900; font-family: monospace; }
-        .tpl-sport p { color: #9ca3af; }
-        .tpl-sport .accent-text { color: var(--color-primario, #ccff00); }
-        .tpl-sport .avatar-ring { border-color: var(--color-primario, #ccff00); border-width: 2px; padding: 2px; box-shadow: 0 0 15px rgba(204,255,0,0.2); }
-
-        .tpl-minimalista { 
-            background-color: #fafafa; border: 1px solid #eaeaea; border-radius: 20px; 
-            padding: 20px 15px; margin: 15px; 
-        }
-        .tpl-minimalista h2 { color: #111111; font-weight: 600; }
-        .tpl-minimalista p { color: #666666; font-weight: 300; }
-        .tpl-minimalista .accent-text { color: var(--color-primario, #111111); }
-        .tpl-minimalista .avatar-ring { border-color: #cccccc; padding: 2px; }
+        @media (max-width: 768px) and (max-height: 760px) { .ed-preview.abierta .ed-telefono { transform:scale(.8); } }
+        @media (max-width: 768px) and (max-height: 660px) { .ed-preview.abierta .ed-telefono { transform:scale(.68); } }
     </style>
 </head>
 <body x-data="perfilDigital()">
@@ -325,7 +278,6 @@
                 <button x-show="paso > (modoActual === 'editar' ? 2 : 1)" @click="paso--" class="dt-btn" style="height:40px">Atrás</button>
                 <span x-show="!(paso > (modoActual === 'editar' ? 2 : 1))"></span>
                 <div style="display:flex;gap:8px">
-                    <button @click="modalPreviewMovil = true" class="dt-btn md:hidden" style="height:40px">Ver tarjeta</button>
                     <button x-show="paso === 1 && modoActual === 'crear'" @click="avanzar(2)" :disabled="!nickValidado" class="dt-btn pri" style="height:40px">Continuar</button>
                     <button x-show="paso >= 2 && paso < totalPasos" @click="avanzar(paso === 2 && tipoPerfil === 'empresa' ? 4 : paso + 1)" class="dt-btn pri" style="height:40px">Continuar</button>
                     <button x-show="paso === totalPasos" @click="guardarPerfilCompleto" :disabled="guardando" class="dt-btn pri" style="height:40px">
@@ -336,93 +288,17 @@
         </section>
 
         {{-- Vista previa del perfil público (mantiene el estilo propio del perfil) --}}
-        <section class="ed-preview" :class="modalPreviewMovil ? 'abierta' : ''" aria-label="Vista previa">
+        <section class="ed-preview" :class="modalPreviewMovil ? 'abierta' : ''" aria-label="Vista previa de tu tarjeta">
             <span class="ed-preview-label">Vista previa</span>
-            <button x-show="modalPreviewMovil" @click="modalPreviewMovil = false" class="dt-ico" style="position:absolute;top:14px;right:16px;width:36px;height:36px;border-radius:50%" aria-label="Cerrar vista previa">&times;</button>
-        <div class="phone-mockup flex flex-col items-center pt-12 pb-2 relative scale-[0.95] md:scale-100">
-            <div class="phone-notch"></div>
-            
-            <div class="w-full h-full overflow-y-auto hide-scrollbar pb-6 relative" 
-                 :style="config.tema_base === 'crystal' ? 'background-image: linear-gradient(to bottom, rgba(9, 9, 11, 0.90), rgba(9, 9, 11, 0.98)), url(\'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=1000&auto=format&fit=crop\'); background-size: cover;' : 'background-color: ' + config.color_fondo + ';'">
-                
-                <!-- Inyección de variables CSS para el Live Preview -->
-                <div class="flex flex-col transition-all duration-500 min-h-[90%]" :class="`tpl-${config.tema_base || plantilla}`" :style="`--color-primario: ${config.color_primario};`">
-                    
-                    <!-- ESTRUCTURA FERIA -->
-                    <div x-show="config.layout_estructura === 'feria'" style="display: none;" class="w-full flex flex-col items-center">
-                        <div class="w-full aspect-square mb-6 overflow-hidden border-2 border-gray-800 shadow-lg" :class="config.forma_botones">
-                            <img x-show="fotoPreview" :src="fotoPreview" class="w-full h-full object-cover">
-                            <div x-show="!fotoPreview" class="w-full h-full bg-gray-900 flex items-center justify-center text-4xl font-black text-gray-700" x-text="nombre ? nombre.charAt(0).toUpperCase() : '?'"></div>
-                        </div>
-                        <div class="text-center w-full mb-4 px-4">
-                            <h2 class="text-[22px] font-black tracking-tight leading-tight" x-text="nombre || 'Tu Nombre'"></h2 >
-                            <h3 x-show="tipoPerfil !== 'empresa'" class="accent-text text-[10px] font-bold mt-1 uppercase tracking-widest" x-text="profesion || 'Tu Profesión'"></h3>
-                        </div>
-                        <div class="h-14 w-[calc(100%-2rem)] mx-4 bg-white text-black font-black text-sm flex items-center justify-center shadow-[0_0_15px_rgba(255,255,255,0.2)] mb-6" :class="config.forma_botones">
-                            GUARDAR CONTACTO
-                        </div>
-                    </div>
-
-                    <!-- ESTRUCTURA CLÁSICA -->
-                    <div x-show="config.layout_estructura !== 'feria'" class="w-full">
-                        <div :class="config.alineacion === 'izquierda' ? 'flex flex-row items-center gap-4 mb-4 text-left w-full px-4 pt-4' : 'flex flex-col items-center text-center w-full px-4 pt-4'">
-                            <div class="avatar-ring bg-gradient-to-br from-gray-700 to-gray-900 border-4 flex items-center justify-center shadow-lg overflow-hidden flex-shrink-0" 
-                                 :class="[tipoPerfil === 'empresa' ? 'rounded-2xl' : 'rounded-full', config.alineacion === 'izquierda' ? 'w-20 h-20 mb-0' : 'w-28 h-28 mb-4']">
-                                <img x-show="fotoPreview" :src="fotoPreview" class="w-full h-full object-cover">
-                                <span x-show="!fotoPreview" class="text-3xl text-gray-600 font-black" x-text="nombre ? nombre.charAt(0).toUpperCase() : '?'"></span>
-                            </div>
-                            
-                            <div :class="config.alineacion === 'izquierda' ? 'flex flex-col flex-1' : 'flex flex-col items-center w-full'">
-                                <h2 class="text-[18px] font-bold tracking-tight leading-tight" x-text="nombre || 'Tu Nombre'"></h2 >
-                                <h3 x-show="tipoPerfil !== 'empresa'" class="accent-text text-[10px] font-bold mt-1 uppercase tracking-widest" x-text="profesion || 'Tu Profesión'"></h3>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <p class="text-[11px] font-light mt-2 mb-6 px-4 leading-relaxed w-full" :class="config.alineacion === 'izquierda' ? 'text-left' : 'text-center'" x-text="bio || 'Tu biografía aparecerá aquí optimizada.'"></p>
-
-                    <div class="w-full px-4 mb-6" x-show="galeriaPreviews.length > 0" style="display: none;">
-                        <div class="grid grid-cols-2 gap-2">
-                            <template x-for="(img, index) in galeriaPreviews" :key="index">
-                                <div class="relative w-full aspect-square overflow-hidden border border-gray-800" :class="config.forma_botones">
-                                    <img :src="img" class="w-full h-full object-cover">
-                                </div>
-                            </template>
-                        </div>
-                    </div>
-
-                    <div class="w-full px-4 flex gap-2 mb-4">
-                        <div x-show="telefono" class="h-10 bg-gray-800/50 border border-gray-700 w-1/2 flex items-center justify-center text-xs text-white font-bold gap-2 cursor-pointer hover:bg-gray-700" :class="config.forma_botones">
-                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg> SMS
-                        </div>
-                        <div x-show="telefono" class="h-10 bg-[#25D366]/20 border border-[#25D366]/40 w-1/2 flex items-center justify-center text-xs text-[#4ade80] font-bold gap-2 cursor-pointer" :class="config.forma_botones">
-                            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg> WhatsApp
-                        </div>
-                    </div>
-
-                    <!-- TAMAÑO DE BOTONES DE REDES REDUCIDO A h-10 -->
-                    <div class="w-full px-4 grid grid-cols-2 gap-2 mb-4" x-show="redesSeleccionadas.length > 0">
-                        <template x-for="red in redesSeleccionadas" :key="red.id">
-                            <div class="h-10 flex items-center justify-center text-[10px] font-bold gap-2 cursor-pointer bg-gray-900 text-white border border-gray-800" :class="config.forma_botones">
-                                <div class="w-4 h-4" x-html="red.svg"></div> <span x-text="red.nombre" class="uppercase tracking-wider"></span>
-                            </div>
-                        </template>
-                    </div>
-
-                    <div class="w-full px-4 space-y-2 mb-6">
-                        <div x-show="zelle" class="w-full h-11 btn-zelle flex items-center justify-center text-xs font-bold cursor-pointer gap-2" :class="config.forma_botones">
-                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"></rect><circle cx="12" cy="12" r="2"></circle><path d="M6 12h.01M18 12h.01"></path></svg> Pagar con Zelle
-                        </div>
-                        <div x-show="cashapp" class="w-full h-11 btn-cashapp flex items-center justify-center text-xs font-bold cursor-pointer" :class="config.forma_botones">Pagar con CashApp</div>
-                        <div x-show="venmo" class="w-full h-11 btn-venmo flex items-center justify-center text-xs font-bold cursor-pointer" :class="config.forma_botones">Pagar con Venmo</div>
-                    </div>
-
-                    <div x-show="config.layout_estructura !== 'feria'" class="h-11 w-[calc(100%-2rem)] mx-4 bg-white text-black font-bold text-xs flex items-center justify-center shadow-[0_0_15px_rgba(255,255,255,0.2)] cursor-pointer hover:bg-gray-200 mt-auto gap-2" :class="config.forma_botones">
-                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg> Guardar Contacto
-                    </div>
+            <button x-show="modalPreviewMovil" x-cloak @click="modalPreviewMovil = false" class="dt-btn ed-cerrar" aria-label="Cerrar vista previa">Volver al editor</button>
+            {{-- En el celular se ve en miniatura; al tocarla se amplía para seguir el progreso --}}
+            <div class="ed-telefono" @click="if (!modalPreviewMovil && window.matchMedia('(max-width: 768px)').matches) modalPreviewMovil = true">
+                <div class="ed-notch"></div>
+                <div class="ed-pantalla">
+                    @include('partials.perfil-publico')
                 </div>
             </div>
-        </div>
+            <span class="ed-tocar" x-show="!modalPreviewMovil">Toca para ampliar</span>
         </section>
     </div>
 
@@ -538,6 +414,19 @@
                 },
 
                 get progreso() { return Math.round((this.paso / this.totalPasos) * 100); },
+
+                // Datos de la vista previa: la misma plantilla que el perfil público (partials/perfil-publico)
+                get p() {
+                    return {
+                        nombre: this.nombre, profesion: this.profesion, bio: this.bio, foto: this.fotoPreview,
+                        tipo: this.tipoPerfil, alineacion: this.config.alineacion, estructura: this.config.layout_estructura,
+                        tema: this.config.tema_base || this.plantilla, color: this.config.color_primario, forma: this.config.forma_botones,
+                        telefono: this.telefono, correo: this.correo, direccion: this.direccion,
+                        zelle: this.zelle, cashapp: this.cashapp, venmo: this.venmo,
+                        redes: this.redesSeleccionadas, galeria: this.galeriaPreviews,
+                        enlace: '#', vcf: '#', preview: true,
+                    };
+                },
 
                 init() {
                     const urlParams = new URLSearchParams(window.location.search);

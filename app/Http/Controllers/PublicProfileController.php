@@ -27,10 +27,36 @@ class PublicProfileController extends Controller
         [$perfil, $linkMaestro] = $this->resolver($nickname);
 
         $galeria = is_string($perfil->galeria) ? json_decode($perfil->galeria, true) : ($perfil->galeria ?? []);
-        // El SVG de cada red sale del catálogo del servidor, nunca de lo guardado (anti-XSS)
-        $redes = RedesSociales::sanear($perfil->redes_sociales);
+        $diseno = is_array($perfil->design_config) ? $perfil->design_config : (json_decode($perfil->design_config ?? '', true) ?: []);
+        $color = $diseno['color_primario'] ?? '#3b82f6';
 
-        return view('public.profile', compact('perfil', 'galeria', 'redes', 'linkMaestro'));
+        // Datos que pinta la plantilla compartida (partials/perfil-publico), la misma de la vista previa del editor
+        $datos = [
+            'nombre' => $perfil->nombre ?: $perfil->nickname,
+            'profesion' => $perfil->profesion,
+            'bio' => $perfil->bio,
+            'foto' => ImageStore::esPropia($perfil->foto_perfil) ? $perfil->foto_perfil : null,
+            'tipo' => $perfil->tipo_perfil,
+            'alineacion' => $diseno['alineacion'] ?? $perfil->alineacion ?? 'centro',
+            'estructura' => $diseno['layout_estructura'] ?? 'clasica',
+            'tema' => in_array($diseno['tema_base'] ?? '', ['crystal', 'matte', 'luxury', 'corporativo', 'sport', 'minimalista'], true) ? $diseno['tema_base'] : 'crystal',
+            'color' => preg_match('/^#[0-9a-fA-F]{3,8}$/', $color) ? $color : '#3b82f6',
+            'forma' => in_array($diseno['forma_botones'] ?? '', ['rounded-none', 'rounded-md', 'rounded-xl', 'rounded-2xl', 'rounded-full', '-skew-x-12'], true) ? $diseno['forma_botones'] : 'rounded-2xl',
+            'telefono' => $perfil->telefono,
+            'correo' => $perfil->correo_contacto,
+            'direccion' => $perfil->direccion,
+            'zelle' => $perfil->zelle,
+            'cashapp' => $perfil->cashapp,
+            'venmo' => $perfil->venmo,
+            // El SVG de cada red sale del catálogo del servidor, nunca de lo guardado (anti-XSS)
+            'redes' => RedesSociales::sanear($perfil->redes_sociales),
+            'galeria' => array_values(array_filter((array) $galeria, fn ($img) => ImageStore::esPropia($img))),
+            'enlace' => url('/' . $linkMaestro),
+            'vcf' => url('/' . $linkMaestro . '/vcf'),
+            'preview' => false,
+        ];
+
+        return view('public.profile', compact('perfil', 'datos'));
     }
 
     public function descargarVCF($nickname)

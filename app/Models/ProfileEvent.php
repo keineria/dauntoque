@@ -15,7 +15,7 @@ class ProfileEvent extends Model
     {
         $redes = array_map(fn ($id) => 'red_social_' . $id, array_keys(config('redes', [])));
 
-        return array_merge(['vista_perfil', 'descarga_vcf', 'llamada', 'whatsapp', 'zelle', 'cashapp'], $redes);
+        return array_merge(['vista_perfil', 'descarga_vcf', 'llamada', 'whatsapp', 'correo', 'compartir', 'zelle', 'cashapp', 'venmo'], $redes);
     }
 
     public function profile()
