@@ -765,7 +765,10 @@
                     }
 
                     this.guardando = true;
-                    
+                    // La Forja: la unidad DT-9 ensambla el perfil mientras el servidor lo guarda
+                    const forja = window.Forja;
+                    forja?.iniciar({ inicial: this.nombre || this.nickname, color: this.config.color_primario, modo: this.modoActual });
+
                     let formData = new FormData();
                     formData.append('perfil_id', this.id_perfil_editar || 'null');
                     formData.append('nickname', this.nickname.toLowerCase().replace(/\s+/g, ''));
@@ -801,12 +804,14 @@
                         let resultado = await respuesta.json();
                         
                         if(resultado.status === 'success') {
-                            this.modalExitoAbierto = true; 
+                            forja ? forja.terminar({ ok: true, nickname: this.nickname.toLowerCase().replace(/\s+/g, '') }) : (this.modalExitoAbierto = true);
                         } else {
                             this.toastError = resultado.message || "Error al procesar los datos.";
+                            forja?.terminar({ ok: false, mensaje: this.toastError });
                         }
-                    } catch (error) { 
-                        this.toastError = 'Error de conexión con el servidor.'; 
+                    } catch (error) {
+                        this.toastError = 'Error de conexión con el servidor.';
+                        forja?.terminar({ ok: false, mensaje: this.toastError });
                     }
                     this.guardando = false;
                 },
@@ -817,5 +822,7 @@
             }
         }
     </script>
+
+    @include('partials.forja')
 </body>
 </html>
