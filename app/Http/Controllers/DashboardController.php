@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Profile;
+use App\Support\RedesSociales;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -19,6 +20,8 @@ class DashboardController extends Controller
 
         // Se garantiza la conversión nativa a Arrays para evitar errores en JavaScript
         $datos = [
+            // Id del perfil cargado: Configuración lo envía al guardar para editarlo (y no crear otro)
+            'id' => $perfil->id,
             'nickname' => $perfil->nickname ?? '',
             'nombre' => $perfil->nombre ?? '',
             'correo_contacto' => $perfil->correo_contacto ?? '',
@@ -32,7 +35,8 @@ class DashboardController extends Controller
             'foto_portada' => $perfil->foto_portada ?? null,
             'foto_perfil' => $perfil->foto_perfil ?? null,
             'galeria' => is_string($perfil->galeria ?? '') ? json_decode($perfil->galeria, true) : ($perfil->galeria ?? []),
-            'redes_sociales' => is_string($perfil->redes_sociales ?? '') ? json_decode($perfil->redes_sociales, true) : ($perfil->redes_sociales ?? [])
+            // Con "plataforma" para que el selector de Configuración muestre la red correcta
+            'redes_sociales' => RedesSociales::conPlataforma($perfil->redes_sociales ?? [])
         ];
 
         return [

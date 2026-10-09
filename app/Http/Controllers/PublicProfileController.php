@@ -5,22 +5,26 @@ namespace App\Http\Controllers;
 use App\Models\Profile;
 use App\Support\ImageStore;
 use App\Support\RedesSociales;
-use Illuminate\Http\Request;
 
 class PublicProfileController extends Controller
 {
-    public function show($nickname)
+    /**
+     * Cualquier nickname del usuario lleva a su perfil activo.
+     * Devuelve [perfil activo, nickname del enlace maestro].
+     */
+    private function resolver(string $nickname): array
     {
         $perfilReferencia = Profile::where('nickname', $nickname)->firstOrFail();
 
-        // Identificamos el enlace original pase lo que pase
-        $perfilMaestro = Profile::where('user_id', $perfilReferencia->user_id)->orderBy('id', 'asc')->first();
-        $linkMaestro = $perfilMaestro ? $perfilMaestro->nickname : $nickname;
+        $linkMaestro = Profile::maestroDe($perfilReferencia->user_id)?->nickname ?? $nickname;
+        $perfil = Profile::activoDe($perfilReferencia->user_id) ?? abort(404);
 
-        $perfil = Profile::where('user_id', $perfilReferencia->user_id)
-            ->orderByRaw('CASE WHEN nfc_uid IS NOT NULL AND nfc_uid != "" THEN 1 ELSE 0 END DESC')
-            ->orderBy('updated_at', 'desc')
-            ->firstOrFail();
+        return [$perfil, $linkMaestro];
+    }
+
+    public function show($nickname)
+    {
+        [$perfil, $linkMaestro] = $this->resolver($nickname);
 
         $galeria = is_string($perfil->galeria) ? json_decode($perfil->galeria, true) : ($perfil->galeria ?? []);
         // El SVG de cada red sale del catálogo del servidor, nunca de lo guardado (anti-XSS)
@@ -31,15 +35,7 @@ class PublicProfileController extends Controller
 
     public function descargarVCF($nickname)
     {
-        $perfilReferencia = Profile::where('nickname', $nickname)->firstOrFail();
-
-        $perfilMaestro = Profile::where('user_id', $perfilReferencia->user_id)->orderBy('id', 'asc')->first();
-        $linkMaestro = $perfilMaestro ? $perfilMaestro->nickname : $nickname;
-
-        $perfil = Profile::where('user_id', $perfilReferencia->user_id)
-            ->orderByRaw('CASE WHEN nfc_uid IS NOT NULL AND nfc_uid != "" THEN 1 ELSE 0 END DESC')
-            ->orderBy('updated_at', 'desc')
-            ->firstOrFail();
+        [$perfil, $linkMaestro] = $this->resolver($nickname);
 
         // Un salto de línea dentro de un campo rompería el formato vCard
         $linea = fn ($valor) => str_replace(["\r", "\n"], ' ', (string) $valor);

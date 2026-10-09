@@ -149,6 +149,8 @@
                                     <option value="Facebook">Facebook</option>
                                     <option value="TikTok">TikTok</option>
                                     <option value="LinkedIn">LinkedIn</option>
+                                    <option value="X (Twitter)">X (Twitter)</option>
+                                    <option value="YouTube">YouTube</option>
                                 </select>
                                 <input type="text" x-model="red.usuario" placeholder="@usuario o https://" class="w-full bg-transparent text-white px-3 py-3 outline-none text-sm">
                                 <button @click="quitarRed(index)" class="px-4 text-red-500 font-bold text-lg">&times;</button>
@@ -286,6 +288,8 @@
                 async guardarPerfil() {
                     this.guardando = true;
                     let formData = new FormData();
+                    // Editar el perfil cargado en vez de crear uno nuevo
+                    formData.append('perfil_id', window.perfilCargado.id || 'null');
                     formData.append('nickname', this.datos.nickname || 'usuario');
                     formData.append('nombre', this.datos.nombre);
                     formData.append('correo_contacto', this.datos.correo_contacto);

@@ -35,4 +35,11 @@ return [
         ],
     ],
 
+    // Bio con IA del editor. El alias "latest" evita que un modelo retirado devuelva 404.
+    'gemini' => [
+        'key' => env('GEMINI_API_KEY'),
+        'model' => env('GEMINI_MODEL', 'gemini-flash-latest'),
+        'timeout' => 15,
+    ],
+
 ];

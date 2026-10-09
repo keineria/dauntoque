@@ -23,7 +23,8 @@ class RedesSociales
         $limpias = [];
 
         foreach ($redes as $red) {
-            $id = is_array($red) ? ($red['id'] ?? null) : null;
+            // El editor envía {id}; la pantalla de Configuración envía {plataforma: "Instagram"}
+            $id = is_array($red) ? ($red['id'] ?? self::idDePlataforma($red['plataforma'] ?? null)) : null;
             if (! is_string($id) || ! isset($catalogo[$id])) {
                 continue;
             }
@@ -43,5 +44,28 @@ class RedesSociales
         }
 
         return $limpias;
+    }
+
+    /** Devuelve el id del catálogo para un nombre visible ("Instagram" → "ig"). */
+    public static function idDePlataforma($plataforma): ?string
+    {
+        if (! is_string($plataforma)) {
+            return null;
+        }
+        foreach (config('redes', []) as $id => $red) {
+            if (strcasecmp($red['nombre'], $plataforma) === 0) {
+                return $id;
+            }
+        }
+        return null;
+    }
+
+    /** Añade "plataforma" (nombre visible) a cada red, para la pantalla de Configuración. */
+    public static function conPlataforma($redes): array
+    {
+        return array_map(
+            fn ($red) => $red + ['plataforma' => $red['nombre']],
+            self::sanear($redes)
+        );
     }
 }

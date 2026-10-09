@@ -5,13 +5,12 @@
         $usuario = \Illuminate\Support\Facades\Auth::user();
         
         // 1. Identificamos el "Enlace Maestro" (el primer nickname sin sufijos)
-        $perfilPrincipal = \App\Models\Profile::where('user_id', $usuario->id)->orderBy('id', 'asc')->first();
+        $perfilPrincipal = \App\Models\Profile::maestroDe($usuario->id);
         $linkMaestro = $perfilPrincipal ? $perfilPrincipal->nickname : 'usuario';
         
         // 2. Traemos todos los perfiles y los ordenamos
         $misPerfiles = \App\Models\Profile::where('user_id', $usuario->id)
-            ->orderByRaw('CASE WHEN nfc_uid IS NOT NULL AND nfc_uid != "" THEN 1 ELSE 0 END DESC')
-            ->orderBy('updated_at', 'desc')
+            ->ordenActivo()
             ->get()
             ->map(function($p, $index) use ($linkMaestro) {
                 $design = json_decode($p->design_config, true);
