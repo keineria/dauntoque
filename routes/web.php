@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AnaliticasController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController;
 
@@ -9,12 +10,15 @@ Route::get('/', function () {
     return redirect('/login');
 });
 
-// Ruta libre para leer la tarjeta física
-Route::get('/activar/{hash}', [App\Http\Controllers\NfcController::class, 'vincularTarjeta']);
+// Ruta libre para leer la tarjeta física (con límite de intentos para evitar barridos de códigos)
+Route::get('/activar/{hash}', [App\Http\Controllers\NfcController::class, 'vincularTarjeta'])->middleware('throttle:20,1');
+
+// Analíticas del perfil público (visitas y clics); público, con CSRF y límite por IP
+Route::post('/api/analiticas/registrar', [AnaliticasController::class, 'registrar'])->middleware('throttle:60,1');
 
 // Todas estas rutas ahora están protegidas por el candado de "auth"
 Route::middleware(['auth'])->group(function () {
-    
+
    Route::get('/perfil/validar-nickname', [App\Http\Controllers\ProfileController::class, 'validarNickname']);
     Route::post('/perfil/{id}/duplicar', [ProfileController::class, 'duplicar']);
     Route::post('/perfil/{id}/activar', [App\Http\Controllers\ProfileController::class, 'activar']);
@@ -29,7 +33,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard/analiticas', [DashboardController::class, 'analiticas']);
     Route::get('/dashboard/configuracion', [DashboardController::class, 'configuracion']);
     Route::post('/api/ia/generar-bio', [App\Http\Controllers\ProfileController::class, 'generarBioIA']);
-    
+
 });
 
 require __DIR__.'/auth.php';

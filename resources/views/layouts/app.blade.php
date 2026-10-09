@@ -26,8 +26,8 @@
 <body class="h-screen w-screen flex overflow-hidden" 
       x-data="{ 
           modalCuentaAbierto: false, 
-          nombreUsuario: '{{ Auth::user()->name ?? 'Administrador' }}', 
-          correoUsuario: '{{ Auth::user()->email ?? 'admin@dauntoque.com' }}' 
+          nombreUsuario: {{ Js::from(Auth::user()->name ?? 'Administrador') }},
+          correoUsuario: {{ Js::from(Auth::user()->email ?? 'admin@dauntoque.com') }}
       }">
     <!-- SISTEMA DE NOTIFICACIONES FLOTANTES (TOASTS) -->
     @if (session('status'))

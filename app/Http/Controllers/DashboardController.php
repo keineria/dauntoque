@@ -49,6 +49,9 @@ class DashboardController extends Controller
 
     public function index() { return view('dashboard.index', $this->cargarDatos()); }
     public function perfiles() { return view('dashboard.perfiles', $this->cargarDatos()); }
-    public function analiticas() { return view('dashboard.analiticas', $this->cargarDatos()); }
+    public function analiticas()
+    {
+        return view('dashboard.analiticas', $this->cargarDatos() + ['stats' => AnaliticasController::resumen(Auth::id())]);
+    }
     public function configuracion() { return view('dashboard.configuracion', $this->cargarDatos()); }
 }
