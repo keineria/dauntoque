@@ -147,7 +147,7 @@
         function gestorPerfiles() {
             return {
                 perfilesUsados: {{ $cantidadPerfiles }}, 
-                listaPerfiles: {!! json_encode($misPerfiles) !!}, 
+                listaPerfiles: @json($misPerfiles),
                 
                 isDuplicating: false,
                 toastMensaje: '',

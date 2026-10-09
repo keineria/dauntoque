@@ -18,6 +18,8 @@
         $formaBotones = $design['forma_botones'] ?? 'rounded-2xl';
         $temaBase = $design['tema_base'] ?? 'crystal';
         $colorPrimario = $design['color_primario'] ?? '#3b82f6';
+        // Solo colores hexadecimales: evita inyectar CSS en el bloque <style>
+        if (!is_string($colorPrimario) || !preg_match('/^#[0-9a-fA-F]{3,8}$/', $colorPrimario)) { $colorPrimario = '#3b82f6'; }
 
         // CONSTRUCTOR INTELIGENTE DE REDES SOCIALES
         function buildSocialUrl($network, $username) {

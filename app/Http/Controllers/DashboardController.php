@@ -38,7 +38,8 @@ class DashboardController extends Controller
         return [
             'usuario' => $usuario,
             'perfil' => $perfil->exists ? $perfil : null, 
-            'datosJsonSeguros' => json_encode($datos)
+            // HEX_* evita que un texto con </script> rompa el bloque <script> donde se imprime
+            'datosJsonSeguros' => json_encode($datos, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT)
         ];
     }
 
