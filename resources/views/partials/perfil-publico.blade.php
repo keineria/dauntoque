@@ -10,7 +10,7 @@
 <style>
     .pp { --acc:#3b82f6; --sobre:#fff; --bg:#0a0a0b; --card:#131316; --text:#f4f4f5; --muted:#a1a1aa; --line:rgba(255,255,255,.08); --chip:rgba(255,255,255,.06);
           --titulo:"Inter", ui-sans-serif, system-ui, sans-serif;
-          min-height:100%; background:var(--bg); color:var(--text); font-family:"Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; position:relative; }
+          min-height:100vh; min-height:100dvh; background:var(--bg); color:var(--text); font-family:"Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; position:relative; }
     .pp-crystal { --bg:#0b0d12; --card:rgba(22,24,32,.62); --line:rgba(255,255,255,.09);
                   background:linear-gradient(180deg, rgba(9,10,14,.82), rgba(9,10,14,.97)), url('https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=1000&auto=format&fit=crop') center/cover fixed; }
     .pp-crystal .pp-card, .pp-medianoche .pp-card { backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); }
@@ -88,6 +88,7 @@
     .pp-modal.centro { align-items:center; padding:16px; }
     .pp-hoja { width:100%; max-width:440px; background:var(--card); color:var(--text); border-radius:22px 22px 0 0; padding:20px 18px calc(20px + env(safe-area-inset-bottom, 0px)); border:1px solid var(--line); }
     .pp-copia { margin:12px 0; padding:14px; border-radius:14px; background:var(--chip); border:1px dashed var(--line); text-align:center; font-weight:700; font-size:16px; word-break:break-all; }
+    .pp-preview { min-height:100%; }
     .pp-preview .pp-modal { position:absolute; }
     .pp-preview .pp-crystal, .pp-preview.pp-crystal { background-attachment:scroll; }
 
