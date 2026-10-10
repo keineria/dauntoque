@@ -73,19 +73,26 @@
     anclas.forEach(function (a) { of.observe(a); });
   }
 
-  // Dos perfiles: alterna entre el perfil ejecutivo y el personal; cambia solo cada 4 s hasta que la persona toque
+  // Dos perfiles: el ejecutivo o una pasión de fin de semana; rota solo hasta que la persona toque
   var dos = document.querySelector('[data-dos]');
   if (dos) {
-    var modos = dos.querySelectorAll('[data-modo]');
-    var vistas = dos.querySelectorAll('[data-perfil-modo]');
-    var verModo = function (n) {
-      modos.forEach(function (b) { b.setAttribute('aria-selected', b.dataset.modo === n ? 'true' : 'false'); });
-      vistas.forEach(function (v) { v.hidden = v.dataset.perfilModo !== n; });
+    var pasion = 'moto', giro = null, paso = 0, orden = ['ejec', 'moto', 'ejec', 'escalada', 'ejec', 'gym'];
+    var verVista = function (v) {
+      var personal = v !== 'ejec';
+      if (personal) pasion = v;
+      dos.querySelectorAll('[data-vista]').forEach(function (x) { x.hidden = x.dataset.vista !== v; });
+      dos.querySelectorAll('[data-modo]').forEach(function (b) { b.setAttribute('aria-pressed', String((b.dataset.modo === 'personal') === personal)); });
+      dos.querySelectorAll('[data-pasion]').forEach(function (b) { b.setAttribute('aria-pressed', String(personal && b.dataset.pasion === v)); });
     };
-    var giro = matchMedia('(prefers-reduced-motion: reduce)').matches ? null
-      : setInterval(function () { verModo(dos.querySelector('[data-modo][aria-selected="false"]').dataset.modo); }, 4000);
-    modos.forEach(function (b) {
-      b.addEventListener('click', function () { clearInterval(giro); verModo(b.dataset.modo); });
+    var parar = function () { clearInterval(giro); };
+    dos.querySelectorAll('[data-modo]').forEach(function (b) {
+      b.addEventListener('click', function () { parar(); verVista(b.dataset.modo === 'personal' ? pasion : 'ejec'); });
     });
+    dos.querySelectorAll('[data-pasion]').forEach(function (b) {
+      b.addEventListener('click', function () { parar(); verVista(b.dataset.pasion); });
+    });
+    if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      giro = setInterval(function () { paso = (paso + 1) % orden.length; verVista(orden[paso]); }, 3500);
+    }
   }
 })();

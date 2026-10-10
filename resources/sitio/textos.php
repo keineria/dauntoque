@@ -43,12 +43,20 @@ return [
 
             'dosOferta' => 'Oferta de lanzamiento · Por tiempo limitado',
             'dosH' => 'Dos perfiles en una sola tarjeta. El segundo va de regalo.',
-            'dosP' => 'De lunes a viernes eres el ejecutivo que cierra tratos. El fin de semana quieres mostrar tus gustos o presentarte a alguien que quieres conocer. Con tu compra creas dos perfiles y activas en tu tarjeta el que quieras, cuando quieras.',
-            'dosModos' => ['Ejecutivo', 'Personal'],
-            'dosPerfiles' => [
-                ['nombre' => 'Andrés Gómez', 'rol' => 'Gerente comercial', 'chips' => ['Guardar contacto', 'WhatsApp', 'Portafolio', 'Pagar']],
-                ['nombre' => 'Andrés 🌴', 'rol' => 'Café, montaña y buena música', 'chips' => ['Instagram', 'Spotify', 'Mis planes', 'Escríbeme']],
+            'dosP' => 'De lunes a viernes eres el ejecutivo que cierra tratos. El fin de semana quieres mostrar tus gustos o presentarte a alguien que quieres conocer. Con tu compra creas un perfil profesional y otro con lo que te apasiona, y activas en tu tarjeta el que quieras.',
+            'dosModos' => [['Lunes a viernes', 'Perfil ejecutivo'], ['Fin de semana', 'Perfil personal']],
+            'dosPasionH' => '¿Qué te mueve el fin de semana?',
+            'dosEjecutivo' => [
+                'nombre' => 'Andrés Gómez', 'rol' => 'Director comercial · Grupo Altos',
+                'cifras' => [['12', 'años'], ['+340', 'proyectos'], ['4.9★', 'clientes']],
+                'botones' => ['Guardar contacto', 'Agendar', 'LinkedIn'], 'galeria' => 'Portafolio',
             ],
+            'dosPasiones' => [
+                'moto' => ['boton' => '🏍️ Motos', 'nombre' => 'Andrés en dos ruedas', 'lema' => 'Piloto aficionado · Rodadas y pista', 'tags' => ['🏍️ Pista los domingos', '🛣️ Rodadas largas', '🔧 Mecánica'], 'cta' => 'Rodemos', 'alt' => 'Andrés con casco manejando su moto en carretera'],
+                'escalada' => ['boton' => '🧗 Escalada', 'nombre' => 'Andrés en la roca', 'lema' => 'Escalador · Roca, montaña y camping', 'tags' => ['🧗 Roca', '⛰️ Montaña', '🏕️ Camping'], 'cta' => 'Escalemos', 'alt' => 'Andrés escalando una pared de roca sobre el mar'],
+                'gym' => ['boton' => '🏋️ Gimnasio', 'nombre' => 'Coach Andrés', 'lema' => 'Entrenador de fuerza · Planes a tu medida', 'tags' => ['🏋️ Fuerza', '🔥 Funcional', '🥗 Nutrición'], 'cta' => 'Entrenemos', 'alt' => 'Andrés entrenando con una pesa rusa en el gimnasio'],
+            ],
+            'dosFinde' => 'Fin de semana',
             'dosPuntos' => ['Uno para el trabajo, otro para tu vida', 'Cambias el perfil activo desde tu panel en segundos', 'Incluido con tu tarjeta solo durante el lanzamiento'],
 
             'beneficiosH' => 'Diseñada para cerrar ventas',
@@ -191,11 +199,19 @@ return [
             'dosOferta' => 'Launch offer · Limited time',
             'dosH' => 'Two profiles on one card. The second one is free.',
             'dosP' => 'Monday to Friday you are the executive closing deals. On the weekend you want to show what you love or introduce yourself to someone you want to meet. With your purchase you create two profiles and switch the one on your card whenever you like.',
-            'dosModos' => ['Executive', 'Personal'],
-            'dosPerfiles' => [
-                ['nombre' => 'Andrew Gomez', 'rol' => 'Sales manager', 'chips' => ['Save contact', 'WhatsApp', 'Portfolio', 'Pay']],
-                ['nombre' => 'Andrew 🌴', 'rol' => 'Coffee, hiking and good music', 'chips' => ['Instagram', 'Spotify', 'My plans', 'Text me']],
+            'dosModos' => [['Monday to Friday', 'Work profile'], ['Weekend', 'Personal profile']],
+            'dosPasionH' => 'What drives you on the weekend?',
+            'dosEjecutivo' => [
+                'nombre' => 'Andrew Gomez', 'rol' => 'Sales Director · Altos Group',
+                'cifras' => [['12', 'years'], ['340+', 'projects'], ['4.9★', 'clients']],
+                'botones' => ['Save contact', 'Book a call', 'LinkedIn'], 'galeria' => 'Portfolio',
             ],
+            'dosPasiones' => [
+                'moto' => ['boton' => '🏍️ Motorcycles', 'nombre' => 'Andrew on two wheels', 'lema' => 'Weekend rider · Road trips and track days', 'tags' => ['🏍️ Sunday track days', '🛣️ Long rides', '🔧 Wrenching'], 'cta' => 'Let\'s ride', 'alt' => 'Andrew wearing a helmet riding his motorcycle'],
+                'escalada' => ['boton' => '🧗 Climbing', 'nombre' => 'Andrew on the rock', 'lema' => 'Climber · Rock, mountains and camping', 'tags' => ['🧗 Rock', '⛰️ Mountains', '🏕️ Camping'], 'cta' => 'Let\'s climb', 'alt' => 'Andrew climbing a rock wall above the sea'],
+                'gym' => ['boton' => '🏋️ Gym', 'nombre' => 'Coach Andrew', 'lema' => 'Strength coach · Custom plans', 'tags' => ['🏋️ Strength', '🔥 Functional', '🥗 Nutrition'], 'cta' => 'Train with me', 'alt' => 'Andrew training with a kettlebell at the gym'],
+            ],
+            'dosFinde' => 'Weekend',
             'dosPuntos' => ['One for work, one for your life', 'Switch the active profile from your dashboard in seconds', 'Included with your card during launch only'],
 
             'beneficiosH' => 'Built to close sales',

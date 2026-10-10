@@ -87,19 +87,44 @@
                     <h2>{{ $i['dosH'] }}</h2>
                     <p>{{ $i['dosP'] }}</p>
                 </div>
-                <div class="dp-modos" role="tablist">
+                <div class="dp-modos" role="group">
                     @foreach ($i['dosModos'] as $n => $modo)
-                        <button type="button" role="tab" data-modo="{{ $n }}" aria-selected="{{ $n === 0 ? 'true' : 'false' }}">{{ $modo }}</button>
+                        <button type="button" data-modo="{{ $n === 0 ? 'ejec' : 'personal' }}" aria-pressed="{{ $n === 0 ? 'true' : 'false' }}"><small>{{ $modo[0] }}</small>{{ $modo[1] }}</button>
+                    @endforeach
+                </div>
+                <div class="dp-pasion" role="group">
+                    <small>{{ $i['dosPasionH'] }}</small>
+                    @foreach ($i['dosPasiones'] as $clave => $pasion)
+                        <button type="button" data-pasion="{{ $clave }}" aria-pressed="false">{{ $pasion['boton'] }}</button>
                     @endforeach
                 </div>
             </div>
-            <div class="dp-telefono" aria-live="polite">
-                @foreach ($i['dosPerfiles'] as $n => $perfil)
-                    <div class="dp-perfil {{ $n === 0 ? 'ejecutivo' : 'personal' }}" data-perfil-modo="{{ $n }}" @if($n !== 0) hidden @endif>
-                        <div class="dp-avatar">{{ \Illuminate\Support\Str::substr($perfil['nombre'], 0, 1) }}</div>
-                        <b>{{ $perfil['nombre'] }}</b>
-                        <span>{{ $perfil['rol'] }}</span>
-                        <ul>@foreach ($perfil['chips'] as $c)<li>{{ $c }}</li>@endforeach</ul>
+            @php $ej = $i['dosEjecutivo']; @endphp
+            <div class="dp-telefono">
+                <div class="dp-perfil ejec" data-vista="ejec">
+                    <div class="dp-portada"><img src="{{ $base }}/media/dp-ejec-portada.webp" width="640" height="400" alt="" loading="lazy"></div>
+                    <div class="dp-cuerpo">
+                        <img class="dp-avatar" src="{{ $base }}/media/dp-ejec-avatar.webp" width="220" height="220" alt="{{ $ej['nombre'] }}" loading="lazy">
+                        <b class="dp-nombre">{{ $ej['nombre'] }} <i class="dp-ok" aria-hidden="true">✓</i></b>
+                        <span class="dp-rol">{{ $ej['rol'] }}</span>
+                        <div class="dp-cifras">@foreach ($ej['cifras'] as $c)<div><b>{{ $c[0] }}</b><span>{{ $c[1] }}</span></div>@endforeach</div>
+                        <span class="dp-b pri">{{ $ej['botones'][0] }}</span>
+                        <div class="dp-fila"><span class="dp-b">{{ $ej['botones'][1] }}</span><span class="dp-b">{{ $ej['botones'][2] }}</span></div>
+                        <span class="dp-lbl">{{ $ej['galeria'] }}</span>
+                        <div class="dp-g3">@for ($f = 1; $f <= 3; $f++)<img src="{{ $base }}/media/dp-ejec-{{ $f }}.webp" width="240" height="240" alt="" loading="lazy">@endfor</div>
+                    </div>
+                </div>
+                @foreach ($i['dosPasiones'] as $clave => $pasion)
+                    <div class="dp-perfil pers {{ $clave }}" data-vista="{{ $clave }}" hidden>
+                        <div class="dp-heroe">
+                            <img src="{{ $base }}/media/dp-{{ $clave }}-portada.webp" width="640" height="760" alt="{{ $pasion['alt'] }}" loading="lazy">
+                            <div class="dp-txt"><span class="dp-kicker">{{ $i['dosFinde'] }}</span><b class="dp-nombre">{{ $pasion['nombre'] }}</b><span class="dp-rol">{{ $pasion['lema'] }}</span></div>
+                        </div>
+                        <div class="dp-cuerpo">
+                            <div class="dp-tags">@foreach ($pasion['tags'] as $etiqueta)<span>{{ $etiqueta }}</span>@endforeach</div>
+                            <div class="dp-fila"><span class="dp-b pri">{{ $pasion['cta'] }}</span><span class="dp-b">Instagram</span></div>
+                            <div class="dp-g3">@for ($f = 1; $f <= 3; $f++)<img src="{{ $base }}/media/dp-{{ $clave }}-{{ $f }}.webp" width="240" height="240" alt="" loading="lazy">@endfor</div>
+                        </div>
                     </div>
                 @endforeach
             </div>
