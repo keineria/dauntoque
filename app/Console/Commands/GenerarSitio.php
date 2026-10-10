@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Support\Precios;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -19,6 +20,7 @@ class GenerarSitio extends Command
         {--destino=public/nuevo : Carpeta de salida (se reemplaza completa)}
         {--base=/nuevo : Ruta donde vivirá el sitio ("" en la raíz del dominio)}
         {--dominio=https://dauntoque.com : Dominio de las URL canónicas}
+        {--portal=https://portal.dauntoque.com : Portal donde se compra en línea (/comprar)}
         {--indexar : Permite que Google indexe (solo para la publicación final)}
         {--fuente= : Carpeta con textos, CSS, JS y media (por defecto resources/sitio)}';
 
@@ -38,6 +40,7 @@ class GenerarSitio extends Command
         $destino = $this->ruta($this->option('destino'));
         $base = rtrim((string) $this->option('base'), '/');
         $dominio = rtrim((string) $this->option('dominio'), '/');
+        $portal = rtrim((string) $this->option('portal'), '/');
         $indexar = (bool) $this->option('indexar');
         $fuente = rtrim($this->option('fuente') ?: resource_path('sitio'), '/');
 
@@ -54,7 +57,12 @@ class GenerarSitio extends Command
             $o = $version['idioma'] === 'en' ? ' or ' : ' o ';
             // :pagos = cómo se paga la tarjeta en ese país (tabla payment_methods): "Nequi o Llave Bre-B"
             $pagos = implode($o, $mercado['pagos']);
-            $reemplazos = [':precio' => $mercado['precioTexto'] . ' ' . $mercado['moneda'], ':antes' => (string) $mercado['antesTexto'], ':ahorro' => $mercado['ahorroTexto'] . ' ' . $mercado['moneda'], ':pagos' => $pagos];
+            // Compra en línea con Bold en los países de config/pedidos.php; en los demás, por WhatsApp
+            $enLinea = in_array($mercado['code'], config('pedidos.paises_en_linea', []), true);
+            $modo = $enLinea ? 'linea' : 'whatsapp';
+            $reemplazos = [':precio' => $mercado['precioTexto'] . ' ' . $mercado['moneda'], ':antes' => (string) $mercado['antesTexto'], ':ahorro' => $mercado['ahorroTexto'] . ' ' . $mercado['moneda'], ':pagos' => $pagos,
+                ':comprarCon' => strtr($t['comprarCon'][$modo], [':pagos' => $pagos]), ':comoPago' => strtr($t['comoPago'][$modo], [':pagos' => $pagos])];
+            $wa = fn (string $mensaje) => 'https://wa.me/' . $mercado['whatsapp'] . '?text=' . rawurlencode($mensaje);
             $comun = compact('codigo', 'version', 'mercado', 't', 'base', 'dominio', 'indexar') + [
                 'versiones' => self::VERSIONES,
                 'textos' => $textos,
@@ -62,7 +70,12 @@ class GenerarSitio extends Command
                 // $x('texto con :precio') reemplaza los datos del país
                 'x' => fn (string $texto, array $mas = []) => strtr($texto, $mas + $reemplazos),
                 // Enlace de WhatsApp de ventas con el mensaje ya escrito
-                'wa' => fn (string $mensaje) => 'https://wa.me/' . $mercado['whatsapp'] . '?text=' . rawurlencode($mensaje),
+                'wa' => $wa,
+                // Botones de compra: checkout del portal (misma pestaña) o WhatsApp (pestaña nueva)
+                'compraExterna' => !$enLinea,
+                'comprar' => fn (?string $acabado = null, ?string $mensaje = null) => $enLinea
+                    ? $portal . '/comprar' . ($acabado ? '?acabado=' . $acabado : '')
+                    : $wa($mensaje ?? $t['wa']),
             ];
 
             $paginas[] = $this->pagina('inicio', $comun);
@@ -97,14 +110,8 @@ class GenerarSitio extends Command
     /** Precio vigente y datos de cada país desde la base de datos. */
     private function mercados(): array
     {
-        $producto = DB::table('products')->where('slug', 'tarjeta-nfc')->first();
-        $ahora = now();
-
-        return DB::table('markets')->where('active', true)->get()->mapWithKeys(function ($m) use ($producto, $ahora) {
-            $precio = DB::table('prices')->where('product_id', $producto->id)->where('market_code', $m->code)
-                ->where(fn ($q) => $q->whereNull('valid_from')->orWhere('valid_from', '<=', $ahora))
-                ->where(fn ($q) => $q->whereNull('valid_to')->orWhere('valid_to', '>=', $ahora))
-                ->orderByDesc('id')->first();
+        return DB::table('markets')->where('active', true)->get()->mapWithKeys(function ($m) {
+            $precio = Precios::tarjeta($m->code);
 
             $whatsapp = $m->whatsapp ?: DB::table('markets')->where('code', 'CO')->value('whatsapp');
 

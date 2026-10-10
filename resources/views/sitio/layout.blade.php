@@ -55,7 +55,7 @@
                         @endforeach
                     </div>
                 </details>
-                <a class="btn btn-pri" href="{{ $wa($t['wa']) }}" target="_blank" rel="noopener">{{ $t['nav']['comprar'] }}</a>
+                <a class="btn btn-pri" href="{{ $comprar() }}" @if($compraExterna) target="_blank" rel="noopener" @endif>{{ $t['nav']['comprar'] }}</a>
             </div>
         </div>
     </header>
@@ -86,7 +86,7 @@
         </div>
     </footer>
 
-    <div class="compra-fija"><a class="btn btn-pri" href="{{ $wa($t['wa']) }}" target="_blank" rel="noopener">{{ $t['nav']['comprar'] }} · {{ $mercado['precioTexto'] }}</a></div>
+    <div class="compra-fija"><a class="btn btn-pri" href="{{ $comprar() }}" @if($compraExterna) target="_blank" rel="noopener" @endif>{{ $t['nav']['comprar'] }} · {{ $mercado['precioTexto'] }}</a></div>
     <a class="burbuja-wa" href="{{ $wa($t['waDuda']) }}" target="_blank" rel="noopener" aria-label="{{ $t['escribenos'] }}">@include('sitio._ico', ['n' => 'wa'])</a>
 
     <script src="{{ $base }}/sitio.js" defer></script>

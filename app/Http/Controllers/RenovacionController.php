@@ -8,12 +8,10 @@ use App\Models\Profile;
 use App\Models\Tarjeta;
 use App\Services\Bold;
 use App\Support\MediosPago;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-/** Renovación anual del servicio de la tarjeta: link de pago de Bold y su webhook. */
+/** Renovación anual del servicio de la tarjeta con un link de pago de Bold (el aviso llega a WebhookBoldController). */
 class RenovacionController extends Controller
 {
     /** Crea el link de pago de la renovación y lleva al cliente al checkout de Bold. */
@@ -56,40 +54,5 @@ class RenovacionController extends Controller
         ]);
 
         return redirect()->away($link['url']);
-    }
-
-    /**
-     * Webhook de Bold. Debe responder 200 en menos de 2 s; Bold reintenta y puede repetir avisos,
-     * así que un pago ya procesado no vuelve a sumar días.
-     */
-    public function webhookBold(Request $request)
-    {
-        if (!Bold::firmaValida($request->getContent(), $request->header('x-bold-signature'))) {
-            return response()->json(['ok' => false], 401);
-        }
-
-        $tipo = $request->input('type');
-        // En links de pago, metadata.reference es el id del link (LNK_...)
-        $pago = Pago::where('proveedor', 'bold')->where('link_id', $request->input('data.metadata.reference'))->first();
-        if (!$pago) {
-            return response()->json(['ok' => true]);
-        }
-
-        DB::transaction(function () use ($pago, $tipo, $request) {
-            $pago = Pago::whereKey($pago->id)->lockForUpdate()->first();
-            if ($pago->estado === 'pagado') {
-                return;
-            }
-            if ($tipo === 'SALE_APPROVED') {
-                $pago->update(['estado' => 'pagado', 'pagado_en' => now(), 'pago_proveedor_id' => $request->input('data.payment_id')]);
-                if ($pago->concepto === 'renovacion' && $pago->tarjeta) {
-                    $pago->tarjeta->renovar();
-                }
-            } elseif ($tipo === 'SALE_REJECTED') {
-                $pago->update(['estado' => 'rechazado']);
-            }
-        });
-
-        return response()->json(['ok' => true]);
     }
 }

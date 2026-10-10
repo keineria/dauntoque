@@ -40,7 +40,7 @@
                 <h1 style="margin-top:14px">{{ $a['nombre'] }}</h1>
                 <p class="lema">{{ $a['texto'] }}</p>
                 <div class="precio"><b>{{ $mercado['precioTexto'] }}</b><small>{{ $mercado['moneda'] }}</small>@if ($mercado['antesTexto'])<s>{{ $mercado['antesTexto'] }} {{ $mercado['moneda'] }}</s>@endif</div>
-                <a class="btn btn-pri btn-ancho" data-compra href="{{ $wa($x($t['waAcabado'], $rep + [':precio' => $mercado['precioTexto'] . ' ' . $mercado['moneda']])) }}" target="_blank" rel="noopener">{{ $x($t['tarjeta']['cta'], $rep) }}</a>
+                <a class="btn btn-pri btn-ancho" data-compra href="{{ $comprar($acabado, $x($t['waAcabado'], $rep + [':precio' => $mercado['precioTexto'] . ' ' . $mercado['moneda']])) }}" @if($compraExterna) target="_blank" rel="noopener" @endif>{{ $x($t['tarjeta']['cta'], $rep) }}</a>
                 <p class="nota">{{ $t['inicio']['unico'] }}</p>
 
                 <h2 style="font-size:20px;margin-top:30px">{{ $t['tarjeta']['incluyeH'] }}</h2>

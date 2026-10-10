@@ -14,6 +14,12 @@ return [
         'waAcabado' => 'Hola, quiero mi tarjeta DaUnToque :acabado (:precio)',
         'waDuda' => 'Hola, tengo una pregunta sobre la tarjeta DaUnToque',
         'escribenos' => 'Escríbenos por WhatsApp',
+        // Cómo se paga la tarjeta: en línea (Bold, ver config/pedidos.php) o por WhatsApp
+        'comprarCon' => ['linea' => 'en línea con tarjeta, PSE, Nequi o Botón Bancolombia', 'whatsapp' => 'con :pagos'],
+        'comoPago' => [
+            'linea' => 'En línea, con tarjeta, PSE, Nequi o Botón Bancolombia (pago seguro con Bold). Al pagar te llega un correo con el enlace para crear tu perfil.',
+            'whatsapp' => 'Con :pagos. Al hacer tu pedido te damos el dato para pagar y nos envías el comprobante.',
+        ],
 
         'inicio' => [
             'titulo' => 'Tarjeta de presentación NFC premium | DaUnToque',
@@ -70,7 +76,7 @@ return [
 
             'comoH' => 'Cómo funciona',
             'como' => [
-                ['Pides tu tarjeta', 'Eliges Matte Black o Crystal y pagas con :pagos.'],
+                ['Pides tu tarjeta', 'Eliges Matte Black o Crystal y pagas :comprarCon.'],
                 ['Creas tu perfil', 'Lo armas en minutos en el portal: foto, WhatsApp, fotos y cobros.'],
                 ['Tocas y cierras', 'Acercas la tarjeta al celular de tu cliente y listo.'],
             ],
@@ -126,7 +132,7 @@ return [
             ['¿Hay que pagar mensualidad?', 'No. Pagas una sola vez :precio y la tarjeta y tu perfil son tuyos.'],
             ['¿Puedo cambiar mi perfil después?', 'Sí. Desde tu panel cambias foto, datos, fotos de trabajos, colores y medios de pago cuando quieras, sin cambiar la tarjeta.'],
             ['¿Cómo me pagan mis clientes?', 'Tu perfil muestra botones de :pagos. Tu cliente toca, copia tu dato o abre su app y te paga en el momento.'],
-            ['¿Cómo pago mi tarjeta?', 'Con :pagos. Al hacer tu pedido te damos el dato para pagar y nos envías el comprobante.'],
+            ['¿Cómo pago mi tarjeta?', ':comoPago'],
             ['¿Qué diferencia hay entre Matte Black y Crystal?', 'Solo el acabado: Matte Black es negro mate y sobrio; Crystal es transparente y llamativo. Las dos traen el mismo chip y el mismo perfil.'],
             ['¿Cuánto tarda en llegar?', 'Te confirmamos el tiempo de entrega a tu ciudad por WhatsApp cuando haces tu pedido.'],
             ['¿Puedo ver cuántas personas vieron mi perfil?', 'Sí. Tu panel muestra visitas, contactos guardados y clics en WhatsApp, llamadas y pagos.'],
@@ -145,6 +151,11 @@ return [
         'waAcabado' => 'Hi, I want my DaUnToque :acabado card (:precio)',
         'waDuda' => 'Hi, I have a question about the DaUnToque card',
         'escribenos' => 'Message us on WhatsApp',
+        'comprarCon' => ['linea' => 'online by card', 'whatsapp' => 'with :pagos'],
+        'comoPago' => [
+            'linea' => 'Online by card (secure payment). After paying you get an email with the link to create your profile.',
+            'whatsapp' => 'With :pagos. When you order we send you the payment details and you send us the receipt.',
+        ],
 
         'inicio' => [
             'titulo' => 'Premium NFC business card | DaUnToque',
@@ -201,7 +212,7 @@ return [
 
             'comoH' => 'How it works',
             'como' => [
-                ['Order your card', 'Pick Matte Black or Crystal and pay with :pagos.'],
+                ['Order your card', 'Pick Matte Black or Crystal and pay :comprarCon.'],
                 ['Build your profile', 'Set it up in minutes: photo, WhatsApp, work photos and payments.'],
                 ['Tap and close', 'Tap the card on your client\'s phone. Done.'],
             ],
@@ -257,7 +268,7 @@ return [
             ['Is there a monthly fee?', 'No. You pay :precio once and the card and your profile are yours.'],
             ['Can I change my profile later?', 'Yes. From your dashboard you can change your photo, details, work photos, colors and payment methods anytime, without changing the card.'],
             ['How do my clients pay me?', 'Your profile shows :pagos buttons. Your client taps, copies your details or opens their app and pays you right away.'],
-            ['How do I pay for my card?', 'With :pagos. When you order we send you the payment details and you send us the receipt.'],
+            ['How do I pay for my card?', ':comoPago'],
             ['What is the difference between Matte Black and Crystal?', 'Only the finish: Matte Black is understated matte black; Crystal is transparent and eye-catching. Both have the same chip and profile.'],
             ['How long does shipping take?', 'We confirm the delivery time to your city on WhatsApp when you place your order.'],
             ['Can I see how many people viewed my profile?', 'Yes. Your dashboard shows views, saved contacts and clicks on WhatsApp, calls and payments.'],

@@ -26,7 +26,7 @@
             </div>
             <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:28px" data-compra>
                 <a class="btn btn-wa" href="{{ $wa($t['waDuda']) }}" target="_blank" rel="noopener">@include('sitio._ico', ['n' => 'wa']) {{ $t['escribenos'] }}</a>
-                <a class="btn btn-pri" href="{{ $wa($t['wa']) }}" target="_blank" rel="noopener">{{ $t['nav']['comprar'] }} · {{ $mercado['precioTexto'] }} {{ $mercado['moneda'] }}</a>
+                <a class="btn btn-pri" href="{{ $comprar() }}" @if($compraExterna) target="_blank" rel="noopener" @endif>{{ $t['nav']['comprar'] }} · {{ $mercado['precioTexto'] }} {{ $mercado['moneda'] }}</a>
             </div>
         </div>
     </section>

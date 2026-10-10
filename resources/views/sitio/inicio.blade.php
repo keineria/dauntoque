@@ -46,7 +46,7 @@
                     @if ($mercado['antesTexto'])<s>{{ $mercado['antesTexto'] }} {{ $mercado['moneda'] }}</s>@endif
                 </div>
                 <div class="acciones" data-compra>
-                    <a class="btn btn-pri" href="{{ $wa($t['wa']) }}" target="_blank" rel="noopener">{{ $i['cta'] }} @include('sitio._ico', ['n' => 'flecha'])</a>
+                    <a class="btn btn-pri" href="{{ $comprar() }}" @if($compraExterna) target="_blank" rel="noopener" @endif>{{ $i['cta'] }} @include('sitio._ico', ['n' => 'flecha'])</a>
                     <a class="btn btn-sec" href="#toque">{{ $i['toqueH'] }}</a>
                 </div>
                 <p class="nota">{{ $i['unico'] }}</p>
@@ -189,7 +189,7 @@
                 <p class="muted">{{ $i['productoSub'] }}</p>
                 <div class="precio"><b>{{ $mercado['precioTexto'] }}</b><small>{{ $mercado['moneda'] }}</small>@if ($mercado['antesTexto'])<s>{{ $mercado['antesTexto'] }} {{ $mercado['moneda'] }}</s>@endif</div>
                 <ul class="incluye">@foreach ($i['incluye'] as $inc)<li>{{ $x($inc) }}</li>@endforeach</ul>
-                <a class="btn btn-pri btn-ancho" data-compra href="{{ $wa($t['wa']) }}" target="_blank" rel="noopener">{{ $i['ctaPrecio'] }}</a>
+                <a class="btn btn-pri btn-ancho" data-compra href="{{ $comprar() }}" @if($compraExterna) target="_blank" rel="noopener" @endif>{{ $i['ctaPrecio'] }}</a>
                 <p class="nota" style="text-align:center">{{ $i['unico'] }}</p>
                 <div class="pagos-pais">@foreach ($medios as $m)<span class="chip">{{ $m }}</span>@endforeach</div>
             </div>
@@ -213,7 +213,7 @@
     <section class="seccion cierre">
         <div class="envoltura">
             <h2>{{ $i['cierreH'] }}</h2>
-            <a class="btn btn-pri" data-compra href="{{ $wa($t['wa']) }}" target="_blank" rel="noopener">{{ $i['cta'] }} · {{ $mercado['precioTexto'] }} {{ $mercado['moneda'] }}</a>
+            <a class="btn btn-pri" data-compra href="{{ $comprar() }}" @if($compraExterna) target="_blank" rel="noopener" @endif>{{ $i['cta'] }} · {{ $mercado['precioTexto'] }} {{ $mercado['moneda'] }}</a>
         </div>
     </section>
 @endsection
