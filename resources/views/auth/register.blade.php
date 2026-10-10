@@ -20,7 +20,7 @@
 
         <div class="ac-campo">
             <label class="dt-label" for="email">Correo electrónico</label>
-            <input id="email" class="dt-input" type="email" name="email" value="{{ old('email') }}" required autocomplete="username" placeholder="tu@correo.com">
+            <input id="email" class="dt-input" type="email" name="email" value="{{ old('email', request('correo')) }}" required autocomplete="username" placeholder="tu@correo.com">
             @foreach ($errors->get('email') as $mensaje)<p class="ac-error">{{ $mensaje }}</p>@endforeach
         </div>
 

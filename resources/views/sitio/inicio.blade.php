@@ -1,32 +1,41 @@
 @extends('sitio.layout')
 @php
     $i = $t['inicio'];
+    $d = $i['demo'];
+    $pn = $i['panel'];
+    $modo = $compraExterna ? 'whatsapp' : 'linea';
+    $envio = $t['envio'][$mercado['code']] ?? reset($t['envio']);
+    $medio1 = $medios[0] ?? 'WhatsApp';
+    $medio2 = $medios[1] ?? null;
+    $ext = $compraExterna ? 'target="_blank" rel="noopener"' : '';
     $casos = [
-        ['foto' => 'caso-kathe', 'nombre' => 'Kathe Glam & Nails', 'url' => 'https://kathe.dauntoque.com',
-         'es' => 'Desde que uso la tarjeta, la percepción de mi salón cambió por completo. Las clientas ven mis fotos de uñas al instante y guardan mi contacto sin excusas. Mi agenda se llena sola.',
-         'en' => 'Since I started using the card, the way people see my salon changed completely. Clients see my nail photos instantly and save my contact, no excuses. My calendar fills itself.'],
-        ['foto' => 'caso-brey', 'nombre' => 'Breynner Logistics & Transportation', 'url' => 'https://brey.dauntoque.com',
-         'es' => 'En el mundo del transporte no hay tiempo que perder. Toco el teléfono del cliente, se abre mi perfil, cobro el flete y arrancamos. Eficiencia absoluta.',
-         'en' => 'In transportation there is no time to waste. I tap the client\'s phone, my profile opens, I get paid for the job and we roll. Pure efficiency.'],
-        ['foto' => 'caso-carlos', 'nombre' => 'Carlos Constructor', 'url' => 'https://carlos.dauntoque.com',
-         'es' => 'Llegar a cotizar una remodelación, sacar la Matte Black y que el cliente vea mis obras pasadas en un segundo justifica mis precios. Me da autoridad total.',
-         'en' => 'Showing up to quote a remodel, pulling out the Matte Black and letting the client see my past work in a second justifies my prices. Total authority.'],
+        ['foto' => 'caso-kathe', 'nombre' => 'Kathe Glam & Nails', 'url' => 'https://kathe.dauntoque.com'],
+        ['foto' => 'caso-brey', 'nombre' => 'Breynner Logistics', 'url' => 'https://brey.dauntoque.com'],
+        ['foto' => 'caso-carlos', 'nombre' => 'Carlos Constructor', 'url' => 'https://carlos.dauntoque.com'],
     ];
-    $perfiles = ['Kathe' => 'https://kathe.dauntoque.com', 'Breynner' => 'https://brey.dauntoque.com', 'Camilo' => 'https://camilo.dauntoque.com', 'Angela' => 'https://angela.dauntoque.com'];
-    $iconos = ['contacto', 'chat', 'pago', 'galeria', 'grafica', 'nfc'];
+    // Valor por separado de cada cosa incluida: partes del precio anterior que suman exactamente ese precio
+    $valores = [];
+    if ($mercado['antes']) {
+        $redondeo = $mercado['moneda'] === 'COP' ? 1000 : 1;
+        foreach ([0.30, 0.36, 0.12] as $parte) {
+            $valores[] = round($mercado['antes'] * $parte / $redondeo) * $redondeo;
+        }
+        $valores[] = $mercado['antes'] - array_sum($valores);
+        $valores = array_map(fn ($v) => \App\Console\Commands\GenerarSitio::dinero($v, $mercado['moneda']), $valores);
+    }
     $producto = [
         '@context' => 'https://schema.org', '@type' => 'Product', 'name' => $i['producto'], 'brand' => ['@type' => 'Brand', 'name' => 'DaUnToque'],
         'description' => $x($i['descripcion']), 'image' => [$dominio . $base . '/media/og-' . $version['idioma'] . '.jpg'],
         'offers' => ['@type' => 'Offer', 'price' => $mercado['precio'], 'priceCurrency' => $mercado['moneda'], 'availability' => 'https://schema.org/InStock', 'url' => $canonica($codigo)],
     ];
-    $como = ['@context' => 'https://schema.org', '@type' => 'HowTo', 'name' => $i['comoH'],
-        'step' => array_map(fn ($p, $n) => ['@type' => 'HowToStep', 'position' => $n + 1, 'name' => $p[0], 'text' => $x($p[1])], $i['como'], array_keys($i['como']))];
+    $como = ['@context' => 'https://schema.org', '@type' => 'HowTo', 'name' => $i['viajeH'],
+        'step' => array_map(fn ($p, $n) => ['@type' => 'HowToStep', 'position' => $n + 1, 'name' => $p[0], 'text' => $x($p[1], [':envio' => $envio])], $i['viaje'], array_keys($i['viaje']))];
 @endphp
 
 @section('titulo', $i['titulo'])
 @section('descripcion', $x($i['descripcion']))
 @section('precarga')
-    <link rel="preload" as="image" href="{{ $base }}/media/heroe-sm.webp" imagesrcset="{{ $base }}/media/heroe-sm.webp 640w, {{ $base }}/media/heroe.webp 1280w" imagesizes="(min-width: 920px) 540px, 100vw" fetchpriority="high">
+    <link rel="preload" as="image" href="{{ $base }}/media/caso-kathe-sm.webp">
 @endsection
 @section('schema')
     <script type="application/ld+json">{!! json_encode($producto, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG) !!}</script>
@@ -34,186 +43,396 @@
 @endsection
 
 @section('contenido')
-    {{-- 1. Héroe: el dolor, el precio del país y el botón --}}
-    <section class="heroe">
-        <div class="envoltura">
-            <div>
-                @if ($mercado['ahorroTexto'])<span class="cinta">{{ $x($i['oferta']) }}</span>@endif
-                <h1>{{ $i['h1a'] }} <span>{{ $i['h1b'] }}</span></h1>
-                <p class="sub">{{ $i['sub'] }}</p>
-                <div class="precio" aria-label="{{ $mercado['precioTexto'] }} {{ $mercado['moneda'] }}">
-                    <b>{{ $mercado['precioTexto'] }}</b><small>{{ $mercado['moneda'] }}</small>
-                    @if ($mercado['antesTexto'])<s>{{ $mercado['antesTexto'] }} {{ $mercado['moneda'] }}</s>@endif
+    {{-- 1. Héroe: resultado en el titular, precio del país y la tarjeta tocando el celular --}}
+    <section class="hero">
+        <div class="wrap">
+            <div class="hero-txt">
+                @if ($mercado['ahorroTexto'])<span class="badge"><svg width="14" height="14" aria-hidden="true"><use href="#spark"/></svg>{{ $x($i['oferta']) }}</span>@endif
+                <h1>{{ $i['h1a'] }} <em>{{ $i['h1b'] }}</em></h1>
+                <p class="lead mut">{{ $i['sub'] }}</p>
+                <div class="precio-hero" aria-label="{{ $mercado['precioTexto'] }} {{ $mercado['moneda'] }}">
+                    <strong class="num">{{ $mercado['precioTexto'] }}</strong>
+                    <small>{{ $mercado['moneda'] }}</small>
+                    @if ($mercado['antesTexto'])<s class="price-old num">{{ $mercado['antesTexto'] }}</s>@endif
                 </div>
-                <div class="acciones" data-compra>
-                    <a class="btn btn-pri" href="{{ $wa($t['wa']) }}" target="_blank" rel="noopener">{{ $i['cta'] }} @include('sitio._ico', ['n' => 'flecha'])</a>
-                    <a class="btn btn-sec" href="#toque">{{ $i['toqueH'] }}</a>
+                <div class="ctas" data-compra>
+                    <a class="btn btn-pri" href="{{ $comprar() }}" {!! $ext !!}>{{ $i['cta'] }} <svg width="18" height="18" aria-hidden="true"><use href="#nfc"/></svg></a>
+                    <a class="btn btn-sec" href="#pruebalo">{{ $i['ctaDemo'] }}</a>
                 </div>
-                <p class="nota">{{ $i['unico'] }}</p>
-                <div class="compat">
-                    <span>{{ $i['compatible'] }}</span>
-                    @foreach ($i['compatibles'] as $c)<span class="chip">{{ $c }}</span>@endforeach
-                    @foreach ($medios as $m)<span class="chip"><i style="background:{{ collect(config('pagos.medios'))->firstWhere('nombre', $m)['acento'] ?? '#999' }}"></i>{{ $m }}</span>@endforeach
+                <div class="garantias">
+                    <span><svg width="16" height="16" aria-hidden="true"><use href="#truck"/></svg>{{ $envio }}</span>
+                    <span><svg width="16" height="16" aria-hidden="true"><use href="#cal"/></svg>{{ $i['sinMensualidades'] }}</span>
+                    <span><svg width="16" height="16" aria-hidden="true"><use href="#shield"/></svg>{{ $i['garantia30'] }}</span>
+                    <span><svg width="16" height="16" aria-hidden="true"><use href="#spark"/></svg><b>{{ $i['regalo'][0] }}</b> {{ $i['regalo'][1] }}</span>
+                </div>
+                <div class="prueba">
+                    <div class="caras">
+                        @foreach ($casos as $c)<img src="{{ $base }}/media/{{ $c['foto'] }}-sm.webp" alt="" width="40" height="40">@endforeach
+                    </div>
+                    <div><div class="estrellas" role="img" aria-label="{{ $i['estrellas'] }}">★★★★★</div><span class="mut">{{ $i['prueba'] }}</span></div>
                 </div>
             </div>
-            <div class="marco-video" data-video="{{ $base }}/media/heroe">
-                <img class="portada" src="{{ $base }}/media/heroe-sm.webp" srcset="{{ $base }}/media/heroe-sm.webp 640w, {{ $base }}/media/heroe.webp 1280w" sizes="(min-width: 920px) 540px, 100vw" width="1280" height="720" alt="{{ $i['videoAlt'] }}" fetchpriority="high">
+
+            @php $e = $i['escena']; @endphp
+            <div class="escena" role="img" aria-label="{{ $e['aria'] }}">
+                <div class="etq e1"><svg width="16" height="16" aria-hidden="true"><use href="#nfc"/></svg>{{ $e['chip'] }} <b>NTAG215</b> · {{ $e['chipSub'] }}</div>
+                <div class="ondas" aria-hidden="true"><i></i><i></i><i></i></div>
+                <div class="tarjeta" aria-hidden="true">
+                    <div class="t-top"><span>dauntoque</span><svg class="nfc-ic" width="22" height="22"><use href="#nfc"/></svg></div>
+                    <div><div class="t-nom">Kathe Glam &amp; Nails</div><div class="t-sub">Matte Black</div></div>
+                </div>
+                <div class="tel" aria-hidden="true">
+                    <div class="pantalla">
+                        <div class="bloqueo"><b>9:41</b><span>{{ $e['bloqueo'] }}</span></div>
+                        <div class="perfil-mini">
+                            <img class="av" src="{{ $base }}/media/caso-kathe-sm.webp" alt="" width="74" height="74">
+                            <div class="n">Kathe Glam &amp; Nails</div>
+                            <div class="r">{{ $e['rol'] }}</div>
+                            <div class="pbtn g"><svg width="16" height="16"><use href="#user"/></svg>{{ $e['guardar'] }}</div>
+                            <div class="pbtn"><svg width="16" height="16"><use href="#wa"/></svg>WhatsApp</div>
+                            <div class="pbtn"><svg width="16" height="16"><use href="#cash"/></svg>{{ $x($e['pagarCon'], [':medio' => $medio1]) }}</div>
+                            <div class="pgrid"><i></i><i></i><i></i></div>
+                        </div>
+                        <div class="toast-tel"><i><svg width="16" height="16"><use href="#ok"/></svg></i>{{ $e['guardado'] }}</div>
+                    </div>
+                </div>
+                <div class="etq e2"><svg width="16" height="16" aria-hidden="true"><use href="#ok"/></svg>{{ $e['apps'] }} · <b>{{ $e['appsN'] }}</b></div>
             </div>
         </div>
     </section>
 
-    {{-- 2. Demostración del toque y perfiles reales --}}
-    <section class="seccion" id="toque">
-        <div class="envoltura toque">
-            <div class="marco-video vertical" data-video="{{ $base }}/media/constructor">
-                <img class="portada" src="{{ $base }}/media/constructor-sm.webp" width="360" height="640" alt="" loading="lazy">
+    <nav class="indice" aria-label="{{ $i['indiceAria'] }}">
+        <div class="wrap">
+            @foreach ($i['indice'] as [$id, $ico, $txt])
+                <a href="#{{ $id }}"><svg width="16" height="16" aria-hidden="true"><use href="#{{ $ico }}"/></svg>{{ $txt }}</a>
+            @endforeach
+        </div>
+    </nav>
+
+    {{-- 2. Pruébalo: la persona toca el perfil como cliente y ve el panel del dueño en vivo --}}
+    <section class="sec light" id="pruebalo">
+        <div class="wrap">
+            <div class="head">
+                <span class="eyebrow">{{ $d['eyebrow'] }}</span>
+                <h2>{{ $d['h'] }}</h2>
+                <p class="lead mut">{{ $d['p'] }}</p>
             </div>
-            <div>
-                <div class="cabeza" style="margin-bottom:0">
-                    <h2>{{ $i['toqueH'] }}</h2>
-                    <p>{{ $i['toqueP'] }}</p>
+            <div class="demo" data-demo data-ahora="{{ $d['ahora'] }}" data-hace="{{ $d['hace'] }}" data-abrio="{{ $d['abrio'] }}">
+                <div class="demo-tel">
+                    <div class="tel-toast" role="status" aria-live="polite"><i><svg width="16" height="16" aria-hidden="true"><use href="#ok"/></svg></i><span>{{ $d['listo'] }}</span></div>
+                    <div class="pantalla">
+                        <div class="dp-head">
+                            <img class="av" src="{{ $base }}/media/caso-kathe-sm.webp" alt="{{ $d['foto'] }}" width="92" height="92" loading="lazy">
+                            <h3>Kathe Glam &amp; Nails</h3>
+                            <p>{{ $d['rol'] }}</p>
+                        </div>
+                        <div class="dp-body">
+                            <button type="button" class="g" data-acc="contacto" data-kpi="con" data-ico="📇" data-aviso="{{ $d['acciones']['contacto'][0] }}" data-evento="{{ $d['acciones']['contacto'][1] }}"><svg width="18" height="18" aria-hidden="true"><use href="#user"/></svg>{{ $d['guardar'] }}</button>
+                            <button type="button" data-acc="wa" data-kpi="wa" data-ico="💬" data-aviso="{{ $d['acciones']['wa'][0] }}" data-evento="{{ $d['acciones']['wa'][1] }}"><svg width="18" height="18" aria-hidden="true"><use href="#wa"/></svg>{{ $d['wa'] }}</button>
+                            <div class="dp-row">
+                                <button type="button" data-acc="llamar" data-ico="📞" data-aviso="{{ $d['acciones']['llamar'][0] }}" data-evento="{{ $d['acciones']['llamar'][1] }}"><svg width="18" height="18" aria-hidden="true"><use href="#phone"/></svg>{{ $d['llamar'] }}</button>
+                                <button type="button" data-acc="ig" data-ico="📸" data-aviso="{{ $d['acciones']['ig'][0] }}" data-evento="{{ $d['acciones']['ig'][1] }}"><svg width="18" height="18" aria-hidden="true"><use href="#spark"/></svg>{{ $d['ig'] }}</button>
+                                <button type="button" data-acc="compartir" data-ico="🔁" data-aviso="{{ $d['acciones']['compartir'][0] }}" data-evento="{{ $d['acciones']['compartir'][1] }}"><svg width="18" height="18" aria-hidden="true"><use href="#share"/></svg>{{ $d['compartir'] }}</button>
+                            </div>
+                            <div class="dp-lbl">{{ $d['trabajos'] }}</div>
+                            <div class="dp-gal" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+                            <div class="dp-lbl">{{ $d['pagame'] }}</div>
+                            <div class="dp-pay">
+                                @foreach (array_slice($medios, 0, 2) as $m)
+                                    @php $dato = $m . ' ' . ($d['datos'][$m] ?? '@kathenails'); @endphp
+                                    <button type="button" data-acc="pago" data-kpi="pag" data-ico="💵" data-copiar="{{ $dato }}" data-aviso="{{ $x($d['copiado'], [':dato' => $dato]) }}" data-evento="{{ $x($d['pagoEvento'], [':medio' => $m]) }}"><svg width="18" height="18" aria-hidden="true"><use href="#cash"/></svg>{{ $m }}</button>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <ol class="pasos">@foreach ($i['pasos'] as $p)<li>{{ $p }}</li>@endforeach</ol>
+
+                <div class="demo-der">
+                    <div class="panel-vivo">
+                        <div class="pv-head"><b>{{ $d['panel'] }}</b><span class="vivo">{{ $d['vivo'] }}</span></div>
+                        <div class="pv-kpis">
+                            @foreach (['vis' => 38, 'con' => 12, 'wa' => 9, 'pag' => 4] as $k => $n)
+                                <div><b data-k="{{ $k }}">{{ $n }}</b><span>{{ $d['kpis'][$loop->index] }}</span></div>
+                            @endforeach
+                        </div>
+                        <ul class="feed" aria-live="polite">
+                            @foreach ($d['feed'] as [$ico, $txt, $hora])<li><i>{{ $ico }}</i><span>{{ $txt }}</span><time>{{ $hora }}</time></li>@endforeach
+                        </ul>
+                    </div>
+                    <ul class="pistas">
+                        @foreach ($d['pistas'] as [$b, $txt])
+                            <li><svg width="18" height="18" aria-hidden="true"><use href="#ok"/></svg><span><b>{{ $b }}</b> {{ $x($txt) }}</span></li>
+                        @endforeach
+                    </ul>
+                </div>
             </div>
         </div>
     </section>
 
-    <section class="seccion gris">
-        <div class="envoltura visor" data-visor>
-            <div>
-                <div class="cabeza">
-                    <h2>{{ $i['visorH'] }}</h2>
-                    <p>{{ $i['visorP'] }}</p>
+    {{-- 3. Gancho: segundo perfil de regalo (ejecutivo y personal) --}}
+    <section class="sec dos-sec" id="dos-perfiles">
+        <div class="wrap dos-perfiles" data-dos>
+            <div class="dp-texto">
+                <span class="cinta">{{ $i['dosOferta'] }}</span>
+                <div class="head" style="margin:14px 0 0">
+                    <h2>{{ $i['dosH'] }}</h2>
+                    <p class="lead mut">{{ $i['dosP'] }}</p>
                 </div>
-                <div class="visor-tabs" role="tablist">
-                    @foreach ($perfiles as $nombre => $url)
-                        <button type="button" role="tab" data-perfil="{{ $url }}" aria-selected="{{ $loop->first ? 'true' : 'false' }}">{{ $nombre }}</button>
+                <div class="dp-modos" role="group">
+                    @foreach ($i['dosModos'] as $n => $modoDos)
+                        <button type="button" data-modo="{{ $n === 0 ? 'ejec' : 'personal' }}" aria-pressed="{{ $n === 0 ? 'true' : 'false' }}"><small>{{ $modoDos[0] }}</small>{{ $modoDos[1] }}</button>
                     @endforeach
                 </div>
-                <a class="visor-abrir" href="{{ reset($perfiles) }}" target="_blank" rel="noopener">{{ $i['visorAbrir'] }} →</a>
+                <div class="dp-pasion" role="group">
+                    <small>{{ $i['dosPasionH'] }}</small>
+                    @foreach ($i['dosPasiones'] as $clave => $pasion)
+                        <button type="button" data-pasion="{{ $clave }}" aria-pressed="false">{{ $pasion['boton'] }}</button>
+                    @endforeach
+                </div>
             </div>
-            <div class="telefono">
-                <span class="vacio">dauntoque</span>
-                <iframe title="{{ $i['visorH'] }}" loading="lazy" style="position:relative"></iframe>
+            @php $ej = $i['dosEjecutivo']; @endphp
+            <div class="dp-telefono">
+                <div class="dp-perfil ejec" data-vista="ejec">
+                    <div class="dp-portada"><img src="{{ $base }}/media/dp-ejec-portada.webp" width="640" height="400" alt="" loading="lazy"></div>
+                    <div class="dp-cuerpo">
+                        <img class="dp-avatar" src="{{ $base }}/media/dp-ejec-avatar.webp" width="220" height="220" alt="{{ $ej['nombre'] }}" loading="lazy">
+                        <b class="dp-nombre">{{ $ej['nombre'] }} <i class="dp-ok" aria-hidden="true">✓</i></b>
+                        <span class="dp-rol">{{ $ej['rol'] }}</span>
+                        <div class="dp-cifras">@foreach ($ej['cifras'] as $c)<div><b>{{ $c[0] }}</b><span>{{ $c[1] }}</span></div>@endforeach</div>
+                        <span class="dp-b pri">{{ $ej['botones'][0] }}</span>
+                        <div class="dp-fila"><span class="dp-b">{{ $ej['botones'][1] }}</span><span class="dp-b">{{ $ej['botones'][2] }}</span></div>
+                        <span class="dp-lbl">{{ $ej['galeria'] }}</span>
+                        <div class="dp-g3">@for ($f = 1; $f <= 3; $f++)<img src="{{ $base }}/media/dp-ejec-{{ $f }}.webp" width="240" height="240" alt="" loading="lazy">@endfor</div>
+                    </div>
+                </div>
+                @foreach ($i['dosPasiones'] as $clave => $pasion)
+                    <div class="dp-perfil pers {{ $clave }}" data-vista="{{ $clave }}" hidden>
+                        <div class="dp-heroe">
+                            <img src="{{ $base }}/media/dp-{{ $clave }}-portada.webp" width="640" height="760" alt="{{ $pasion['alt'] }}" loading="lazy">
+                            <div class="dp-txt"><span class="dp-kicker">{{ $i['dosFinde'] }}</span><b class="dp-nombre">{{ $pasion['nombre'] }}</b><span class="dp-rol">{{ $pasion['lema'] }}</span></div>
+                        </div>
+                        <div class="dp-cuerpo">
+                            <div class="dp-tags">@foreach ($pasion['tags'] as $etiqueta)<span>{{ $etiqueta }}</span>@endforeach</div>
+                            <div class="dp-fila"><span class="dp-b pri">{{ $pasion['cta'] }}</span><span class="dp-b">Instagram</span></div>
+                            <div class="dp-g3">@for ($f = 1; $f <= 3; $f++)<img src="{{ $base }}/media/dp-{{ $clave }}-{{ $f }}.webp" width="240" height="240" alt="" loading="lazy">@endfor</div>
+                        </div>
+                    </div>
+                @endforeach
             </div>
+            <ul class="dp-puntos">@foreach ($i['dosPuntos'] as $punto)<li>{{ $punto }}</li>@endforeach</ul>
         </div>
     </section>
 
-    {{-- 3. Beneficios --}}
-    <section class="seccion">
-        <div class="envoltura">
-            <div class="cabeza"><h2>{{ $i['beneficiosH'] }}</h2></div>
-            <div class="rejilla dos tres-lg">
-                @foreach ($i['beneficios'] as $n => $b)
-                    <article class="beneficio">@include('sitio._ico', ['n' => $iconos[$n]])<h3>{{ $b[0] }}</h3><p>{{ $x($b[1]) }}</p></article>
+    {{-- 4. Tu panel: quién te vio, te guardó y te pagó --}}
+    <section class="sec panel-sec" id="panel">
+        <div class="wrap">
+            <div class="head">
+                <span class="eyebrow">{{ $pn['eyebrow'] }}</span>
+                <h2>{{ $pn['h'] }}</h2>
+                <p class="lead mut">{{ $pn['p'] }}</p>
+            </div>
+            <div class="dash" role="img" aria-label="{{ $pn['aria'] }}">
+                <div class="dash-side" aria-hidden="true">
+                    <span class="logo"><i></i><span>dauntoque</span></span>
+                    @foreach ($pn['menu'] as $n => $op)
+                        <span class="dash-op {{ $n === 3 ? 'on' : '' }}"><svg width="16" height="16"><use href="#{{ ['chart', 'nfc', 'user', 'chart', 'cash'][$n] }}"/></svg>{{ $op }}</span>
+                    @endforeach
+                </div>
+                <div class="dash-main">
+                    <div class="mini-kpis">@foreach ($pn['kpis'] as [$n, $txt])<div><b>{{ $n }}</b><span>{{ $txt }}</span></div>@endforeach</div>
+                    <div class="dash-grid">
+                        <div class="card-d">
+                            <div class="card-top"><h3>{{ $pn['contactosH'] }}</h3><span class="chip-uid">{{ $pn['hoy'] }}</span></div>
+                            <ul class="contactos">
+                                @foreach ($pn['contactos'] as [$ini, $nom, $acc, $hora])
+                                    <li><i>{{ $ini }}</i><span><b>{{ $nom }}</b><small>{{ $x($acc, [':medio' => $medio1]) }}</small></span><time>{{ $hora }}</time></li>
+                                @endforeach
+                            </ul>
+                        </div>
+                        <div class="card-d">
+                            <div class="card-top"><h3>{{ $pn['visitasH'] }}</h3><span class="chip-uid">{{ $pn['visitasDelta'] }}</span></div>
+                            <div class="barras">@foreach ([32, 45, 38, 60, 52, 28, 22, 48, 66, 58, 74, 69, 41, 88] as $h)<i style="height:{{ $h }}%"></i>@endforeach</div>
+                            <div class="ejes">@foreach ($pn['ejes'] as $eje)<span>{{ $eje }}</span>@endforeach</div>
+                            <p class="mut" style="font-size:13.5px;margin-top:14px">{{ $pn['ejemplo'] }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="notas-panel">@foreach ($pn['notas'] as [$b, $txt])<div><b>{{ $b }}</b><p>{{ $txt }}</p></div>@endforeach</div>
+        </div>
+    </section>
+
+    {{-- 5. De la compra al primer toque --}}
+    <section class="sec light" id="viaje">
+        <div class="wrap viaje-wrap">
+            <div class="viaje-top">
+                <div class="head" style="margin:0">
+                    <span class="eyebrow">{{ $i['viajeEyebrow'] }}</span>
+                    <h2>{{ $i['viajeH'] }}</h2>
+                </div>
+                <div class="marco-video" data-video="{{ $base }}/media/tienda">
+                    <img class="portada" src="{{ $base }}/media/tienda-sm.webp" width="640" height="360" alt="{{ $i['viajeVideo'] }}" loading="lazy">
+                </div>
+            </div>
+            <ol class="viaje">
+                @foreach ($i['viaje'] as $n => [$h, $txt])
+                    <li @if ($n === 3) class="clave" @endif>
+                        <span class="paso">{{ $x($i['paso'], [':n' => $n + 1]) }}</span>
+                        <span class="ic"><svg width="20" height="20" aria-hidden="true"><use href="#{{ ['cash', 'truck', 'nfc', 'user', 'chart'][$n] }}"/></svg></span>
+                        <h3>{{ $h }}</h3><p>{{ $x($txt, [':envio' => $envio]) }}</p>
+                    </li>
+                @endforeach
+            </ol>
+        </div>
+    </section>
+
+    {{-- 6. Tu tarjeta con tu nombre: acabado Matte Black o Crystal --}}
+    @php $ac = $i['acab']; @endphp
+    <section class="sec light" id="acabados" style="padding-top:0">
+        <div class="wrap acabados" data-estudio data-vacio="{{ $ac['tuNombre'] }}">
+            <div class="estudio">
+                <div class="t3d">
+                    <div class="fila"><span>dauntoque</span><svg class="nfc-ic" aria-hidden="true"><use href="#nfc"/></svg></div>
+                    <div><div class="nom" data-nombre>{{ $ac['tuNombre'] }}</div><div class="car"><span data-car>Matte Black</span> · NFC</div></div>
+                </div>
+            </div>
+            <div class="controles">
+                <div class="head" style="margin:0">
+                    <span class="eyebrow">{{ $ac['eyebrow'] }}</span>
+                    <h2>{{ $ac['h'] }}</h2>
+                </div>
+                <div class="seg" role="group" aria-label="{{ $ac['aria'] }}">
+                    @foreach (['matte-black', 'crystal'] as $a)
+                        <button type="button" data-acab="{{ $a }}" aria-pressed="{{ $loop->first ? 'true' : 'false' }}">{{ $t['acabados'][$a]['nombre'] }}</button>
+                    @endforeach
+                </div>
+                <div class="campo">
+                    <label for="nomInput">{{ $ac['label'] }}</label>
+                    <input id="nomInput" maxlength="28" placeholder="{{ $ac['placeholder'] }}" autocomplete="off">
+                </div>
+                @foreach (['matte-black', 'crystal'] as $a)
+                    @php $acabadoTxt = $t['acabados'][$a]; @endphp
+                    <div class="acab-txt" data-acab-txt="{{ $a }}" @if (!$loop->first) hidden @endif>
+                        <b>{{ $acabadoTxt['nombre'] }}</b>
+                        <p class="mut">{{ $acabadoTxt['texto'] }} {{ $acabadoTxt['corto'] }}</p>
+                        <div class="ctas" data-compra>
+                            <a class="btn btn-pri" href="{{ $comprar($a, $x($t['waAcabado'], [':acabado' => $acabadoTxt['nombre']])) }}" {!! $ext !!}>{{ $ac['cta'] }}</a>
+                            <a class="btn btn-sec" href="{{ $ir($codigo, 'tarjeta', $a) }}">{{ $ac['ver'] }}</a>
+                        </div>
+                    </div>
                 @endforeach
             </div>
         </div>
     </section>
 
-    {{-- 4. Acabados --}}
-    <section class="seccion gris">
-        <div class="envoltura">
-            <div class="cabeza"><h2>{{ $i['acabadosH'] }}</h2><p>{{ $i['acabadosP'] }}</p></div>
-            <div class="rejilla dos">
-                @foreach (['matte-black' => 'matte', 'crystal' => 'crystal'] as $a => $clase)
-                    <a class="acabado {{ $clase }}" href="{{ $ir($codigo, 'tarjeta', $a) }}">
-                        <span class="muestra" aria-hidden="true"></span>
-                        <h3>{{ $t['acabados'][$a]['nombre'] }}</h3>
-                        <p>{{ $t['acabados'][$a]['corto'] }}</p>
-                        <span class="ir">{{ $t['nav']['tarjetas'] }} @include('sitio._ico', ['n' => 'flecha'])</span>
-                    </a>
+    {{-- 7. Casos reales con su perfil vivo --}}
+    <section class="sec" id="casos">
+        <div class="wrap">
+            <div class="head">
+                <span class="eyebrow">{{ $i['casosEyebrow'] }}</span>
+                <h2>{{ $i['casosH'] }}</h2>
+            </div>
+            <div class="casos">
+                @foreach ($casos as $n => $c)
+                    @php [$dato, $cita, $rol] = $i['casos'][$n]; @endphp
+                    <article class="caso">
+                        <img src="{{ $base }}/media/{{ $c['foto'] }}.webp" width="480" height="480" alt="{{ $c['nombre'] }}" loading="lazy">
+                        <div>
+                            <span class="dato">{{ $dato }}</span>
+                            <blockquote>“{{ $cita }}”</blockquote>
+                            <div class="quien"><span><b>{{ $c['nombre'] }}</b><span class="mut">{{ $rol }}</span></span><a href="{{ $c['url'] }}" target="_blank" rel="noopener">{{ $i['verPerfil'] }} →</a></div>
+                        </div>
+                    </article>
                 @endforeach
             </div>
         </div>
     </section>
 
-    {{-- 5. Casos reales --}}
-    <section class="seccion">
-        <div class="envoltura">
-            <div class="cabeza"><h2>{{ $i['casosH'] }}</h2><p>{{ $i['casosP'] }}</p></div>
-            <div class="rejilla tres">
-                @foreach ($casos as $c)
-                    <figure class="caso" style="margin:0">
-                        <blockquote>“{{ $c[$version['idioma']] }}”</blockquote>
-                        <figcaption class="quien">
-                            <img src="{{ $base }}/media/{{ $c['foto'] }}-sm.webp" width="104" height="104" alt="{{ $c['nombre'] }}" loading="lazy">
-                            <span><b>{{ $c['nombre'] }}</b><a href="{{ $c['url'] }}" target="_blank" rel="noopener">{{ $i['verPerfil'] }} →</a></span>
-                        </figcaption>
-                    </figure>
-                @endforeach
+    {{-- 8. Comparación y calculadora --}}
+    <section class="sec light" id="compara">
+        <div class="wrap">
+            <div class="head">
+                <span class="eyebrow">{{ $i['comparaEyebrow'] }}</span>
+                <h2>{{ $i['comparaH'] }}</h2>
             </div>
-        </div>
-    </section>
-
-    {{-- 6. Comparador y calculadora --}}
-    <section class="seccion gris">
-        <div class="envoltura">
-            <div class="cabeza"><h2>{{ $i['comparaH'] }}</h2></div>
-            <div class="tabla-scroll">
-                <table class="tabla">
-                    <thead><tr>@foreach ($i['comparaCols'] as $col)<th scope="col">{{ $col }}</th>@endforeach</tr></thead>
+            <div class="tabla-wrap">
+                <table>
+                    <thead><tr>@foreach ($i['comparaCols'] as $col)<th scope="col" @if ($loop->last) class="col-dt" @endif>@if ($loop->first)<span class="sr">{{ $col }}</span>@else{{ $col }}@endif</th>@endforeach</tr></thead>
                     <tbody>
                         @foreach ($i['comparaFilas'] as $fila)
-                            <tr><th scope="row">{{ $fila[0] }}</th><td>{{ $fila[1] }}</td><td>{{ $fila[2] }}</td><td>{{ $fila[3] }}</td></tr>
+                            <tr><th scope="row">{{ $fila[0] }}</th>
+                                @for ($k = 1; $k <= 3; $k++)<td class="{{ $k === 3 ? 'col-dt' : ($fila[$k] === $i['comparaNo'] ? 'no' : '') }}">{{ $fila[$k] }}</td>@endfor
+                            </tr>
                         @endforeach
                     </tbody>
                 </table>
             </div>
             <div class="calc" data-calc data-locale="{{ $version['hreflang'] }}" data-moneda="{{ $mercado['moneda'] }}">
-                <label>{{ $i['calcTarjetas'] }}<input type="number" name="tarjetas" value="100" min="0" step="10" inputmode="numeric"></label>
-                <label>{{ $i['calcCosto'] }} ({{ $mercado['moneda'] }})<input type="number" name="costo" value="{{ $mercado['moneda'] === 'COP' ? 40000 : 25 }}" min="0" inputmode="numeric"></label>
-                <div class="resultado">
-                    <div><small>{{ $i['calcAnio'] }}</small><b data-anio>—</b></div>
-                    <div><small>{{ $i['calcVs'] }}</small><b>{{ $mercado['precioTexto'] }}</b></div>
+                <div class="campo"><label for="cTar">{{ $i['calcTarjetas'] }}</label><input id="cTar" type="number" name="tarjetas" value="100" min="0" step="10" inputmode="numeric"></div>
+                <div class="campo"><label for="cCos">{{ $i['calcCosto'] }} ({{ $mercado['moneda'] }})</label><input id="cCos" type="number" name="costo" value="{{ $mercado['moneda'] === 'COP' ? 40000 : 25 }}" min="0" inputmode="numeric"></div>
+                <div class="r papel"><span>{{ $i['calcAnio'] }}</span><b class="num" data-anio>—</b></div>
+                <div class="r dt"><span>{{ $i['calcVs'] }}</span><b class="num">{{ $mercado['precioTexto'] }}</b></div>
+            </div>
+        </div>
+    </section>
+
+    {{-- 9. Precio: valor apilado, botón de compra del país y garantía --}}
+    <section class="sec" id="precio">
+        <div class="wrap precio">
+            <div class="oferta">
+                <div class="tope">
+                    <h3>{{ $i['ofertaH'] }}</h3>
+                    @if ($mercado['ahorroTexto'])<span class="badge">{{ $x($i['ahorroCorto']) }}</span>@endif
                 </div>
+                <div class="monto"><strong class="num">{{ $mercado['precioTexto'] }}</strong><span class="mut">{{ $mercado['moneda'] }}</span>@if ($mercado['antesTexto'])<s class="price-old num">{{ $mercado['antesTexto'] }}</s>@endif</div>
+                <ul class="stack">
+                    @foreach ($i['stack'] as $n => $item)
+                        <li><span><svg width="16" height="16" aria-hidden="true"><use href="#ok"/></svg>{{ $x($item) }}</span>@if ($valores)<em>{{ $valores[$n] }}</em>@endif</li>
+                    @endforeach
+                    <li><span><svg width="16" height="16" aria-hidden="true"><use href="#ok"/></svg><span><b>{{ $i['stackRegalo'][0] }}</b> · {{ $i['stackRegalo'][1] }}</span></span><em>{{ $i['stackRegalo'][2] }}</em></li>
+                    <li><span><svg width="16" height="16" aria-hidden="true"><use href="#ok"/></svg>{{ $i['stackEnvio'][0] }}</span><em>{{ $i['stackEnvio'][1] }}</em></li>
+                </ul>
+                @if ($mercado['antesTexto'])<div class="valor"><span>{{ $i['valorSeparado'] }}</span><s class="num">{{ $mercado['antesTexto'] }} {{ $mercado['moneda'] }}</s></div>@endif
+                <p class="mut renueva">{{ $i['renueva'] }}</p>
+                <div class="checkout">
+                    <a class="btn btn-pri btn-ancho" data-compra href="{{ $comprar() }}" {!! $ext !!}>@if ($compraExterna)<svg width="20" height="20" aria-hidden="true"><use href="#wa"/></svg>@endif{{ $i['pagar'][$modo] }}</a>
+                    <div class="pasarela"><span>{{ $i['pagoSeguro'][$modo] }}</span>@foreach ($compraExterna ? $medios : $i['pasarela'] as $m)<span class="chip">{{ $m }}</span>@endforeach</div>
+                </div>
+                <div class="garantia"><span class="sello">{{ $i['sello'][0] }}<small>{{ $i['sello'][1] }}</small></span><span>{{ $i['garantia'] }}</span></div>
             </div>
-        </div>
-    </section>
-
-    {{-- 7. Cómo funciona --}}
-    <section class="seccion negra">
-        <div class="envoltura">
-            <div class="cabeza"><h2>{{ $i['comoH'] }}</h2></div>
-            <ol class="como">@foreach ($i['como'] as $p)<li><h3>{{ $p[0] }}</h3><p>{{ $x($p[1]) }}</p></li>@endforeach</ol>
-        </div>
-    </section>
-
-    {{-- 8. Precio y qué incluye --}}
-    <section class="seccion" id="precio">
-        <div class="envoltura">
-            <div class="cabeza centro"><h2>{{ $i['precioH'] }}</h2><p>{{ $i['precioP'] }}</p></div>
-            <div class="ficha">
-                @if ($mercado['ahorroTexto'])<span class="cinta">{{ $x($i['oferta']) }}</span>@endif
-                <h3>{{ $i['producto'] }}</h3>
-                <p class="muted">{{ $i['productoSub'] }}</p>
-                <div class="precio"><b>{{ $mercado['precioTexto'] }}</b><small>{{ $mercado['moneda'] }}</small>@if ($mercado['antesTexto'])<s>{{ $mercado['antesTexto'] }} {{ $mercado['moneda'] }}</s>@endif</div>
-                <ul class="incluye">@foreach ($i['incluye'] as $inc)<li>{{ $x($inc) }}</li>@endforeach</ul>
-                <a class="btn btn-pri btn-ancho" data-compra href="{{ $wa($t['wa']) }}" target="_blank" rel="noopener">{{ $i['ctaPrecio'] }}</a>
-                <p class="nota" style="text-align:center">{{ $i['unico'] }}</p>
-                <div class="pagos-pais">@foreach ($medios as $m)<span class="chip">{{ $m }}</span>@endforeach</div>
-            </div>
-        </div>
-    </section>
-
-    {{-- 9. Preguntas frecuentes (las primeras) --}}
-    <section class="seccion gris">
-        <div class="envoltura">
-            <div class="cabeza centro"><h2>{{ $i['faqH'] }}</h2></div>
-            <div class="faq">
-                @foreach (array_slice($t['faq'], 0, 5) as $q)
-                    <details><summary>{{ $q[0] }}</summary><p>{{ $x($q[1]) }}</p></details>
+            <div class="porque">
+                <div class="head" style="margin:0">
+                    <span class="eyebrow">{{ $i['precioEyebrow'] }}</span>
+                    <h2>{{ $i['precioH'] }}</h2>
+                    <p class="lead mut">{{ $i['precioP'] }}</p>
+                </div>
+                @foreach ($i['porque'] as [$ico, $h, $txt])
+                    <div class="item"><span class="ic"><svg width="20" height="20" aria-hidden="true"><use href="#{{ $ico }}"/></svg></span><div><h3>{{ $h }}</h3><p>{{ $x($txt, [':moneda' => $mercado['moneda']]) }}</p></div></div>
                 @endforeach
             </div>
-            <p style="text-align:center;margin-top:20px"><a class="btn btn-sec" href="{{ $ir($codigo, 'preguntas') }}">{{ $i['faqTodas'] }}</a></p>
         </div>
     </section>
 
-    {{-- 10. Cierre --}}
-    <section class="seccion cierre">
-        <div class="envoltura">
+    {{-- 10. Preguntas --}}
+    <section class="sec light" id="preguntas">
+        <div class="wrap">
+            <div class="head"><span class="eyebrow">{{ $i['faqEyebrow'] }}</span><h2>{{ $i['faqH'] }}</h2></div>
+            <div class="faq">
+                @foreach ($t['faqInicio'] as $n)
+                    <details @if ($loop->first) open @endif><summary>{{ $t['faq'][$n][0] }}</summary><p>{{ $x($t['faq'][$n][1]) }}</p></details>
+                @endforeach
+            </div>
+            <p style="margin-top:22px"><a class="btn btn-sec" href="{{ $ir($codigo, 'preguntas') }}">{{ $i['faqTodas'] }}</a></p>
+        </div>
+    </section>
+
+    {{-- 11. Cierre --}}
+    <section class="sec cierre">
+        <div class="wrap">
+            <span class="eyebrow">{{ $i['cierreEyebrow'] }}</span>
             <h2>{{ $i['cierreH'] }}</h2>
-            <a class="btn btn-pri" data-compra href="{{ $wa($t['wa']) }}" target="_blank" rel="noopener">{{ $i['cta'] }} · {{ $mercado['precioTexto'] }} {{ $mercado['moneda'] }}</a>
+            <a class="btn btn-pri" data-compra href="{{ $comprar() }}" {!! $ext !!}>{{ $i['cta'] }} · {{ $mercado['precioTexto'] }} {{ $mercado['moneda'] }}</a>
+            <span class="mut cierre-nota">{{ $envio }} · {{ $i['sinMensualidades'] }} · {{ $i['garantia30'] }}</span>
         </div>
     </section>
 @endsection

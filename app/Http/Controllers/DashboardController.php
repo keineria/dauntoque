@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Market;
 use App\Models\Profile;
+use App\Models\Tarjeta;
 use App\Support\ImageStore;
 use App\Support\MediosPago;
+use App\Support\Precios;
 use App\Support\RedesSociales;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -82,11 +84,31 @@ class DashboardController extends Controller
             })->all();
     }
 
+    /** Tarjetas físicas del usuario con su contador de servicio (365 días desde la activación). */
+    private function tarjetas(int $userId): array
+    {
+        return Tarjeta::where('user_id', $userId)->orderBy('activada_en')->get()
+            ->map(fn (Tarjeta $t) => ['id' => $t->id, 'uid' => $t->nfc_uid] + $t->servicio())
+            ->all();
+    }
+
+    /** WhatsApp de ventas del país del usuario (o el de cualquier país que lo tenga) para pedir la renovación. */
+    private function whatsappVentas(?string $pais): ?string
+    {
+        return Market::whereNotNull('whatsapp')->where('whatsapp', '!=', '')
+            ->orderByRaw('CASE WHEN code = ? THEN 0 ELSE 1 END', [MediosPago::pais($pais)])
+            ->value('whatsapp');
+    }
+
     public function index()
     {
         return view('dashboard.index', $this->cargarDatos() + [
             'stats' => AnaliticasController::resumen(Auth::id()),
             'fichas' => $this->fichasPerfiles(Auth::id()),
+            'tarjetas' => $this->tarjetas(Auth::id()),
+            'whatsappRenovar' => $this->whatsappVentas(Profile::activoDe(Auth::id())?->pais),
+            'pagosEnLinea' => \App\Services\Bold::configurado(),
+            'precioRenovacion' => Precios::renovacion(Profile::activoDe(Auth::id())?->pais),
         ]);
     }
 

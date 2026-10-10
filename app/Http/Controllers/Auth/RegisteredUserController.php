@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Pedido;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
@@ -43,6 +44,9 @@ class RegisteredUserController extends Controller
         ]);
 
         event(new Registered($user));
+
+        // Las compras hechas en el sitio con este correo quedan a nombre de la cuenta nueva
+        Pedido::where('correo', $user->email)->whereNull('user_id')->update(['user_id' => $user->id]);
 
         Auth::login($user);
 

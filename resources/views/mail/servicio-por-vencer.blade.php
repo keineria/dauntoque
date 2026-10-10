@@ -1,0 +1,39 @@
+@php
+    $nombre = \Illuminate\Support\Str::before($tarjeta->user->name ?? '', ' ');
+    $titulo = match ($etapa) {
+        'mes', 'semana' => 'Te quedan ' . $servicio['diasRestantes'] . ' ' . ($servicio['diasRestantes'] === 1 ? 'día' : 'días') . ' de servicio.',
+        'vencido' => 'Tu año de servicio terminó.',
+        default => 'Tu tarjeta quedó en pausa.',
+    };
+    $texto = match ($etapa) {
+        'mes' => 'Renueva cuando quieras: el nuevo año se suma al final del actual, así que no pierdes ningún día.',
+        'semana' => 'Renueva esta semana para que tu perfil siga abriendo sin pausas cuando entregues tu tarjeta.',
+        'vencido' => 'Tu perfil sigue funcionando ' . $servicio['diasGracia'] . ' ' . ($servicio['diasGracia'] === 1 ? 'día' : 'días') . ' más. Renueva y todo sigue igual: tu perfil, tus contactos y tus estadísticas.',
+        default => 'Renueva y tu tarjeta vuelve a abrir tu perfil al instante, con todo lo que ya tenías.',
+    };
+@endphp
+<!doctype html>
+<html lang="es">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{{ $titulo }}</title></head>
+<body style="margin:0;background:#f5f4ef;font-family:Helvetica,Arial,sans-serif;color:#151816">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f5f4ef;padding:24px 12px">
+<tr><td align="center">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border-radius:18px;overflow:hidden">
+    <tr><td style="background:#0d0f10;padding:26px 28px;color:#eef1ee">
+        <div style="font-size:20px;font-weight:800">dauntoque<span style="color:#2fae6e">.com</span></div>
+        <div style="margin-top:18px;font-size:26px;font-weight:800;line-height:1.15">@if($nombre)Hola, {{ $nombre }}. @endif{{ $titulo }}</div>
+        <div style="margin-top:8px;color:#9aa39f;font-size:15px">Tarjeta ···{{ \Illuminate\Support\Str::substr($tarjeta->nfc_uid, -6) }} · vence el {{ $servicio['venceEn']->format('d/m/Y') }}</div>
+    </td></tr>
+    <tr><td style="padding:26px 28px">
+        <p style="margin:0 0 14px;font-size:16px;line-height:1.5">{{ $texto }}</p>
+        <table role="presentation" cellpadding="0" cellspacing="0" style="margin:20px 0"><tr><td style="background:#2fae6e;border-radius:999px">
+            <a href="{{ url('/dashboard') }}" style="display:inline-block;padding:15px 28px;color:#04140b;font-weight:700;font-size:16px;text-decoration:none">Renovar mi tarjeta{{ $precio ? ' · ' . $precio : '' }}</a>
+        </td></tr></table>
+        <p style="margin:0;font-size:13px;color:#5d655f">Entra a tu panel con tu correo y busca la ficha "Servicio de tu tarjeta".@if(\App\Services\Bold::configurado()) Tocas "Renovar ahora", pagas en línea y el año nuevo aparece en minutos.@else Ahí tienes el botón para renovar por WhatsApp.@endif</p>
+    </td></tr>
+    <tr><td style="padding:18px 28px;background:#ebe9e1;font-size:12px;color:#5d655f">Sin mensualidades: renuevas una vez al año el servidor de tu perfil y listo. · DaUnToque</td></tr>
+</table>
+</td></tr>
+</table>
+</body>
+</html>

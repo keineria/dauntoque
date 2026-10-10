@@ -16,6 +16,73 @@
         @endif
     </div>
 
+    @if(request()->boolean('renovacion'))
+        <div class="dt-panel" role="status" style="margin-bottom:18px">Recibimos tu pago. Cuando Bold lo confirme, tu nuevo año aparece aquí (puede tardar unos minutos).</div>
+    @endif
+
+    {{-- Servicio de cada tarjeta: 365 días desde que se activó el chip (config/servicio.php) --}}
+    @foreach($tarjetas as $t)
+        @php
+            $estilo = [
+                'activo' => ['color' => '#22c55e', 'chip' => 'up', 'texto' => 'Activo'],
+                'pronto' => ['color' => '#f59e0b', 'chip' => '', 'texto' => 'Renueva pronto'],
+                'gracia' => ['color' => '#ef4444', 'chip' => 'down', 'texto' => 'Vencido · en gracia'],
+                'pausa' => ['color' => '#ef4444', 'chip' => 'down', 'texto' => 'Vencido'],
+            ][$t['estado']];
+            $mensaje = match ($t['estado']) {
+                'activo' => 'Tu servicio está activo. Te avisaremos ' . config('servicio.aviso_dias') . ' días antes del vencimiento.',
+                'pronto' => 'Te quedan ' . $t['diasRestantes'] . ' ' . ($t['diasRestantes'] === 1 ? 'día' : 'días') . '. Renueva para que tu perfil siga sin pausas.',
+                'gracia' => 'Tu año de servicio terminó. Renueva en los próximos ' . $t['diasGracia'] . ' ' . ($t['diasGracia'] === 1 ? 'día' : 'días') . '.',
+                'pausa' => 'Tu año de servicio terminó. Renueva para seguir usando tu tarjeta.',
+            };
+            $circ = 2 * M_PI * 52;
+        @endphp
+        <section class="dt-panel" style="margin-bottom:18px">
+            <div class="dt-panel-h">
+                <h2>Servicio de tu tarjeta</h2>
+                <span class="dt-chip {{ $estilo['chip'] }}" @if($t['estado'] === 'pronto') style="background:rgba(245,158,11,.14);color:#fbbf24" @endif>{{ $estilo['texto'] }}</span>
+            </div>
+            <div class="dt-servicio">
+                <div style="position:relative;width:132px;height:132px;flex:none">
+                    <svg width="132" height="132" viewBox="0 0 132 132" style="transform:rotate(-90deg)" aria-hidden="true">
+                        <circle cx="66" cy="66" r="52" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="11"/>
+                        <circle cx="66" cy="66" r="52" fill="none" stroke="{{ $estilo['color'] }}" stroke-width="11" stroke-linecap="round"
+                                stroke-dasharray="{{ round($circ, 1) }}" stroke-dashoffset="{{ round($circ * (1 - $t['porcentaje'] / 100), 1) }}"/>
+                    </svg>
+                    <div style="position:absolute;inset:0;display:grid;place-content:center;text-align:center">
+                        <b style="font-size:34px;line-height:1;font-variant-numeric:tabular-nums">{{ $t['diasRestantes'] }}</b>
+                        <span class="dt-sub" style="font-size:11px;text-transform:uppercase;letter-spacing:.08em">{{ $t['diasRestantes'] === 1 ? 'día' : 'días' }}</span>
+                    </div>
+                </div>
+                <div style="min-width:0;display:grid;gap:10px">
+                    <p style="margin:0">{{ $mensaje }}</p>
+                    <dl style="display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:0;font-size:13px">
+                        <dt class="dt-sub">Activada</dt><dd style="margin:0">{{ $t['activadaEn']->translatedFormat('j M Y') }}</dd>
+                        <dt class="dt-sub">Vence</dt><dd style="margin:0">{{ $t['venceEn']->translatedFormat('j M Y') }}</dd>
+                        @if($precioRenovacion)
+                            <dt class="dt-sub">Renovación</dt><dd style="margin:0">{{ $precioRenovacion }} / año</dd>
+                        @endif
+                        <dt class="dt-sub">Chip</dt><dd style="margin:0;font-family:ui-monospace,Consolas,monospace">···{{ \Illuminate\Support\Str::substr($t['uid'], -6) }}</dd>
+                    </dl>
+                    @if($t['estado'] !== 'activo')
+                        @if($pagosEnLinea)
+                            <form method="POST" action="/renovar/{{ $t['id'] }}" style="margin:0">
+                                @csrf
+                                <button type="submit" class="dt-btn pri">Renovar ahora{{ $precioRenovacion ? ' · ' . $precioRenovacion : '' }}</button>
+                            </form>
+                        @elseif($whatsappRenovar)
+                            <a href="https://wa.me/{{ $whatsappRenovar }}?text={{ rawurlencode('Hola, quiero renovar el servicio de mi tarjeta DaUnToque (chip ···' . \Illuminate\Support\Str::substr($t['uid'], -6) . ')') }}"
+                               target="_blank" rel="noopener" class="dt-btn pri" style="justify-self:start">Renovar por WhatsApp</a>
+                        @endif
+                    @endif
+                </div>
+            </div>
+        </section>
+    @endforeach
+    @if($tarjetas)
+        <style>.dt-servicio{display:flex;gap:22px;align-items:center}@media (max-width:480px){.dt-servicio{flex-direction:column;align-items:flex-start}}</style>
+    @endif
+
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:18px">
         <div class="dt-stat">
             <div class="ic" style="background:rgba(59,130,246,.18);color:#60a5fa"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></div>

@@ -1,32 +1,40 @@
-// Sitio de ventas DaUnToque: videos perezosos, visor de perfiles, calculadora y botón fijo. Sin dependencias.
+// Sitio de ventas DaUnToque: videos perezosos, demo "Pruébalo", dos perfiles, tarjeta con tu nombre,
+// calculadora y barra fija de compra. Sin dependencias. Cada bloque usa const/let propios para no pisar nombres.
 (function () {
-  var reducir = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var ahorro = navigator.connection && navigator.connection.saveData;
+  'use strict';
+  const reducir = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const ahorroDatos = navigator.connection && navigator.connection.saveData;
+  const hayIO = 'IntersectionObserver' in window;
 
-  // Videos: arrancan solo al entrar en pantalla y no se cargan con ahorro de datos
-  var videos = document.querySelectorAll('[data-video]');
-  if (videos.length && 'IntersectionObserver' in window && !reducir && !ahorro) {
-    var obs = new IntersectionObserver(function (entradas) {
+  // Videos: arrancan solo al entrar en pantalla y no se cargan con ahorro de datos ni movimiento reducido
+  const marcosVideo = document.querySelectorAll('[data-video]');
+  if (marcosVideo.length && hayIO && !reducir && !ahorroDatos) {
+    const obsVideo = new IntersectionObserver(function (entradas) {
       entradas.forEach(function (e) {
-        var marco = e.target, v = marco.querySelector('video');
+        const marco = e.target;
+        let v = marco.querySelector('video');
         if (e.isIntersecting) {
           if (!v) {
             v = document.createElement('video');
-            v.muted = true; v.loop = true; v.playsInline = true; v.setAttribute('playsinline', ''); v.setAttribute('aria-hidden', 'true');
-            ['webm', 'mp4'].forEach(function (t) { var s = document.createElement('source'); s.src = marco.dataset.video + '.' + t; s.type = 'video/' + t; v.appendChild(s); });
+            v.muted = true; v.loop = true; v.playsInline = true;
+            v.setAttribute('playsinline', ''); v.setAttribute('aria-hidden', 'true');
+            ['webm', 'mp4'].forEach(function (tipo) {
+              const s = document.createElement('source');
+              s.src = marco.dataset.video + '.' + tipo; s.type = 'video/' + tipo; v.appendChild(s);
+            });
             v.addEventListener('playing', function () { marco.classList.add('reproduciendo'); });
             v.addEventListener('pause', function () { marco.classList.remove('reproduciendo'); });
             marco.insertBefore(v, marco.firstChild);
           }
-          var p = v.play(); if (p && p.catch) p.catch(function () {});
+          const p = v.play(); if (p && p.catch) p.catch(function () {});
         } else if (v) { v.pause(); }
       });
     }, { rootMargin: '120px 0px', threshold: 0.25 });
-    videos.forEach(function (m) { obs.observe(m); });
+    marcosVideo.forEach(function (m) { obsVideo.observe(m); });
   }
 
   // Elección de país e idioma: se recuerda para la próxima visita
-  document.querySelectorAll('[data-version]').forEach(function (a) {
+  document.querySelectorAll('a[data-version]').forEach(function (a) {
     a.addEventListener('click', function () { try { localStorage.setItem('dt-version', a.dataset.version); } catch (e) {} });
   });
   try { localStorage.setItem('dt-version', document.documentElement.dataset.version); } catch (e) {}
@@ -34,42 +42,119 @@
     document.querySelectorAll('details.selector[open]').forEach(function (d) { if (!d.contains(e.target)) d.removeAttribute('open'); });
   });
 
-  // Visor de perfiles reales: el iframe se carga al llegar a la sección
-  var visor = document.querySelector('[data-visor]');
-  if (visor) {
-    var marco = visor.querySelector('iframe'), abrir = visor.querySelector('.visor-abrir');
-    var botones = visor.querySelectorAll('[data-perfil]');
-    var mostrar = function (b) {
-      botones.forEach(function (x) { x.setAttribute('aria-selected', x === b ? 'true' : 'false'); });
-      marco.src = b.dataset.perfil; abrir.href = b.dataset.perfil;
-    };
-    botones.forEach(function (b) { b.addEventListener('click', function () { mostrar(b); }); });
-    var cargado = false;
-    var ov = new IntersectionObserver(function (e) { if (e[0].isIntersecting && !cargado) { cargado = true; mostrar(botones[0]); ov.disconnect(); } }, { rootMargin: '300px 0px' });
-    ov.observe(visor);
-  }
-
   // Calculadora de ahorro: papel al año frente al pago único
-  var calc = document.querySelector('[data-calc]');
+  const calc = document.querySelector('[data-calc]');
   if (calc) {
-    var fmt = new Intl.NumberFormat(calc.dataset.locale, { style: 'currency', currency: calc.dataset.moneda, maximumFractionDigits: 0 });
-    var tarjetas = calc.querySelector('[name=tarjetas]'), costo = calc.querySelector('[name=costo]'), salida = calc.querySelector('[data-anio]');
-    var calcular = function () {
-      var anual = Math.max(0, +tarjetas.value || 0) * 12 / 100 * Math.max(0, +costo.value || 0);
-      salida.textContent = fmt.format(anual);
+    const fmtCalc = new Intl.NumberFormat(calc.dataset.locale, { style: 'currency', currency: calc.dataset.moneda, maximumFractionDigits: 0 });
+    const inTarjetas = calc.querySelector('[name=tarjetas]'), inCosto = calc.querySelector('[name=costo]'), salidaAnio = calc.querySelector('[data-anio]');
+    const calcular = function () {
+      const anual = Math.max(0, +inTarjetas.value || 0) * 12 / 100 * Math.max(0, +inCosto.value || 0);
+      salidaAnio.textContent = fmtCalc.format(anual);
     };
-    tarjetas.addEventListener('input', calcular); costo.addEventListener('input', calcular); calcular();
+    inTarjetas.addEventListener('input', calcular); inCosto.addEventListener('input', calcular); calcular();
   }
 
-  // Botón fijo de compra en el celular: se esconde cuando ya hay un botón de compra en pantalla
-  var fija = document.querySelector('.compra-fija');
-  var anclas = document.querySelectorAll('[data-compra]');
-  if (fija && anclas.length && 'IntersectionObserver' in window) {
-    var visibles = new Set();
-    var of = new IntersectionObserver(function (es) {
-      es.forEach(function (e) { e.isIntersecting ? visibles.add(e.target) : visibles.delete(e.target); });
-      fija.classList.toggle('fuera', visibles.size > 0);
+  // Barra fija de compra en el celular: se esconde cuando ya hay un botón de compra en pantalla
+  const barra = document.querySelector('.barra-movil');
+  const anclasCompra = document.querySelectorAll('[data-compra]');
+  if (barra && anclasCompra.length && hayIO) {
+    const enPantalla = new Set();
+    const obsCompra = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (e.isIntersecting) enPantalla.add(e.target); else enPantalla.delete(e.target); });
+      barra.classList.toggle('fuera', enPantalla.size > 0);
     });
-    anclas.forEach(function (a) { of.observe(a); });
+    anclasCompra.forEach(function (a) { obsCompra.observe(a); });
+  }
+
+  // Pruébalo: cada botón del perfil avisa en el celular y suma en el panel del dueño
+  const demo = document.querySelector('[data-demo]');
+  if (demo) {
+    const feed = demo.querySelector('.feed'), avisoTel = demo.querySelector('.tel-toast');
+    const ahora = demo.dataset.ahora, hace = demo.dataset.hace;
+    let relojAviso = null, abierto = false;
+    const sube = function (k) {
+      const el = demo.querySelector('[data-k="' + k + '"]');
+      if (!el) return;
+      el.textContent = String(+el.textContent + 1);
+      el.classList.add('sube');
+      setTimeout(function () { el.classList.remove('sube'); }, 900);
+    };
+    const evento = function (ico, txt) {
+      const li = document.createElement('li');
+      const i = document.createElement('i'), s = document.createElement('span'), tm = document.createElement('time');
+      i.textContent = ico; s.textContent = txt; tm.textContent = ahora;
+      li.append(i, s, tm);
+      feed.prepend(li);
+      Array.prototype.slice.call(feed.querySelectorAll('time'), 1, 3).forEach(function (t, n) {
+        if (t.textContent === ahora) t.textContent = hace.replace(':n', String((n + 1) * 2));
+      });
+      while (feed.children.length > 7) feed.lastElementChild.remove();
+    };
+    const avisar = function (txt) {
+      avisoTel.querySelector('span').textContent = txt;
+      avisoTel.classList.add('on');
+      clearTimeout(relojAviso);
+      relojAviso = setTimeout(function () { avisoTel.classList.remove('on'); }, 2200);
+    };
+    demo.querySelectorAll('[data-acc]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        if (!abierto) { abierto = true; sube('vis'); evento('👀', demo.dataset.abrio); }
+        if (b.dataset.copiar && navigator.clipboard) navigator.clipboard.writeText(b.dataset.copiar).catch(function () {});
+        avisar(b.dataset.aviso);
+        if (b.dataset.kpi) sube(b.dataset.kpi);
+        evento(b.dataset.ico, b.dataset.evento);
+      });
+    });
+  }
+
+  // Dos perfiles: el ejecutivo o una pasión de fin de semana; rota solo hasta que la persona toque
+  const dos = document.querySelector('[data-dos]');
+  if (dos) {
+    const ordenDos = ['ejec', 'moto', 'ejec', 'escalada', 'ejec', 'gym'];
+    let pasion = 'moto', giroDos = null, pasoDos = 0;
+    const verVista = function (v) {
+      const personal = v !== 'ejec';
+      if (personal) pasion = v;
+      dos.querySelectorAll('[data-vista]').forEach(function (x) { x.hidden = x.dataset.vista !== v; });
+      dos.querySelectorAll('[data-modo]').forEach(function (b) { b.setAttribute('aria-pressed', String((b.dataset.modo === 'personal') === personal)); });
+      dos.querySelectorAll('[data-pasion]').forEach(function (b) { b.setAttribute('aria-pressed', String(personal && b.dataset.pasion === v)); });
+    };
+    const pararDos = function () { clearInterval(giroDos); giroDos = null; };
+    dos.querySelectorAll('[data-modo]').forEach(function (b) {
+      b.addEventListener('click', function () { pararDos(); verVista(b.dataset.modo === 'personal' ? pasion : 'ejec'); });
+    });
+    dos.querySelectorAll('[data-pasion]').forEach(function (b) {
+      b.addEventListener('click', function () { pararDos(); verVista(b.dataset.pasion); });
+    });
+    if (!reducir) {
+      giroDos = setInterval(function () { pasoDos = (pasoDos + 1) % ordenDos.length; verVista(ordenDos[pasoDos]); }, 3500);
+    }
+  }
+
+  // Tu tarjeta con tu nombre: acabado Matte Black o Crystal y la tarjeta se inclina con el puntero
+  const estudioBox = document.querySelector('[data-estudio]');
+  if (estudioBox) {
+    const escenario = estudioBox.querySelector('.estudio'), tarjeta3d = estudioBox.querySelector('.t3d');
+    const nombreTarjeta = estudioBox.querySelector('[data-nombre]'), acabadoTarjeta = estudioBox.querySelector('[data-car]');
+    const campoNombre = estudioBox.querySelector('input');
+    campoNombre.addEventListener('input', function () {
+      nombreTarjeta.textContent = campoNombre.value.trim() || estudioBox.dataset.vacio;
+    });
+    estudioBox.querySelectorAll('[data-acab]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        const k = b.dataset.acab;
+        estudioBox.querySelectorAll('[data-acab]').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+        escenario.classList.toggle('crystal', k === 'crystal');
+        acabadoTarjeta.textContent = b.textContent.trim();
+        estudioBox.querySelectorAll('[data-acab-txt]').forEach(function (x) { x.hidden = x.dataset.acabTxt !== k; });
+      });
+    });
+    if (!reducir) {
+      escenario.addEventListener('pointermove', function (e) {
+        const r = escenario.getBoundingClientRect(), px = (e.clientX - r.left) / r.width - 0.5, py = (e.clientY - r.top) / r.height - 0.5;
+        tarjeta3d.style.transform = 'rotateX(' + (-py * 24) + 'deg) rotateY(' + (px * 30) + 'deg)';
+      });
+      escenario.addEventListener('pointerleave', function () { tarjeta3d.style.transform = ''; });
+    }
   }
 })();

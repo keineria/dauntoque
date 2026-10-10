@@ -6,5 +6,5 @@ return [
     'limite' => 2,
 
     // Nicknames que chocan con rutas del portal (nuevo = sitio de ventas de prueba, ver sitio:generar)
-    'reservados' => ['login', 'register', 'dashboard', 'editor', 'activar', 'perfil', 'admin', 'api', 'password', 'configuracion', 'analiticas', 'nuevo', 'build', 'uploads', 'storage'],
+    'reservados' => ['login', 'register', 'dashboard', 'editor', 'activar', 'perfil', 'admin', 'api', 'password', 'configuracion', 'analiticas', 'nuevo', 'build', 'uploads', 'storage', 'renovar', 'webhooks', 'comprar', 'pedido'],
 ];

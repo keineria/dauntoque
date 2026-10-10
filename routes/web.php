@@ -13,6 +13,14 @@ Route::get('/', function () {
 // Ruta libre para leer la tarjeta física (con límite de intentos para evitar barridos de códigos)
 Route::get('/activar/{hash}', [App\Http\Controllers\NfcController::class, 'vincularTarjeta'])->middleware('throttle:20,1');
 
+// Avisos de pago de Bold (firmados con x-bold-signature; sin CSRF, ver bootstrap/app.php)
+Route::post('/webhooks/bold', App\Http\Controllers\WebhookBoldController::class);
+
+// Compra de la tarjeta en línea (Colombia, Bold) y página privada del pedido
+Route::get('/comprar', [App\Http\Controllers\CompraController::class, 'formulario']);
+Route::post('/comprar', [App\Http\Controllers\CompraController::class, 'crear'])->middleware('throttle:10,1');
+Route::get('/pedido/{pedido}', [App\Http\Controllers\CompraController::class, 'ver'])->name('pedido.ver');
+
 // Analíticas del perfil público (visitas y clics); público, con CSRF y límite por IP
 Route::post('/api/analiticas/registrar', [AnaliticasController::class, 'registrar'])->middleware('throttle:60,1');
 
@@ -32,6 +40,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard/perfiles', [DashboardController::class, 'perfiles']);
     Route::get('/dashboard/analiticas', [DashboardController::class, 'analiticas']);
     Route::get('/dashboard/configuracion', [DashboardController::class, 'configuracion']);
+    Route::post('/renovar/{tarjeta}', [App\Http\Controllers\RenovacionController::class, 'crear']);
     Route::post('/api/ia/generar-bio', [App\Http\Controllers\ProfileController::class, 'generarBioIA']);
 
 });
