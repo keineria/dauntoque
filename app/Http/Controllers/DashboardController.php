@@ -7,6 +7,7 @@ use App\Models\Profile;
 use App\Models\Tarjeta;
 use App\Support\ImageStore;
 use App\Support\MediosPago;
+use App\Support\Precios;
 use App\Support\RedesSociales;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -99,19 +100,6 @@ class DashboardController extends Controller
             ->value('whatsapp');
     }
 
-    /** Precio de la renovación anual en la moneda del país del usuario: "$120.000 COP" o "$55 USD". */
-    private function precioRenovacion(?string $pais): ?string
-    {
-        $pais = MediosPago::pais($pais);
-        $monto = config("servicio.precio_renovacion.$pais");
-        if ($monto === null) {
-            return null;
-        }
-        $moneda = Market::where('code', $pais)->value('currency') ?? ($pais === 'US' ? 'USD' : 'COP');
-
-        return '$' . number_format($monto, 0, ',', $pais === 'US' ? ',' : '.') . ' ' . $moneda;
-    }
-
     public function index()
     {
         return view('dashboard.index', $this->cargarDatos() + [
@@ -120,7 +108,7 @@ class DashboardController extends Controller
             'tarjetas' => $this->tarjetas(Auth::id()),
             'whatsappRenovar' => $this->whatsappVentas(Profile::activoDe(Auth::id())?->pais),
             'pagosEnLinea' => \App\Services\Bold::configurado(),
-            'precioRenovacion' => $this->precioRenovacion(Profile::activoDe(Auth::id())?->pais),
+            'precioRenovacion' => Precios::renovacion(Profile::activoDe(Auth::id())?->pais),
         ]);
     }
 

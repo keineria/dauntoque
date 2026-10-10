@@ -2,6 +2,7 @@
 
 namespace App\Support;
 
+use App\Models\Market;
 use Illuminate\Support\Facades\DB;
 
 /** Precio vigente de la tarjeta por país (tabla prices). Lo usan el sitio de ventas y el checkout. */
@@ -17,5 +18,18 @@ class Precios
             ->where(fn ($q) => $q->whereNull('valid_from')->orWhere('valid_from', '<=', $ahora))
             ->where(fn ($q) => $q->whereNull('valid_to')->orWhere('valid_to', '>=', $ahora))
             ->orderByDesc('id')->first();
+    }
+
+    /** Precio de la renovación anual en la moneda del país: "$120.000 COP" o "$55 USD" (config/servicio.php). */
+    public static function renovacion(?string $pais): ?string
+    {
+        $pais = MediosPago::pais($pais);
+        $monto = config("servicio.precio_renovacion.$pais");
+        if ($monto === null) {
+            return null;
+        }
+        $moneda = Market::where('code', $pais)->value('currency') ?? ($pais === 'US' ? 'USD' : 'COP');
+
+        return '$' . number_format($monto, 0, ',', $pais === 'US' ? ',' : '.') . ' ' . $moneda;
     }
 }
