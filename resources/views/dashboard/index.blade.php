@@ -55,6 +55,9 @@
                     <dl style="display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:0;font-size:13px">
                         <dt class="dt-sub">Activada</dt><dd style="margin:0">{{ $t['activadaEn']->translatedFormat('j M Y') }}</dd>
                         <dt class="dt-sub">Vence</dt><dd style="margin:0">{{ $t['venceEn']->translatedFormat('j M Y') }}</dd>
+                        @if($precioRenovacion)
+                            <dt class="dt-sub">Renovación</dt><dd style="margin:0">{{ $precioRenovacion }} / año</dd>
+                        @endif
                         <dt class="dt-sub">Chip</dt><dd style="margin:0;font-family:ui-monospace,Consolas,monospace">···{{ \Illuminate\Support\Str::substr($t['uid'], -6) }}</dd>
                     </dl>
                     @if($t['estado'] !== 'activo' && $whatsappRenovar)

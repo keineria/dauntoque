@@ -76,7 +76,8 @@ class TarjetaServicioTest extends TestCase
             ->assertOk()
             ->assertSee('Servicio de tu tarjeta')
             ->assertSee('312')
-            ->assertSee('···abc123');
+            ->assertSee('···abc123')
+            ->assertSee('$120.000 COP / año');
     }
 
     private function estado(Tarjeta $tarjeta, string $hoy): array
