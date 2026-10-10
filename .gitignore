@@ -29,3 +29,4 @@ Thumbs.db
 # Datos de usuarios y artefactos locales (no van al repositorio)
 /public/uploads
 /database/*.sqlite
+/public/nuevo
