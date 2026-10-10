@@ -1,25 +1,24 @@
 <x-guest-layout>
-    <div class="mb-4 text-sm text-gray-600">
-        {{ __('Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.') }}
-    </div>
+    <x-slot name="titulo">Recuperar contraseña</x-slot>
 
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+    <h2>¿Olvidaste tu contraseña?</h2>
+    <p class="dt-sub">Escribe tu correo y te enviaremos un enlace para crear una nueva.</p>
 
-    <form method="POST" action="{{ route('password.email') }}">
+    @if (session('status'))
+        <p class="ac-aviso" role="status">{{ session('status') }}</p>
+    @endif
+
+    <form method="POST" action="{{ route('password.email') }}" x-data="{ enviando: false }" @submit="enviando = true">
         @csrf
-
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+        <div class="ac-campo">
+            <label class="dt-label" for="email">Correo electrónico</label>
+            <input id="email" class="dt-input" type="email" name="email" value="{{ old('email') }}" required autofocus placeholder="tu@correo.com">
+            @foreach ($errors->get('email') as $mensaje)<p class="ac-error">{{ $mensaje }}</p>@endforeach
         </div>
-
-        <div class="flex items-center justify-end mt-4">
-            <x-primary-button>
-                {{ __('Email Password Reset Link') }}
-            </x-primary-button>
-        </div>
+        <button type="submit" class="dt-btn pri ac-enviar" :disabled="enviando">
+            <span x-show="!enviando">Enviarme el enlace</span><span x-show="enviando" x-cloak>Enviando…</span>
+        </button>
     </form>
+
+    <p class="ac-pie"><a href="{{ route('login') }}">Volver a entrar</a></p>
 </x-guest-layout>
