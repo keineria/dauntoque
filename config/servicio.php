@@ -11,6 +11,6 @@ return [
     // Precio de la renovación anual por país (moneda de la tabla markets)
     'precio_renovacion' => ['CO' => 120000, 'US' => 55],
 
-    // Días que el perfil sigue visible después de vencer (propuesta, pendiente de aprobar)
+    // Días que el perfil sigue visible después de vencer
     'gracia_dias' => 15,
 ];
