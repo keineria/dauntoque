@@ -115,6 +115,14 @@
         .t-corporativo .card, .t-corporativo .sp { background:#fff; border:1px solid #e2e8f0; }
         .t-sport { background:#111 radial-gradient(#2b3342 1px, transparent 1px) 0 0/9px 9px; color:#fff; }
         .t-sport .card, .t-sport .sp { background:#000; border-left:3px solid var(--acc); }
+        .t-onyx { background:#080808; color:#f5f5f4; }
+        .t-onyx .card, .t-onyx .sp { background:#141414; border:1px solid rgba(255,255,255,.08); }
+        .t-medianoche { background:radial-gradient(120% 90% at 50% 0%, #1e3a8a 0%, #060a14 60%); color:#f1f5f9; }
+        .t-medianoche .card, .t-medianoche .sp { background:rgba(15,23,42,.8); border:1px solid rgba(148,163,184,.18); }
+        .t-rose { background:radial-gradient(120% 90% at 50% 0%, #4a1d33 0%, #130b10 60%); color:#fdf2f8; }
+        .t-rose .card, .t-rose .sp { background:rgba(34,19,28,.85); border:1px solid rgba(244,194,214,.16); }
+        .t-esmeralda { background:radial-gradient(120% 90% at 50% 0%, #064e3b 0%, #05110d 60%); color:#ecfdf5; }
+        .t-esmeralda .card, .t-esmeralda .sp { background:rgba(10,30,23,.85); border:1px solid rgba(167,243,208,.14); }
         .t-minimalista { background:#f4f4f4; color:#111; }
         .t-minimalista .card, .t-minimalista .sp { background:#fff; border:1px solid #eaeaea; }
 

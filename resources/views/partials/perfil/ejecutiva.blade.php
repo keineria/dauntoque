@@ -1,4 +1,4 @@
-{{-- Diseño "Ejecutivo": arriba una tarjeta de presentación como la física, debajo los datos de contacto a la vista. --}}
+{{-- Diseño "Deportivo" (id ejecutiva): arriba una tarjeta de presentación como la física, debajo los datos de contacto a la vista. --}}
 <div class="px">
     <style>
         .px { max-width:460px; margin:0 auto; padding:20px 14px 96px; display:flex; flex-direction:column; gap:12px; }
@@ -17,7 +17,7 @@
         .px-dato + .px-dato { border-top:1px solid var(--line); border-radius:0; }
         .px-dato .ic { width:38px; height:38px; flex:none; border-radius:11px; display:grid; place-items:center; background:color-mix(in srgb, var(--acc) 16%, transparent); color:var(--acc); }
         .px-dato small { display:block; font-size:10.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
-        .px-dato b { display:block; font-size:14.5px; font-weight:600; overflow-wrap:anywhere; }
+        .px-dato b { display:block; font-size:14.5px; font-weight:600; overflow-wrap:anywhere; } .px-dato > span:last-child { flex:1; min-width:0; }
         .px-acciones { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
         .px-acciones.una { grid-template-columns:1fr; }
         .px-btn { height:52px; display:flex; align-items:center; justify-content:center; gap:8px; font-size:14px; font-weight:700; text-decoration:none; border:0; cursor:pointer; white-space:nowrap; }
@@ -44,31 +44,30 @@
             <template x-if="!p.foto"><span x-text="(p.nombre || '?').charAt(0).toUpperCase()"></span></template>
         </div>
         <div style="min-width:0;position:relative;z-index:1">
-            <h1 class="px-nombre pp-nombre" x-text="p.nombre || 'Tu nombre'"></h1>
-            <p class="px-prof" x-show="p.tipo !== 'empresa' && (p.profesion || p.preview)" x-text="p.profesion || 'Tu profesión'"></p>
+            <h1 class="px-nombre pp-nombre" x-text="p.nombre || t('tuNombre')"></h1>
+            <p class="px-prof" x-show="p.tipo !== 'empresa' && (p.profesion || p.preview)" x-text="p.profesion || t('tuProfesion')"></p>
             <p class="px-marca" x-text="p.preview ? 'portal.dauntoque.com' : String(p.enlace || '').replace(/^https?:\/\//, '')"></p>
         </div>
     </section>
 
     <div class="px-acciones" :class="p.telefono ? '' : 'una'" x-ref="acciones">
         <a class="px-btn pri" :class="p.forma" :href="p.vcf" @click="accion('descarga_vcf', $event)">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>Guardar contacto
-        </a>
-        <a class="px-btn wa" :class="p.forma" x-show="p.telefono" :href="'https://wa.me/' + dtSoloDigitos(p.telefono)" target="_blank" rel="noopener" @click="accion('whatsapp', $event)">WhatsApp</a>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg><span class="ajusta" x-text="t('guardar')">Guardar contacto</span></a>
+        <a class="px-btn wa" :class="p.forma" x-show="p.telefono" :href="'https://wa.me/' + dtSoloDigitos(p.telefono)" target="_blank" rel="noopener" @click="accion('whatsapp', $event)"><span class="ajusta" x-text="t('whatsapp')">WhatsApp</span></a>
     </div>
 
     <section class="px-bloque" x-show="p.telefono || p.correo || p.direccion">
         <a class="px-dato" x-show="p.telefono" :href="'tel:' + p.telefono" @click="accion('llamada', $event)">
             <span class="ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg></span>
-            <span><small>Teléfono</small><b x-text="p.telefono"></b></span>
+            <span><small><span x-text="t('telefono')">Teléfono</span></small><b class="ajusta" x-text="p.telefono"></b></span>
         </a>
         <a class="px-dato" x-show="p.correo" :href="'mailto:' + p.correo" @click="accion('correo', $event)">
             <span class="ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg></span>
-            <span><small>Correo</small><b x-text="p.correo"></b></span>
+            <span><small><span class="ajusta" x-text="t('correo')">Correo</span></small><b class="ajusta" x-text="p.correo"></b></span>
         </a>
         <div class="px-dato" x-show="p.direccion">
             <span class="ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></span>
-            <span><small>Ubicación</small><b x-text="p.direccion"></b></span>
+            <span><small><span x-text="t('ubicacion')">Ubicación</span></small><b x-text="p.direccion"></b></span>
         </div>
     </section>
 
@@ -79,21 +78,21 @@
     </div>
 
     <section class="px-bloque" x-show="p.bio || p.preview">
-        <h2 class="px-h">Perfil</h2>
-        <p class="px-texto" x-text="p.bio || 'Tu biografía aparecerá aquí.'"></p>
+        <h2 class="px-h"><span x-text="t('perfil')">Perfil</span></h2>
+        <p class="px-texto" x-text="p.bio || t('tuBio')"></p>
     </section>
 
     <section class="px-bloque" x-show="p.galeria && p.galeria.length">
-        <h2 class="px-h">Portafolio</h2>
+        <h2 class="px-h"><span x-text="t('portafolio')">Portafolio</span></h2>
         <div class="px-gal">
             <template x-for="(img, i) in (p.galeria || [])" :key="i">
-                <button type="button" @click="if (!p.preview) fotoGrande = img" :aria-label="'Ver imagen ' + (i + 1)"><img :src="img" alt="" loading="lazy"></button>
+                <button type="button" @click="if (!p.preview) fotoGrande = img" :aria-label="t('verImagen') + ' ' + (i + 1)"><img :src="img" alt="" loading="lazy"></button>
             </template>
         </div>
     </section>
 
     <section class="px-bloque" x-show="p.zelle || p.cashapp || p.venmo">
-        <h2 class="px-h">Pagos</h2>
+        <h2 class="px-h"><span x-text="t('pagos')">Pagos</span></h2>
         <div class="px-pagos">
             <button type="button" :class="p.forma" style="background:linear-gradient(#8621a1,#741b8c)" x-show="p.zelle" @click="accion('zelle', $event); if (!p.preview) zelleAbierto = true">Zelle</button>
             <a :class="p.forma" style="background:#00d632;color:#06210f" x-show="p.cashapp" :href="'https://cash.app/$' + encodeURIComponent(String(p.cashapp || '').replace(/^\$/, ''))" target="_blank" rel="noopener" @click="accion('cashapp', $event)">Cash App</a>
@@ -102,6 +101,6 @@
     </section>
 
     <footer class="px-pie">
-        <a href="https://dauntoque.com" target="_blank" rel="noopener" @click="if (p.preview) $event.preventDefault()">Tarjeta digital por <b>dauntoque</b> · Crea la tuya</a>
+        <a href="https://dauntoque.com" target="_blank" rel="noopener" @click="if (p.preview) $event.preventDefault()"><span x-text="t('tarjetaPor')">Tarjeta digital por</span> <b>dauntoque</b> · Crea la tuya</a>
     </footer>
 </div>

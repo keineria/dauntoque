@@ -89,6 +89,20 @@
             <span class="dt-chip">Se guarda solo</span>
         </div>
 
+        {{-- Temas listos: diseño, colores y botones ya combinados --}}
+        <span class="dt-label">Temas listos</span>
+        <div class="dt-styles" style="margin-bottom:24px">
+            <template x-for="c in combos" :key="c.id">
+                <div class="dt-tile" :class="esCombo(c) ? 'sel' : ''">
+                    <button class="dt-thumb" @click="aplicarCombo(c)" :aria-label="'Tema ' + c.nombre">
+                        <x-mini-perfil var="({ ...actual, tema: c.tema, color: c.color, forma: c.forma, estructura: c.diseno })" :solo="true" />
+                        <span class="dt-check" x-show="esCombo(c)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span>
+                    </button>
+                    <div><b style="font-size:13px" x-text="c.nombre"></b><small style="display:block;color:var(--muted);font-size:11.5px" x-text="c.desc"></small></div>
+                </div>
+            </template>
+        </div>
+
         <span class="dt-label">Diseño de la tarjeta</span>
         <div class="dt-styles" style="margin-bottom:24px">
             <template x-for="d in disenos" :key="d.id">
@@ -164,6 +178,10 @@
             aEliminar: null,
             toast: '', toastError: false, toastT: null, guardarT: null,
             estilos: [
+                { id: 'onyx', nombre: 'Ónix', desc: 'Negro y dorado' },
+                { id: 'medianoche', nombre: 'Medianoche', desc: 'Azul profundo' },
+                { id: 'rose', nombre: 'Rosé', desc: 'Ciruela y oro rosa' },
+                { id: 'esmeralda', nombre: 'Esmeralda', desc: 'Verde y dorado' },
                 { id: 'crystal', nombre: 'Crystal', desc: 'Vidrio sobre noche' },
                 { id: 'matte', nombre: 'Mate', desc: 'Negro sin brillo' },
                 { id: 'luxury', nombre: 'Luxury', desc: 'Dorado nocturno' },
@@ -172,13 +190,27 @@
                 { id: 'minimalista', nombre: 'Minimal', desc: 'Blanco limpio' },
             ],
             disenos: [
+                { id: 'premium', nombre: 'Premium', desc: 'Ejecutivo y sobrio' },
+                { id: 'boutique', nombre: 'Boutique', desc: 'Elegante, trabajos primero' },
                 { id: 'clasica', nombre: 'Clásico', desc: 'Todo en una tarjeta' },
                 { id: 'moderna', nombre: 'Moderno', desc: 'Secciones y acciones arriba' },
                 { id: 'feria', nombre: 'Feria', desc: 'Tu foto en grande' },
                 { id: 'enlaces', nombre: 'Enlaces', desc: 'Botones para tu bio' },
-                { id: 'ejecutiva', nombre: 'Ejecutivo', desc: 'Tarjeta de presentación' },
+                { id: 'ejecutiva', nombre: 'Deportivo', desc: 'Franja de color al lado' },
             ],
-            colores: ['#3b82f6', '#38bdf8', '#2eaa6e', '#d4af37', '#e4572e', '#d6336c', '#7a3fd6', '#111111'],
+            colores: ['#3b82f6', '#c8a96a', '#d4af37', '#e8a3b8', '#2eaa6e', '#38bdf8', '#7a3fd6', '#f5f5f4'],
+            combos: @json(config('combos')),
+            // ¿El perfil tiene exactamente este tema listo?
+            esCombo(c) {
+                const p = this.actual;
+                return !!p && (p.estructura || 'clasica') === c.diseno && p.tema === c.tema && (p.color || '').toLowerCase() === c.color && p.forma === c.forma;
+            },
+            // Aplica diseño, estilo, color y botones de una vez (un solo guardado)
+            aplicarCombo(c) {
+                const p = this.actual; if (!p) return;
+                Object.assign(p, { estructura: c.diseno, tema: c.tema, color: c.color, forma: c.forma });
+                this.cambiar({ layout_estructura: c.diseno, tema_base: c.tema, color_primario: c.color, forma_botones: c.forma }, 'tema', c.tema);
+            },
 
             get actual() { return this.fichas.find(p => p.id === this.sel) || null; },
 

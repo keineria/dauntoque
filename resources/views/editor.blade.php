@@ -224,6 +224,19 @@
 
                         {{-- PASO 8: diseño --}}
                         <div x-show="paso === 8" x-cloak>
+                            <span class="dt-label">Temas listos</span>
+                            <div class="dt-styles" style="grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px;margin-bottom:22px">
+                                <template x-for="c in combos" :key="c.id">
+                                    <div class="dt-tile" :class="esCombo(c) ? 'sel' : ''">
+                                        <button class="dt-thumb" @click="aplicarCombo(c)" :aria-label="'Tema ' + c.nombre">
+                                            <x-mini-perfil var="({ tema: c.tema, color: c.color, forma: c.forma, estructura: c.diseno, foto: fotoPreview, inicial: (nombre || '?').charAt(0).toUpperCase() })" :solo="true" />
+                                            <span class="dt-check" x-show="esCombo(c)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span>
+                                        </button>
+                                        <b style="font-size:12.5px" x-text="c.nombre"></b>
+                                    </div>
+                                </template>
+                            </div>
+
                             <span class="dt-label">Diseño de la tarjeta</span>
                             <div class="dt-styles" style="grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px;margin-bottom:22px">
                                 <template x-for="d in disenosEditor" :key="d.id">
@@ -393,9 +406,20 @@
                 
                 nombrePerfil: 'Mi Tarjeta Principal',
                 config: { tema_base: 'crystal', color_fondo: 'transparent', color_primario: '#3b82f6', alineacion: 'centro', forma_botones: 'rounded-2xl', layout_estructura: 'clasica' },
-                presets: { luxury: { tema_base: 'luxury', color_fondo: '#050505', color_primario: '#D4AF37', alineacion: 'centro', forma_botones: 'rounded-none', layout_estructura: 'clasica' }, sport: { tema_base: 'sport', color_fondo: '#000000', color_primario: '#ccff00', alineacion: 'izquierda', forma_botones: '-skew-x-12', layout_estructura: 'clasica' }, corporativo: { tema_base: 'corporativo', color_fondo: '#f8fafc', color_primario: '#0f172a', alineacion: 'izquierda', forma_botones: 'rounded-md', layout_estructura: 'clasica' }, crystal: { tema_base: 'crystal', color_fondo: 'transparent', color_primario: '#3b82f6', alineacion: 'centro', forma_botones: 'rounded-2xl', layout_estructura: 'clasica' }, minimalista: { tema_base: 'minimalista', color_fondo: '#ffffff', color_primario: '#000000', alineacion: 'centro', forma_botones: 'rounded-full', layout_estructura: 'clasica' }, feria: { tema_base: 'matte', color_fondo: '#09090b', color_primario: '#ff3b30', alineacion: 'centro', forma_botones: 'rounded-xl', layout_estructura: 'feria' } },
-                disenosEditor: [ { id: 'clasica', nombre: 'Clásico' }, { id: 'moderna', nombre: 'Moderno' }, { id: 'feria', nombre: 'Feria' }, { id: 'enlaces', nombre: 'Enlaces' }, { id: 'ejecutiva', nombre: 'Ejecutivo' } ],
-                estilosEditor: [ { id: 'crystal', nombre: 'Crystal' }, { id: 'matte', nombre: 'Mate' }, { id: 'luxury', nombre: 'Luxury' }, { id: 'sport', nombre: 'Sport' }, { id: 'corporativo', nombre: 'Corporativo' }, { id: 'minimalista', nombre: 'Minimal' } ],
+                presets: { onyx: { tema_base: 'onyx', color_fondo: '#080808', color_primario: '#c8a96a', alineacion: 'centro', forma_botones: 'rounded-xl', layout_estructura: 'premium' }, medianoche: { tema_base: 'medianoche', color_fondo: '#060a14', color_primario: '#60a5fa', alineacion: 'centro', forma_botones: 'rounded-2xl', layout_estructura: 'premium' }, rose: { tema_base: 'rose', color_fondo: '#130b10', color_primario: '#e8a3b8', alineacion: 'centro', forma_botones: 'rounded-full', layout_estructura: 'boutique' }, esmeralda: { tema_base: 'esmeralda', color_fondo: '#05110d', color_primario: '#d4af37', alineacion: 'centro', forma_botones: 'rounded-xl', layout_estructura: 'premium' }, luxury: { tema_base: 'luxury', color_fondo: '#050505', color_primario: '#D4AF37', alineacion: 'centro', forma_botones: 'rounded-none', layout_estructura: 'clasica' }, sport: { tema_base: 'sport', color_fondo: '#000000', color_primario: '#ccff00', alineacion: 'izquierda', forma_botones: '-skew-x-12', layout_estructura: 'clasica' }, corporativo: { tema_base: 'corporativo', color_fondo: '#f8fafc', color_primario: '#0f172a', alineacion: 'izquierda', forma_botones: 'rounded-md', layout_estructura: 'clasica' }, crystal: { tema_base: 'crystal', color_fondo: 'transparent', color_primario: '#3b82f6', alineacion: 'centro', forma_botones: 'rounded-2xl', layout_estructura: 'clasica' }, minimalista: { tema_base: 'minimalista', color_fondo: '#ffffff', color_primario: '#000000', alineacion: 'centro', forma_botones: 'rounded-full', layout_estructura: 'clasica' }, feria: { tema_base: 'matte', color_fondo: '#09090b', color_primario: '#ff3b30', alineacion: 'centro', forma_botones: 'rounded-xl', layout_estructura: 'feria' } },
+                disenosEditor: [ { id: 'premium', nombre: 'Premium' }, { id: 'boutique', nombre: 'Boutique' }, { id: 'clasica', nombre: 'Clásico' }, { id: 'moderna', nombre: 'Moderno' }, { id: 'feria', nombre: 'Feria' }, { id: 'enlaces', nombre: 'Enlaces' }, { id: 'ejecutiva', nombre: 'Deportivo' } ],
+                estilosEditor: [ { id: 'onyx', nombre: 'Ónix' }, { id: 'medianoche', nombre: 'Medianoche' }, { id: 'rose', nombre: 'Rosé' }, { id: 'esmeralda', nombre: 'Esmeralda' }, { id: 'crystal', nombre: 'Crystal' }, { id: 'matte', nombre: 'Mate' }, { id: 'luxury', nombre: 'Luxury' }, { id: 'sport', nombre: 'Sport' }, { id: 'corporativo', nombre: 'Corporativo' }, { id: 'minimalista', nombre: 'Minimal' } ],
+                // Temas listos (config/combos.php): diseño, estilo, color y botones de una vez
+                combos: @json(config('combos')),
+                esCombo(c) {
+                    return (this.config.layout_estructura || 'clasica') === c.diseno && this.config.tema_base === c.tema
+                        && String(this.config.color_primario || '').toLowerCase() === c.color && this.config.forma_botones === c.forma;
+                },
+                aplicarCombo(c) {
+                    this.config = { ...this.config, tema_base: c.tema, color_primario: c.color, forma_botones: c.forma, layout_estructura: c.diseno, alineacion: 'centro' };
+                    this.plantilla = c.tema;
+                    this.alineacion = 'centro';
+                },
                 // Cambia colores y botones del estilo sin tocar el diseño elegido
                 aplicarTema(id) {
                     const diseno = this.config.layout_estructura || 'clasica';

@@ -3,9 +3,9 @@
     <style>
         .pc { max-width:440px; margin:0 auto; padding:18px 14px 96px; display:flex; flex-direction:column; gap:14px; }
         .pc-card { position:relative; background:var(--card); border:1px solid var(--line); border-radius:28px; padding:28px 20px 22px; display:flex; flex-direction:column; gap:18px; box-shadow:0 30px 60px -32px rgba(0,0,0,.7); }
-        .pc-compartir { position:absolute; top:14px; right:14px; width:38px; height:38px; border-radius:50%; display:grid; place-items:center; background:var(--chip); border:1px solid var(--line); color:var(--text); cursor:pointer; z-index:2; }
+        .pc-compartir { position:absolute; top:14px; left:14px; width:38px; height:38px; border-radius:50%; display:grid; place-items:center; background:var(--chip); border:1px solid var(--line); color:var(--text); cursor:pointer; z-index:2; }
         .pc-id { display:flex; flex-direction:column; align-items:center; text-align:center; gap:12px; }
-        .pc-id.izq { flex-direction:row; text-align:left; gap:16px; padding-right:40px; }
+        .pc-id.izq { flex-direction:row; text-align:left; gap:16px; }
         .pc-av { width:116px; height:116px; border-radius:50%; overflow:hidden; flex:none; display:grid; place-items:center; background:var(--chip); font:800 40px var(--titulo); color:var(--muted);
                  border:4px solid var(--card); box-shadow:0 0 0 2px color-mix(in srgb, var(--acc) 75%, transparent), 0 18px 40px -18px var(--acc); }
         .pc-id.izq .pc-av { width:84px; height:84px; font-size:30px; }
@@ -60,59 +60,55 @@
                 </div>
             </template>
             <div style="min-width:0">
-                <h1 class="pc-nombre pp-nombre" x-text="p.nombre || 'Tu nombre'"></h1>
-                <p class="pc-prof" x-show="p.tipo !== 'empresa' && (p.profesion || p.preview)" x-text="p.profesion || 'Tu profesión'"></p>
+                <h1 class="pc-nombre pp-nombre" x-text="p.nombre || t('tuNombre')"></h1>
+                <p class="pc-prof" x-show="p.tipo !== 'empresa' && (p.profesion || p.preview)" x-text="p.profesion || t('tuProfesion')"></p>
                 <p class="pc-lugar" x-show="p.direccion" x-text="p.direccion"></p>
             </div>
         </div>
 
         <template x-if="p.estructura === 'feria'">
-            <a class="pc-btn pri" :class="p.forma" :href="p.vcf" @click="accion('descarga_vcf', $event)">Guardar contacto</a>
+            <a class="pc-btn pri" :class="p.forma" :href="p.vcf" @click="accion('descarga_vcf', $event)"><span class="ajusta" x-text="t('guardar')">Guardar contacto</span></a>
         </template>
 
-        <p class="pc-bio" :class="p.estructura !== 'feria' && p.alineacion === 'izquierda' ? 'izq' : ''" x-show="p.bio || p.preview" x-text="p.bio || 'Tu biografía aparecerá aquí.'"></p>
+        <p class="pc-bio" :class="p.estructura !== 'feria' && p.alineacion === 'izquierda' ? 'izq' : ''" x-show="p.bio || p.preview" x-text="p.bio || t('tuBio')"></p>
 
         <div class="pc-grid" x-show="p.redes && p.redes.length">
             <template x-for="red in (p.redes || [])" :key="red.id">
                 <a class="pc-red" :class="p.forma" :href="dtUrlRed(red.id, red.usuario)" target="_blank" rel="noopener" @click="accion('red_social_' + red.id, $event)">
-                    <span x-html="red.svg" style="display:grid"></span><span x-text="red.nombre"></span>
+                    <span x-html="red.svg" style="display:grid"></span><span class="ajusta" x-text="red.nombre"></span>
                 </a>
             </template>
         </div>
 
         <div class="pc-grid pc-gal" x-show="p.galeria && p.galeria.length">
             <template x-for="(img, i) in (p.galeria || [])" :key="i">
-                <button type="button" style="border-radius:14px" @click="if (!p.preview) fotoGrande = img" :aria-label="'Ver imagen ' + (i + 1)"><img :src="img" alt="" loading="lazy"></button>
+                <button type="button" style="border-radius:14px" @click="if (!p.preview) fotoGrande = img" :aria-label="t('verImagen') + ' ' + (i + 1)"><img :src="img" alt="" loading="lazy"></button>
             </template>
         </div>
 
         <div class="pc-grid" x-show="p.telefono">
             <a class="pc-btn sec" :class="p.forma" :href="'tel:' + p.telefono" @click="accion('llamada', $event)">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg>Llamar
-            </a>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg><span class="ajusta" x-text="t('llamar')">Llamar</span></a>
             <a class="pc-btn wa" :class="p.forma" :href="'https://wa.me/' + dtSoloDigitos(p.telefono)" target="_blank" rel="noopener" @click="accion('whatsapp', $event)">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12.05 0C5.5 0 .16 5.34.16 11.89c0 2.1.55 4.14 1.59 5.95L.06 24l6.3-1.65a11.88 11.88 0 0 0 5.68 1.45h.01c6.55 0 11.89-5.34 11.89-11.89A11.82 11.82 0 0 0 12.05 0zm6.94 16.88c-.29.82-1.71 1.57-2.36 1.67-.6.09-1.37.13-2.21-.14-.51-.16-1.16-.38-2-.74-3.51-1.52-5.81-5.06-5.98-5.29-.17-.23-1.43-1.9-1.43-3.63s.9-2.57 1.23-2.93c.32-.35.7-.44.94-.44l.67.01c.21.01.5-.08.79.6.29.7.99 2.42 1.08 2.6.09.17.15.38.03.61-.12.23-.17.38-.35.58-.17.2-.36.45-.52.61-.17.17-.35.36-.15.7.2.35.9 1.48 1.93 2.4 1.33 1.18 2.45 1.55 2.8 1.72.35.17.55.15.75-.09.2-.23.87-1.01 1.1-1.36.23-.35.46-.29.78-.17.32.12 2.03.96 2.38 1.13.35.17.58.26.67.41.09.14.09.84-.2 1.66z"/></svg>WhatsApp
-            </a>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12.05 0C5.5 0 .16 5.34.16 11.89c0 2.1.55 4.14 1.59 5.95L.06 24l6.3-1.65a11.88 11.88 0 0 0 5.68 1.45h.01c6.55 0 11.89-5.34 11.89-11.89A11.82 11.82 0 0 0 12.05 0zm6.94 16.88c-.29.82-1.71 1.57-2.36 1.67-.6.09-1.37.13-2.21-.14-.51-.16-1.16-.38-2-.74-3.51-1.52-5.81-5.06-5.98-5.29-.17-.23-1.43-1.9-1.43-3.63s.9-2.57 1.23-2.93c.32-.35.7-.44.94-.44l.67.01c.21.01.5-.08.79.6.29.7.99 2.42 1.08 2.6.09.17.15.38.03.61-.12.23-.17.38-.35.58-.17.2-.36.45-.52.61-.17.17-.35.36-.15.7.2.35.9 1.48 1.93 2.4 1.33 1.18 2.45 1.55 2.8 1.72.35.17.55.15.75-.09.2-.23.87-1.01 1.1-1.36.23-.35.46-.29.78-.17.32.12 2.03.96 2.38 1.13.35.17.58.26.67.41.09.14.09.84-.2 1.66z"/></svg><span class="ajusta" x-text="t('whatsapp')">WhatsApp</span></a>
         </div>
 
         <div class="pc-pagos" x-show="p.zelle || p.cashapp || p.venmo">
-            <button type="button" class="pc-btn zelle" :class="p.forma" x-show="p.zelle" @click="accion('zelle', $event); if (!p.preview) zelleAbierto = true">Pagar con Zelle</button>
-            <a class="pc-btn cash" :class="p.forma" x-show="p.cashapp" :href="'https://cash.app/$' + encodeURIComponent(String(p.cashapp || '').replace(/^\$/, ''))" target="_blank" rel="noopener" @click="accion('cashapp', $event)">Pagar con Cash App</a>
-            <a class="pc-btn venmo" :class="p.forma" x-show="p.venmo" :href="'https://venmo.com/u/' + encodeURIComponent(String(p.venmo || '').replace(/^@/, ''))" target="_blank" rel="noopener" @click="accion('venmo', $event)">Pagar con Venmo</a>
+            <button type="button" class="pc-btn zelle" :class="p.forma" x-show="p.zelle" @click="accion('zelle', $event); if (!p.preview) zelleAbierto = true"><span class="ajusta" x-text="t('pagoZelle')">Pagar con Zelle</span></button>
+            <a class="pc-btn cash" :class="p.forma" x-show="p.cashapp" :href="'https://cash.app/$' + encodeURIComponent(String(p.cashapp || '').replace(/^\$/, ''))" target="_blank" rel="noopener" @click="accion('cashapp', $event)"><span class="ajusta" x-text="t('pagarCon') + ' Cash App'">Pagar con Cash App</span></a>
+            <a class="pc-btn venmo" :class="p.forma" x-show="p.venmo" :href="'https://venmo.com/u/' + encodeURIComponent(String(p.venmo || '').replace(/^@/, ''))" target="_blank" rel="noopener" @click="accion('venmo', $event)"><span class="ajusta" x-text="t('pagarCon') + ' Venmo'">Pagar con Venmo</span></a>
         </div>
 
         <template x-if="p.estructura !== 'feria'">
             <div x-ref="acciones">
                 <a class="pc-btn pri" :class="p.forma" :href="p.vcf" @click="accion('descarga_vcf', $event)">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>
-                    Guardar contacto
-                </a>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg><span class="ajusta" x-text="t('guardar')">Guardar contacto</span></a>
             </div>
         </template>
     </div>
 
     <footer class="pc-pie">
-        <a href="https://dauntoque.com" target="_blank" rel="noopener" @click="if (p.preview) $event.preventDefault()">Tarjeta digital por <b>dauntoque</b></a>
-        <a class="crea" href="https://dauntoque.com" target="_blank" rel="noopener" @click="if (p.preview) $event.preventDefault()">¿Quieres una así? Crea la tuya</a>
+        <a href="https://dauntoque.com" target="_blank" rel="noopener" @click="if (p.preview) $event.preventDefault()"><span x-text="t('tarjetaPor')">Tarjeta digital por</span> <b>dauntoque</b></a>
+        <a class="crea" href="https://dauntoque.com" target="_blank" rel="noopener" @click="if (p.preview) $event.preventDefault()" x-text="t('quieresUna')">¿Quieres una así? Crea la tuya</a>
     </footer>
 </div>

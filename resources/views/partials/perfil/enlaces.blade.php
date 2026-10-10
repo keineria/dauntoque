@@ -30,56 +30,49 @@
         <template x-if="p.foto"><img :src="p.foto" :alt="p.nombre"></template>
         <template x-if="!p.foto"><span x-text="(p.nombre || '?').charAt(0).toUpperCase()"></span></template>
     </div>
-    <h1 class="pe-nombre pp-nombre" x-text="p.nombre || 'Tu nombre'"></h1>
-    <p class="pe-prof" x-show="p.tipo !== 'empresa' && (p.profesion || p.preview)" x-text="p.profesion || 'Tu profesión'"></p>
-    <p class="pe-bio" x-show="p.bio || p.preview" x-text="p.bio || 'Tu biografía aparecerá aquí.'"></p>
+    <h1 class="pe-nombre pp-nombre" x-text="p.nombre || t('tuNombre')"></h1>
+    <p class="pe-prof" x-show="p.tipo !== 'empresa' && (p.profesion || p.preview)" x-text="p.profesion || t('tuProfesion')"></p>
+    <p class="pe-bio" x-show="p.bio || p.preview" x-text="p.bio || t('tuBio')"></p>
 
     <div class="pe-lista">
         <div x-ref="acciones" style="display:flex;flex-direction:column;gap:12px">
             <a class="pe-btn pri" :class="p.forma" :href="p.vcf" @click="accion('descarga_vcf', $event)">
-                <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg></span>Guardar contacto
-            </a>
+                <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg></span><span class="ajusta" x-text="t('guardar')">Guardar contacto</span></a>
             <a class="pe-btn wa" :class="p.forma" x-show="p.telefono" :href="'https://wa.me/' + dtSoloDigitos(p.telefono)" target="_blank" rel="noopener" @click="accion('whatsapp', $event)">
-                <span class="ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.05 0C5.5 0 .16 5.34.16 11.89c0 2.1.55 4.14 1.59 5.95L.06 24l6.3-1.65a11.88 11.88 0 0 0 5.68 1.45h.01c6.55 0 11.89-5.34 11.89-11.89A11.82 11.82 0 0 0 12.05 0zm6.94 16.88c-.29.82-1.71 1.57-2.36 1.67-.6.09-1.37.13-2.21-.14-.51-.16-1.16-.38-2-.74-3.51-1.52-5.81-5.06-5.98-5.29-.17-.23-1.43-1.9-1.43-3.63s.9-2.57 1.23-2.93c.32-.35.7-.44.94-.44l.67.01c.21.01.5-.08.79.6.29.7.99 2.42 1.08 2.6.09.17.15.38.03.61-.12.23-.17.38-.35.58-.17.2-.36.45-.52.61-.17.17-.35.36-.15.7.2.35.9 1.48 1.93 2.4 1.33 1.18 2.45 1.55 2.8 1.72.35.17.55.15.75-.09.2-.23.87-1.01 1.1-1.36.23-.35.46-.29.78-.17.32.12 2.03.96 2.38 1.13.35.17.58.26.67.41.09.14.09.84-.2 1.66z"/></svg></span>Escríbeme por WhatsApp
-            </a>
+                <span class="ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.05 0C5.5 0 .16 5.34.16 11.89c0 2.1.55 4.14 1.59 5.95L.06 24l6.3-1.65a11.88 11.88 0 0 0 5.68 1.45h.01c6.55 0 11.89-5.34 11.89-11.89A11.82 11.82 0 0 0 12.05 0zm6.94 16.88c-.29.82-1.71 1.57-2.36 1.67-.6.09-1.37.13-2.21-.14-.51-.16-1.16-.38-2-.74-3.51-1.52-5.81-5.06-5.98-5.29-.17-.23-1.43-1.9-1.43-3.63s.9-2.57 1.23-2.93c.32-.35.7-.44.94-.44l.67.01c.21.01.5-.08.79.6.29.7.99 2.42 1.08 2.6.09.17.15.38.03.61-.12.23-.17.38-.35.58-.17.2-.36.45-.52.61-.17.17-.35.36-.15.7.2.35.9 1.48 1.93 2.4 1.33 1.18 2.45 1.55 2.8 1.72.35.17.55.15.75-.09.2-.23.87-1.01 1.1-1.36.23-.35.46-.29.78-.17.32.12 2.03.96 2.38 1.13.35.17.58.26.67.41.09.14.09.84-.2 1.66z"/></svg></span><span class="ajusta" x-text="t('escribeme')">Escríbeme por WhatsApp</span></a>
         </div>
         <a class="pe-btn" :class="p.forma" x-show="p.telefono" :href="'tel:' + p.telefono" @click="accion('llamada', $event)">
-            <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg></span>Llamar
-        </a>
+            <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg></span><span class="ajusta" x-text="t('llamar')">Llamar</span></a>
         <a class="pe-btn" :class="p.forma" x-show="p.correo" :href="'mailto:' + p.correo" @click="accion('correo', $event)">
-            <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg></span>Enviar un correo
-        </a>
+            <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg></span><span class="ajusta" x-text="t('enviarCorreo')">Enviar un correo</span></a>
         <template x-for="red in (p.redes || [])" :key="red.id">
             <a class="pe-btn" :class="p.forma" :href="dtUrlRed(red.id, red.usuario)" target="_blank" rel="noopener" @click="accion('red_social_' + red.id, $event)">
                 <span class="ic" x-html="red.svg"></span><span x-text="red.nombre"></span>
             </a>
         </template>
         <button type="button" class="pe-btn" :class="p.forma" x-show="p.zelle" @click="accion('zelle', $event); if (!p.preview) zelleAbierto = true">
-            <span class="ic" style="color:#8b3fe0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/></svg></span>Pagar con Zelle
-        </button>
+            <span class="ic" style="color:#8b3fe0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/></svg></span><span class="ajusta" x-text="t('pagoZelle')">Pagar con Zelle</span></button>
         <a class="pe-btn" :class="p.forma" x-show="p.cashapp" :href="'https://cash.app/$' + encodeURIComponent(String(p.cashapp || '').replace(/^\$/, ''))" target="_blank" rel="noopener" @click="accion('cashapp', $event)">
-            <span class="ic" style="color:#00b82b;font-weight:800">$</span>Pagar con Cash App
-        </a>
+            <span class="ic" style="color:#00b82b;font-weight:800">$</span><span class="ajusta" x-text="t('pagarCon') + ' Cash App'">Pagar con Cash App</span></a>
         <a class="pe-btn" :class="p.forma" x-show="p.venmo" :href="'https://venmo.com/u/' + encodeURIComponent(String(p.venmo || '').replace(/^@/, ''))" target="_blank" rel="noopener" @click="accion('venmo', $event)">
-            <span class="ic" style="color:#008cff;font-weight:800">V</span>Pagar con Venmo
-        </a>
+            <span class="ic" style="color:#008cff;font-weight:800">V</span><span class="ajusta" x-text="t('pagarCon') + ' Venmo'">Pagar con Venmo</span></a>
         <button type="button" class="pe-btn" :class="p.forma" @click="compartir($event)">
-            <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg></span><span x-text="copiado ? 'Enlace copiado' : 'Compartir mi tarjeta'"></span>
+            <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg></span><span x-text="copiado ? t('copiadoEnlace') : t('compartirTarjeta')"></span>
         </button>
     </div>
 
     <template x-if="p.galeria && p.galeria.length">
         <div style="width:100%">
-            <p class="pe-sep">Portafolio</p>
+            <p class="pe-sep"><span x-text="t('portafolio')">Portafolio</span></p>
             <div class="pe-gal" style="margin-top:10px">
                 <template x-for="(img, i) in p.galeria" :key="i">
-                    <button type="button" style="border-radius:14px" @click="if (!p.preview) fotoGrande = img" :aria-label="'Ver imagen ' + (i + 1)"><img :src="img" alt="" loading="lazy"></button>
+                    <button type="button" style="border-radius:14px" @click="if (!p.preview) fotoGrande = img" :aria-label="t('verImagen') + ' ' + (i + 1)"><img :src="img" alt="" loading="lazy"></button>
                 </template>
             </div>
         </div>
     </template>
 
     <footer class="pe-pie">
-        <a href="https://dauntoque.com" target="_blank" rel="noopener" @click="if (p.preview) $event.preventDefault()">Tarjeta digital por <b>dauntoque</b> · Crea la tuya</a>
+        <a href="https://dauntoque.com" target="_blank" rel="noopener" @click="if (p.preview) $event.preventDefault()"><span x-text="t('tarjetaPor')">Tarjeta digital por</span> <b>dauntoque</b> · Crea la tuya</a>
     </footer>
 </div>
