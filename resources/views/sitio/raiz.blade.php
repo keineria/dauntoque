@@ -11,6 +11,9 @@
         <link rel="alternate" hreflang="{{ $v['hreflang'] }}" href="{{ $dominio }}/{{ $c }}/">
     @endforeach
     <link rel="alternate" hreflang="x-default" href="{{ $dominio }}/">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Figtree:wght@400;600;700&display=swap">
     <link rel="stylesheet" href="{{ $base }}/sitio.css">
     <script>
         (function () {
@@ -29,8 +32,8 @@
 <body>
     <main class="raiz">
         <div>
-            <a class="logo" href="{{ $base }}/">dauntoque<span>.com</span></a>
-            <h1 style="font-size:28px;margin-top:18px">Elige tu país · Choose your country</h1>
+            <a class="logo" href="{{ $base }}/"><i aria-hidden="true"></i><span>dauntoque<em>.com</em></span></a>
+            <h1>Elige tu país · Choose your country</h1>
             <nav>
                 <a class="btn btn-pri" href="{{ $base }}/es-co/" data-version="es-co">Colombia · Español (COP)</a>
                 <a class="btn btn-sec" href="{{ $base }}/es-us/" data-version="es-us">Estados Unidos · Español (USD)</a>
