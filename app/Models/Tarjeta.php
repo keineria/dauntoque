@@ -34,6 +34,17 @@ class Tarjeta extends Model
     }
 
     /**
+     * Suma un año de servicio. Si aún no vencía, el año se suma al vencimiento (no se pierden días);
+     * si ya venció, cuenta desde hoy.
+     */
+    public function renovar(): void
+    {
+        $desde = $this->vence_en->isFuture() ? $this->vence_en : now();
+        $this->vence_en = $desde->copy()->addDays(config('servicio.dias'));
+        $this->save();
+    }
+
+    /**
      * Estado del servicio para el panel.
      * activo -> pronto (últimos aviso_dias) -> gracia (vencido, aún visible) -> pausa.
      */

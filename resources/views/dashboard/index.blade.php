@@ -16,6 +16,10 @@
         @endif
     </div>
 
+    @if(request()->boolean('renovacion'))
+        <div class="dt-panel" role="status" style="margin-bottom:18px">Recibimos tu pago. Cuando Bold lo confirme, tu nuevo año aparece aquí (puede tardar unos minutos).</div>
+    @endif
+
     {{-- Servicio de cada tarjeta: 365 días desde que se activó el chip (config/servicio.php) --}}
     @foreach($tarjetas as $t)
         @php
@@ -60,9 +64,16 @@
                         @endif
                         <dt class="dt-sub">Chip</dt><dd style="margin:0;font-family:ui-monospace,Consolas,monospace">···{{ \Illuminate\Support\Str::substr($t['uid'], -6) }}</dd>
                     </dl>
-                    @if($t['estado'] !== 'activo' && $whatsappRenovar)
-                        <a href="https://wa.me/{{ $whatsappRenovar }}?text={{ rawurlencode('Hola, quiero renovar el servicio de mi tarjeta DaUnToque (chip ···' . \Illuminate\Support\Str::substr($t['uid'], -6) . ')') }}"
-                           target="_blank" rel="noopener" class="dt-btn pri" style="justify-self:start">Renovar por WhatsApp</a>
+                    @if($t['estado'] !== 'activo')
+                        @if($pagosEnLinea)
+                            <form method="POST" action="/renovar/{{ $t['id'] }}" style="margin:0">
+                                @csrf
+                                <button type="submit" class="dt-btn pri">Renovar ahora{{ $precioRenovacion ? ' · ' . $precioRenovacion : '' }}</button>
+                            </form>
+                        @elseif($whatsappRenovar)
+                            <a href="https://wa.me/{{ $whatsappRenovar }}?text={{ rawurlencode('Hola, quiero renovar el servicio de mi tarjeta DaUnToque (chip ···' . \Illuminate\Support\Str::substr($t['uid'], -6) . ')') }}"
+                               target="_blank" rel="noopener" class="dt-btn pri" style="justify-self:start">Renovar por WhatsApp</a>
+                        @endif
                     @endif
                 </div>
             </div>

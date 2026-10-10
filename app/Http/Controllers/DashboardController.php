@@ -87,7 +87,7 @@ class DashboardController extends Controller
     private function tarjetas(int $userId): array
     {
         return Tarjeta::where('user_id', $userId)->orderBy('activada_en')->get()
-            ->map(fn (Tarjeta $t) => ['uid' => $t->nfc_uid] + $t->servicio())
+            ->map(fn (Tarjeta $t) => ['id' => $t->id, 'uid' => $t->nfc_uid] + $t->servicio())
             ->all();
     }
 
@@ -119,6 +119,7 @@ class DashboardController extends Controller
             'fichas' => $this->fichasPerfiles(Auth::id()),
             'tarjetas' => $this->tarjetas(Auth::id()),
             'whatsappRenovar' => $this->whatsappVentas(Profile::activoDe(Auth::id())?->pais),
+            'pagosEnLinea' => \App\Services\Bold::configurado(),
             'precioRenovacion' => $this->precioRenovacion(Profile::activoDe(Auth::id())?->pais),
         ]);
     }
