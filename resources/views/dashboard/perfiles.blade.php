@@ -223,7 +223,8 @@
                 clearTimeout(this.toastT); this.toastT = setTimeout(() => this.toast = '', 2600);
             },
             elegir(id) { this.sel = id; },
-            nuevo() { window.location.href = '/editor?modo=nuevo_secundario'; },
+            // El editor sin id crea un perfil nuevo y empieza por el paso del usuario
+            nuevo() { window.location.href = '/editor'; },
 
             async llamar(url, metodo, cuerpo = null) {
                 const r = await fetch(url, {

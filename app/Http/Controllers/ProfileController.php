@@ -13,6 +13,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
 class ProfileController extends Controller
@@ -31,42 +32,101 @@ class ProfileController extends Controller
 
     public function validarNickname(Request $request)
     {
-        $nickname = strtolower(trim($request->nickname));
-        if (in_array($nickname, config('perfiles.reservados'))) {
-            return response()->json(['disponible' => false]);
+        $error = self::errorNickname(strtolower(trim((string) $request->nickname)));
+
+        return response()->json(['disponible' => $error === null, 'mensaje' => $error]);
+    }
+
+    /**
+     * Revisa un nickname (ya en minúsculas): formato, palabras reservadas y que nadie más lo use.
+     * Devuelve el error para mostrar o null si se puede usar.
+     */
+    private static function errorNickname(string $nickname, ?int $perfilId = null): ?string
+    {
+        if ($nickname === '') {
+            return 'Escribe un nombre de usuario.';
         }
-        $existe = Profile::where('nickname', $nickname)->where('user_id', '!=', Auth::id())->exists();
-        return response()->json(['disponible' => !$existe]);
+        if (!preg_match('/^[a-z0-9._-]{3,30}$/', $nickname)) {
+            return 'El usuario debe tener de 3 a 30 caracteres: solo letras sin tilde, números, guion (-), guion bajo (_) o punto (.).';
+        }
+        if (in_array($nickname, config('perfiles.reservados'), true)) {
+            return 'Ese nombre de usuario está reservado. Elige otro.';
+        }
+        if (Profile::where('nickname', $nickname)->when($perfilId, fn ($q) => $q->where('id', '!=', $perfilId))->exists()) {
+            return 'Ese nombre de usuario ya está en uso. Elige otro.';
+        }
+
+        return null;
+    }
+
+    /** Reglas de los datos del perfil; los mensajes salen en español sin depender del idioma de la app. */
+    private static function validarCampos(Request $request, bool $nuevo): void
+    {
+        $texto = fn (int $max) => ['nullable', 'string', 'max:' . $max];
+
+        $request->validate([
+            'nombre' => [$nuevo ? 'required' : 'sometimes', 'required', 'string', 'max:100'],
+            'nombre_perfil' => $texto(60),
+            'profesion' => $texto(120),
+            'bio' => $texto(1500),
+            'direccion' => $texto(200),
+            'telefono' => ['nullable', 'string', 'max:30', 'regex:/^[0-9 +()\-]+$/'],
+            'correo_contacto' => ['nullable', 'string', 'max:150', 'email'],
+            'tipo_perfil' => ['sometimes', 'required', Rule::in(config('perfiles.tipos'))],
+            'design_config' => ['nullable', 'string', 'max:5000', 'json'],
+        ], [
+            'nombre.required' => 'Escribe tu nombre público.',
+            'telefono.regex' => 'El teléfono solo puede tener números, espacios y los signos + ( ) -.',
+            'correo_contacto.email' => 'Escribe un correo de contacto válido (ej. nombre@correo.com).',
+            'tipo_perfil.*' => 'Elige un uso válido para tu tarjeta: corporativo, empresa o hobbies.',
+            'design_config.*' => 'El diseño de la tarjeta no es válido. Vuelve a elegirlo.',
+            'max' => ':attribute no puede tener más de :max caracteres.',
+            'string' => ':attribute no es válido.',
+        ], [
+            'nombre' => 'El nombre', 'nombre_perfil' => 'El nombre del perfil', 'profesion' => 'El título o profesión',
+            'bio' => 'La descripción', 'direccion' => 'La dirección', 'telefono' => 'El teléfono', 'correo_contacto' => 'El correo',
+        ]);
     }
 
     public function store(Request $request)
     {
-        try {
-            $usuario = Auth::user();
+        $usuario = Auth::user();
 
-            // CLAVE: Saber si estamos editando o creando uno nuevo
-            if ($request->has('perfil_id') && $request->perfil_id != 'null') {
-                $perfil = Profile::where('id', $request->perfil_id)->where('user_id', $usuario->id)->firstOrFail();
-            } else {
+        // CLAVE: Saber si estamos editando o creando uno nuevo (un perfil de otra cuenta da 404)
+        $perfil = null;
+        if ($request->filled('perfil_id') && $request->perfil_id != 'null') {
+            $perfil = Profile::where('id', $request->perfil_id)->where('user_id', $usuario->id)->firstOrFail();
+        }
+
+        try {
+            if (!$perfil) {
                 // Validar límite si es nuevo
                 $limite = config('perfiles.limite');
                 $totalPerfiles = Profile::where('user_id', $usuario->id)->count();
                 if ($totalPerfiles >= $limite) {
-                    return response()->json(['status' => 'error', 'message' => "Límite de $limite perfiles alcanzado. Mejora a PRO."]);
+                    return response()->json(['status' => 'error', 'message' => "Tu cuenta incluye $limite perfiles y ya los tienes. Puedes editar o borrar uno."], 422);
                 }
                 $perfil = new Profile();
                 $perfil->user_id = $usuario->id;
+                // El primer perfil de la cuenta es el activo; los siguientes solo cuando el usuario los activa
+                $perfil->activo_en = $totalPerfiles === 0 ? now() : null;
             }
 
-            $perfil->nickname = $request->nickname ?: ($perfil->nickname ?: 'user_' . uniqid());
-            if (in_array(strtolower($perfil->nickname), config('perfiles.reservados'))) {
-                return response()->json(['status' => 'error', 'message' => 'Ese nombre de usuario está reservado. Elige otro.'], 422);
+            self::validarCampos($request, !$perfil->exists);
+
+            // El nickname solo se revisa si es nuevo o cambia (los perfiles antiguos conservan el suyo)
+            $nickname = strtolower(trim((string) $request->nickname));
+            if (!$perfil->exists || ($nickname !== '' && $nickname !== $perfil->nickname)) {
+                if ($error = self::errorNickname($nickname, $perfil->id)) {
+                    return response()->json(['status' => 'error', 'message' => $error], 422);
+                }
+                $perfil->nickname = $nickname;
             }
 
             // Solo se actualizan los campos que llegan en la petición: el editor los envía todos,
             // la pantalla de Configuración envía una parte y el resto se conserva.
             $campos = ['nombre_perfil', 'design_config', 'nombre', 'correo_contacto', 'profesion', 'bio',
-                       'telefono', 'direccion'];
+                       'telefono', 'direccion', 'tipo_perfil'];
             foreach ($campos as $campo) {
                 // nombre_perfil es obligatorio en la BD: vacío conserva el actual (o el valor por defecto)
                 if ($request->has($campo) && !($campo === 'nombre_perfil' && blank($request->input($campo)))) {
@@ -110,19 +170,19 @@ class ProfileController extends Controller
             }
             $perfil->save();
 
+            // Chip escaneado antes de tener perfil: va al perfil activo, igual que en NfcController
             if (session()->has('nfc_pendiente')) {
-                $perfil->nfc_uid = session('nfc_pendiente');
-                $perfil->save();
-                Tarjeta::registrarActivacion($perfil->user_id, $perfil->nfc_uid);
+                Tarjeta::vincular(Profile::activoDe($usuario->id), session('nfc_pendiente'));
                 session()->forget('nfc_pendiente');
             }
 
-            return response()->json(['status' => 'success', 'message' => 'Guardado exitoso']);
+            // nickname = link maestro de la cuenta (el botón "Ver mi perfil" del editor)
+            return response()->json(['status' => 'success', 'message' => 'Guardado exitoso', 'nickname' => Profile::maestroDe($usuario->id)?->nickname]);
         } catch (ValidationException $e) {
             return response()->json(['status' => 'error', 'message' => collect($e->errors())->flatten()->first()], 422);
         } catch (QueryException $e) {
             Log::error('Error guardando perfil', ['user_id' => Auth::id(), 'error' => $e->getMessage()]);
-            $mensaje = ($e->errorInfo[1] ?? null) == 1062
+            $mensaje = in_array($e->errorInfo[1] ?? null, [1062, 19])
                 ? 'Ese nombre de usuario ya está en uso. Elige otro.'
                 : 'No se pudo guardar el perfil. Inténtalo de nuevo.';
             return response()->json(['status' => 'error', 'message' => $mensaje], 500);
@@ -134,14 +194,14 @@ class ProfileController extends Controller
 
     public function duplicar($id)
     {
+        $usuario = Auth::user();
+        $perfilOriginal = Profile::where('id', $id)->where('user_id', $usuario->id)->firstOrFail();
+
         try {
-            $usuario = \Illuminate\Support\Facades\Auth::user();
             $limite = config('perfiles.limite');
             if (Profile::where('user_id', $usuario->id)->count() >= $limite) {
-                return response()->json(['status' => 'error', 'message' => "Límite de $limite perfiles alcanzado."]);
+                return response()->json(['status' => 'error', 'message' => "Tu cuenta incluye $limite perfiles y ya los tienes. Puedes editar o borrar uno."], 422);
             }
-
-            $perfilOriginal = Profile::where('id', $id)->where('user_id', $usuario->id)->firstOrFail();
 
             $nuevoPerfil = $perfilOriginal->replicate();
             $nuevoPerfil->nombre_perfil = $perfilOriginal->nombre_perfil . ' (Copia)';
@@ -150,6 +210,7 @@ class ProfileController extends Controller
             $nuevoPerfil->nickname = $perfilOriginal->nickname . '-' . substr(uniqid(), -4);
 
             $nuevoPerfil->nfc_uid = null;
+            $nuevoPerfil->activo_en = null;
             $nuevoPerfil->created_at = now();
             $nuevoPerfil->updated_at = now()->subSecond();
 
@@ -164,18 +225,17 @@ class ProfileController extends Controller
 
     public function activar($id)
     {
+        $usuario = Auth::user();
+        $nuevoActivo = Profile::where('id', $id)->where('user_id', $usuario->id)->firstOrFail();
+
         try {
-            $usuario = \Illuminate\Support\Facades\Auth::user();
-            $nuevoActivo = Profile::where('id', $id)->where('user_id', $usuario->id)->firstOrFail();
+            if ($nuevoActivo->activo_en && Profile::activoDe($usuario->id)?->id === $nuevoActivo->id) {
+                return response()->json(['status' => 'success', 'message' => 'Este perfil ya es el activo.']);
+            }
 
-            // Buscamos si el usuario ya tiene un chip físico
+            // Si el usuario tiene chip físico, lo mudamos de tarjeta a tarjeta
             $perfilConNfc = Profile::where('user_id', $usuario->id)->whereNotNull('nfc_uid')->first();
-
-            if ($perfilConNfc) {
-                if ($perfilConNfc->id == $id) {
-                    return response()->json(['status' => 'success', 'message' => 'Este perfil ya es el activo.']);
-                }
-                // Si tiene chip, lo mudamos de tarjeta a tarjeta
+            if ($perfilConNfc && $perfilConNfc->id !== $nuevoActivo->id) {
                 $chipIdTemporal = $perfilConNfc->nfc_uid;
                 $perfilConNfc->nfc_uid = null;
                 $perfilConNfc->save();
@@ -183,9 +243,9 @@ class ProfileController extends Controller
                 $nuevoActivo->nfc_uid = $chipIdTemporal;
             }
 
-            // Forzamos la actualización de la fecha. Así, incluso si no tiene chip físico,
-            // el sistema sabrá que esta es la tarjeta que debe mostrar en su Link de Bio.
-            $nuevoActivo->updated_at = now();
+            // Marca explícita del perfil activo: es el que muestra su link maestro (y su tarjeta)
+            Profile::where('user_id', $usuario->id)->where('id', '!=', $nuevoActivo->id)->update(['activo_en' => null]);
+            $nuevoActivo->activo_en = now();
             $nuevoActivo->save();
 
             return response()->json(['status' => 'success', 'message' => 'Perfil fijado como principal exitosamente.']);
@@ -197,8 +257,11 @@ class ProfileController extends Controller
 
     public function eliminar($id)
     {
+        $usuario = Auth::user();
+        // 0. Un perfil de otra cuenta da 404
+        $perfil = Profile::where('id', $id)->where('user_id', $usuario->id)->firstOrFail();
+
         try {
-            $usuario = \Illuminate\Support\Facades\Auth::user();
 
             // 1. Verificamos que no sea su único perfil
             $totalPerfiles = Profile::where('user_id', $usuario->id)->count();
@@ -209,13 +272,10 @@ class ProfileController extends Controller
                 ]);
             }
 
-            // 2. Buscamos el perfil que se desea eliminar
-            $perfil = Profile::where('id', $id)->where('user_id', $usuario->id)->firstOrFail();
-
-            // 3. Obtenemos el perfil activo (la misma regla que el perfil público)
+            // 2. Obtenemos el perfil activo (la misma regla que el perfil público)
             $perfilActivo = Profile::activoDe($usuario->id);
 
-            // 4. Bloqueo estricto: solo se impide si coincide exactamente con el perfil activo
+            // 3. Bloqueo estricto: solo se impide si coincide exactamente con el perfil activo
             if ($perfilActivo && $perfilActivo->id === $perfil->id) {
                 return response()->json([
                     'status' => 'error',
@@ -223,7 +283,7 @@ class ProfileController extends Controller
                 ]);
             }
 
-            // 5. Eliminación del perfil secundario
+            // 4. Eliminación del perfil secundario
             $perfil->delete();
 
             return response()->json([

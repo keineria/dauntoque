@@ -13,7 +13,7 @@ class Profile extends Model
     protected $fillable = [
         'user_id', 'nickname', 'tipo_perfil', 'nombre', 'profesion', 'bio',
         'plantilla', 'alineacion', 'telefono', 'correo_contacto', 'direccion', 'pais', 'payment_methods',
-        'zelle', 'cashapp', 'venmo', 'redes_sociales', 'galeria', 'nfc_uid', 'activo',
+        'zelle', 'cashapp', 'venmo', 'redes_sociales', 'galeria', 'nfc_uid', 'activo', 'activo_en',
         'foto_perfil', 'foto_portada', 'titulo_galeria' // <-- Archivos nuevos autorizados
     ];
 
@@ -22,6 +22,7 @@ class Profile extends Model
         'redes_sociales' => 'array',
         'galeria' => 'array',
         'payment_methods' => 'array',
+        'activo_en' => 'datetime',
     ];
 
     public function user()
@@ -30,14 +31,16 @@ class Profile extends Model
     }
 
     /**
-     * Orden del "perfil activo": primero el que tiene chip NFC y luego el editado más recientemente.
+     * Orden del "perfil activo": primero el que el usuario fijó como activo (activo_en, solo lo cambia
+     * ProfileController::activar) y, si ninguno lo está, el primero que creó.
      * Es la regla que decide qué tarjeta se ve en portal.dauntoque.com/{nickname}.
      */
     public function scopeOrdenActivo(Builder $query): Builder
     {
         return $query
-            ->orderByRaw('CASE WHEN nfc_uid IS NOT NULL AND nfc_uid != "" THEN 1 ELSE 0 END DESC')
-            ->orderBy('updated_at', 'desc');
+            ->orderByRaw('CASE WHEN activo_en IS NULL THEN 1 ELSE 0 END')
+            ->orderBy('activo_en', 'desc')
+            ->orderBy('id', 'asc');
     }
 
     /** Perfil que se muestra en público para un usuario. */

@@ -15,9 +15,9 @@ class NfcController extends Controller
         $tarjetaEnUso = Profile::where('nfc_uid', $hash)->first();
 
         if ($tarjetaEnUso) {
-            // ¡LA MAGIA REAL! Si la tarjeta ya está activa, lo enviamos
-            // directamente a portal.dauntoque.com/nickname
-            $urlPublica = url('/' . $tarjetaEnUso->nickname);
+            // ¡LA MAGIA REAL! Si la tarjeta ya está activa, lo enviamos a su link maestro
+            // (portal.dauntoque.com/nickname del primer perfil), que muestra el perfil activo
+            $urlPublica = url('/' . Profile::maestroDe($tarjetaEnUso->user_id)->nickname);
 
             return redirect()->away($urlPublica);
         }
@@ -40,9 +40,7 @@ class NfcController extends Controller
         }
 
         // 3. VINCULACIÓN EXITOSA (El primer escaneo que detona el Confeti)
-        $perfil->nfc_uid = $hash;
-        $perfil->save();
-        Tarjeta::registrarActivacion($usuario->id, $hash);
+        Tarjeta::vincular($perfil, $hash);
         session()->forget('nfc_pendiente');
 
         return redirect('/dashboard')->with('nfc_success', true);

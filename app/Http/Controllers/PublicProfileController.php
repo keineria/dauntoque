@@ -6,6 +6,7 @@ use App\Models\Profile;
 use App\Support\ImageStore;
 use App\Support\MediosPago;
 use App\Support\RedesSociales;
+use Illuminate\Support\Str;
 
 class PublicProfileController extends Controller
 {
@@ -62,34 +63,43 @@ class PublicProfileController extends Controller
     {
         [$perfil, $linkMaestro] = $this->resolver($nickname);
 
-        // Un salto de línea dentro de un campo rompería el formato vCard
-        $linea = fn ($valor) => str_replace(["\r", "\n"], ' ', (string) $valor);
+        // Texto escapado según vCard 3.0: barra invertida, punto y coma, coma y saltos de línea
+        $linea = fn ($valor) => str_replace(['\\', ';', ',', "\r\n", "\n", "\r"], ['\\\\', '\\;', '\\,', '\\n', '\\n', '\\n'], trim((string) $valor));
+
+        // N: apellidos;nombre. El primer nombre va como nombre y el resto como apellidos
+        $partes = preg_split('/\s+/u', trim((string) $perfil->nombre), 2);
 
         $vcf = "BEGIN:VCARD\r\n";
         $vcf .= "VERSION:3.0\r\n";
+        $vcf .= "N:" . $linea($partes[1] ?? '') . ";" . $linea($partes[0] ?? '') . ";;;\r\n";
         $vcf .= "FN:" . $linea($perfil->nombre) . "\r\n";
         if($perfil->profesion) $vcf .= "TITLE:" . $linea($perfil->profesion) . "\r\n";
         if($perfil->telefono) $vcf .= "TEL;TYPE=CELL:" . $linea($perfil->telefono) . "\r\n";
         if($perfil->correo_contacto) $vcf .= "EMAIL;TYPE=WORK:" . $linea($perfil->correo_contacto) . "\r\n";
-        if($perfil->direccion) $vcf .= "ADR;TYPE=WORK:;;;" . $linea($perfil->direccion) . ";;;\r\n";
+        if($perfil->direccion) $vcf .= "ADR;TYPE=WORK:;;" . $linea($perfil->direccion) . ";;;;\r\n";
 
         // URL Limpia en la agenda del celular
         $vcf .= "URL:" . url('/' . $linkMaestro) . "\r\n";
 
-        // Solo se incrusta la foto si es una imagen propia del portal (nunca otros archivos del servidor)
+        // Solo se incrusta la foto si es una imagen propia del portal (nunca otros archivos del servidor).
+        // El tipo sale del contenido real (no de la extensión) y la línea se dobla a 75 caracteres.
         if($perfil->foto_perfil && ImageStore::esPropia($perfil->foto_perfil)) {
-            $imagePath = realpath(public_path(ltrim($perfil->foto_perfil, '/')));
-            $type = pathinfo($imagePath, PATHINFO_EXTENSION);
-            $data = file_get_contents($imagePath);
-            $base64 = base64_encode($data);
-            $vcf .= "PHOTO;ENCODING=b;TYPE=" . strtoupper($type) . ":" . $base64 . "\r\n";
+            $data = file_get_contents(realpath(public_path(ltrim($perfil->foto_perfil, '/'))));
+            $tipos = ['image/jpeg' => 'JPEG', 'image/png' => 'PNG', 'image/gif' => 'GIF', 'image/webp' => 'WEBP'];
+            $tipo = $tipos[@getimagesizefromstring($data)['mime'] ?? ''] ?? null;
+            if ($tipo) {
+                $foto = "PHOTO;ENCODING=b;TYPE=$tipo:" . base64_encode($data);
+                $vcf .= rtrim(chunk_split($foto, 74, "\r\n "), " \r\n") . "\r\n";
+            }
         }
         $vcf .= "END:VCARD\r\n";
 
-        $archivo = str_replace(['"', '\\', '/', "\r", "\n"], '', (string) $perfil->nombre) ?: 'contacto';
+        // Nombre de archivo: versión ASCII segura y la original en UTF-8 (filename*)
+        $nombre = trim(str_replace(['"', '\\', '/', "\r", "\n"], '', (string) $perfil->nombre)) ?: 'contacto';
+        $ascii = trim(preg_replace('/[^A-Za-z0-9 ._-]/', '', Str::ascii($nombre))) ?: 'contacto';
 
         return response($vcf)
-            ->header('Content-Type', 'text/vcard')
-            ->header('Content-Disposition', 'attachment; filename="' . $archivo . '.vcf"');
+            ->header('Content-Type', 'text/vcard; charset=utf-8')
+            ->header('Content-Disposition', 'attachment; filename="' . $ascii . '.vcf"; filename*=UTF-8\'\'' . rawurlencode($nombre . '.vcf'));
     }
 }

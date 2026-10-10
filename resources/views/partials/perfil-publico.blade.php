@@ -95,9 +95,9 @@
     /* Botón de idioma (como en los perfiles de clientes) */
     .pp-idioma { position:absolute; top:14px; right:14px; z-index:5; height:30px; padding:0 12px; border-radius:999px; background:var(--chip); border:1px solid var(--line); color:var(--text); font-size:11.5px; font-weight:800; letter-spacing:.08em; cursor:pointer; }
 
-    /* Bienvenida: "Bienvenido al perfil de …" mientras carga */
-    .pp-bienvenida { position:fixed; inset:0; z-index:90; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; background:var(--bg); color:var(--text); text-align:center; padding:24px; transition:opacity .45s ease, visibility .45s; }
-    .pp-bienvenida.fuera { opacity:0; visibility:hidden; }
+    /* Bienvenida: "Bienvenido al perfil de …" solo mientras carga (se quita apenas el contenido está listo) */
+    .pp-bienvenida { position:fixed; inset:0; z-index:90; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; background:var(--bg); color:var(--text); text-align:center; padding:24px; transition:opacity .2s ease, visibility .2s; }
+    .pp-bienvenida.fuera { opacity:0; visibility:hidden; pointer-events:none; }
     .pp-bienvenida .aro { width:96px; height:96px; border-radius:50%; padding:3px; background:conic-gradient(from 0deg, var(--acc), transparent 70%, var(--acc)); animation:pp-gira 1.1s linear infinite; }
     .pp-bienvenida .aro > div { width:100%; height:100%; border-radius:50%; overflow:hidden; background:var(--card); display:grid; place-items:center; font:800 34px var(--titulo); color:var(--muted); animation:pp-gira 1.1s linear infinite reverse; }
     .pp-bienvenida .aro img { width:100%; height:100%; object-fit:cover; }
@@ -180,7 +180,7 @@
                },
                async copiar(texto) { try { await navigator.clipboard.writeText(texto); this.copiado = true; setTimeout(() => this.copiado = false, 2000); } catch (err) {} } }"
      x-init="document.documentElement.lang = idioma;
-             if (!p.preview) { const o = new IntersectionObserver(([en]) => barraVisible = !en.isIntersecting); $nextTick(() => $refs.acciones && o.observe($refs.acciones)); setTimeout(() => bienvenida = false, 1300); }
+             if (!p.preview) { const o = new IntersectionObserver(([en]) => barraVisible = !en.isIntersecting); $nextTick(() => { $refs.acciones && o.observe($refs.acciones); bienvenida = false; }); }
              $nextTick(() => dtAjustar($el)); window.addEventListener('resize', () => dtAjustar($el));"
      x-effect="JSON.stringify(p); idioma; $nextTick(() => dtAjustar($el))">
 

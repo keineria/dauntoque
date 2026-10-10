@@ -204,14 +204,15 @@
                     }
                 },
 
-                cargarGaleria(e) {
-                    let files = e.target.files;
-                    if(!files) return;
-                    let disponibles = 6 - this.galeria.length;
-                    for(let i=0; i < Math.min(files.length, disponibles); i++) {
-                        let reader = new FileReader();
-                        reader.onload = (event) => { this.galeria.push(event.target.result); };
-                        reader.readAsDataURL(files[i]);
+                // Cada foto se reduce antes de guardarla (partials/reducir-imagen)
+                async cargarGaleria(e) {
+                    const files = Array.from(e.target.files || []);
+                    e.target.value = '';
+                    for (const archivo of files.slice(0, 6 - this.galeria.length)) {
+                        try {
+                            const img = await dtReducirImagen(archivo);
+                            if (this.galeria.length < 6) this.galeria.push(img);
+                        } catch (error) { this.avisar('No pudimos leer una de las imágenes. Prueba con otra foto.', true); }
                     }
                 },
                 eliminarFoto(index) { this.galeria.splice(index, 1); },
@@ -220,8 +221,8 @@
                     this.guardando = true;
                     let formData = new FormData();
                     // Editar el perfil cargado en vez de crear uno nuevo
+                    // El usuario (nickname) no se cambia aquí: el servidor conserva el actual
                     formData.append('perfil_id', window.perfilCargado.id || 'null');
-                    formData.append('nickname', this.datos.nickname || 'usuario');
                     formData.append('nombre', this.datos.nombre);
                     formData.append('correo_contacto', this.datos.correo_contacto);
                     formData.append('profesion', this.datos.profesion);
@@ -245,7 +246,9 @@
                             body: formData
                         });
                         
-                        let resultado = await respuesta.json();
+                        let resultado = respuesta.status === 413
+                            ? { message: 'Las fotos pesan demasiado para guardarlas juntas. Usa imágenes más livianas o sube menos a la vez.' }
+                            : await respuesta.json();
                         if(resultado.status === 'success') {
                             this.avisar('Cambios guardados');
                         } else {
@@ -263,4 +266,5 @@
             }
         }
     </script>
+    @include('partials.reducir-imagen')
 @endsection

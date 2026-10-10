@@ -202,11 +202,11 @@
                 avanzar();
                 timer = setInterval(avanzar, matchMedia('(prefers-reduced-motion: reduce)').matches ? 300 : 900);
             },
-            // Se llama cuando el servidor responde; la máquina termina su ciclo antes de mostrar el resultado
+            // Se llama cuando el servidor responde: la animación dura lo que dura el guardado, sin esperas extra
             terminar(r) {
                 resultado = r || { ok: false };
-                if (!resultado.ok) { clearInterval(timer); timer = null; cerrarCiclo(); return; }
-                if (!timer) cerrarCiclo();
+                clearInterval(timer); timer = null;
+                cerrarCiclo();
             },
         };
     })();

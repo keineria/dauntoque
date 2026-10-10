@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Carbon;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +20,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Fechas de Carbon (diffForHumans, translatedFormat) en el idioma de la app (APP_LOCALE=es)
+        Carbon::setLocale(config('app.locale'));
     }
 }

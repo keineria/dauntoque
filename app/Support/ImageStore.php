@@ -39,7 +39,8 @@ class ImageStore
         $partes = explode(';base64,', $dataUrl, 2);
         $binario = isset($partes[1]) ? base64_decode($partes[1], true) : false;
 
-        if ($binario === false || strlen($binario) > self::MAX_BYTES || @getimagesizefromstring($binario) === false) {
+        $info = $binario === false ? false : @getimagesizefromstring($binario);
+        if ($binario === false || strlen($binario) > self::MAX_BYTES || $info === false) {
             throw ValidationException::withMessages([
                 'imagen' => 'Una de las imágenes no es válida o pesa más de 10 MB.',
             ]);
@@ -50,7 +51,9 @@ class ImageStore
             mkdir($carpeta, 0775, true);
         }
 
-        $nombre = $prefijo . '_' . uniqid() . '.jpg';
+        // La extensión sale del contenido real (los formatos poco comunes quedan como .jpg, como antes)
+        $extension = ['image/png' => 'png', 'image/gif' => 'gif', 'image/webp' => 'webp'][$info['mime'] ?? ''] ?? 'jpg';
+        $nombre = $prefijo . '_' . uniqid() . '.' . $extension;
         file_put_contents($carpeta . $nombre, $binario);
 
         return '/uploads/' . $nombre;
