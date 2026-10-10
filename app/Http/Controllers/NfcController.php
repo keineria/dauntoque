@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Profile;
+use App\Models\Tarjeta;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -41,6 +42,7 @@ class NfcController extends Controller
         // 3. VINCULACIÓN EXITOSA (El primer escaneo que detona el Confeti)
         $perfil->nfc_uid = $hash;
         $perfil->save();
+        Tarjeta::registrarActivacion($usuario->id, $hash);
         session()->forget('nfc_pendiente');
 
         return redirect('/dashboard')->with('nfc_success', true);

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Market;
 use App\Models\Profile;
+use App\Models\Tarjeta;
 use App\Services\GeminiBio;
 use App\Support\ImageStore;
 use App\Support\MediosPago;
@@ -112,6 +113,7 @@ class ProfileController extends Controller
             if (session()->has('nfc_pendiente')) {
                 $perfil->nfc_uid = session('nfc_pendiente');
                 $perfil->save();
+                Tarjeta::registrarActivacion($perfil->user_id, $perfil->nfc_uid);
                 session()->forget('nfc_pendiente');
             }
 
