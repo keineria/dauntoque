@@ -88,9 +88,16 @@
 
                 <section class="dt-panel" style="margin:0">
                     <div class="dt-panel-h"><h2>Pagos rápidos</h2></div>
+                    {{-- País de cobro: Nequi y Llave Bre-B en Colombia; Zelle, Cash App y Venmo en EE. UU. --}}
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px" role="radiogroup" aria-label="País de tus cobros">
+                        <template x-for="(nombrePais, codigo) in mercados" :key="codigo">
+                            <button type="button" class="dt-btn" :class="pais === codigo ? 'pri' : ''" role="radio" :aria-checked="pais === codigo" @click="pais = codigo" x-text="nombrePais"></button>
+                        </template>
+                    </div>
                     <div style="display:flex;flex-direction:column;gap:12px">
-                        <div class="dt-inline"><span style="color:#7a3fd6">Zelle</span><input type="email" x-model="datos.zelle" aria-label="Zelle"></div>
-                        <div class="dt-inline"><span style="color:#1a9c3e">CashApp</span><input type="text" x-model="datos.cashapp" aria-label="CashApp"></div>
+                        <template x-for="tipo in (porPais[pais] || [])" :key="tipo">
+                            <div class="dt-inline"><span :style="'color:' + mediosPago[tipo].acento" x-text="mediosPago[tipo].nombre"></span><input type="text" x-model="pagos[tipo]" :placeholder="mediosPago[tipo].placeholder" :inputmode="mediosPago[tipo].inputmode" :aria-label="mediosPago[tipo].nombre"></div>
+                        </template>
                     </div>
                 </section>
             </div>
@@ -135,9 +142,17 @@
                     bio: db.bio || '',
                     telefono: db.telefono || '',
                     direccion: db.direccion || '',
-                    zelle: db.zelle || '',
-                    cashapp: db.cashapp || '',
                     titulo_galeria: db.titulo_galeria || 'Servicios'
+                },
+
+                // Medios de pago por país (config/pagos.php)
+                mercados: @json($mercados ?? []),
+                porPais: @json(config('pagos.por_pais')),
+                mediosPago: @json(config('pagos.medios')),
+                pais: db.pais || 'CO',
+                pagos: (db.payment_methods || []).reduce((o, m) => ({ ...o, [m.type]: m.value }), { nequi: '', llave_breb: '', zelle: '', cashapp: '', venmo: '' }),
+                get listaPagos() {
+                    return (this.porPais[this.pais] || []).filter(t => String(this.pagos[t] || '').trim()).map(t => ({ type: t, value: String(this.pagos[t]).trim() }));
                 },
 
                 agregarRed() { if(this.redes.length < 4) this.redes.push({ plataforma: 'Instagram', usuario: '' }); },
@@ -213,8 +228,8 @@
                     formData.append('bio', this.datos.bio);
                     formData.append('telefono', this.datos.telefono);
                     formData.append('direccion', this.datos.direccion);
-                    formData.append('zelle', this.datos.zelle);
-                    formData.append('cashapp', this.datos.cashapp);
+                    formData.append('pais', this.pais);
+                    formData.append('payment_methods', JSON.stringify(this.listaPagos));
                     formData.append('foto_perfil', this.fotoPreview || '');
                     formData.append('foto_portada', this.portadaPreview || '');
                     formData.append('redes_sociales', JSON.stringify(this.redes));

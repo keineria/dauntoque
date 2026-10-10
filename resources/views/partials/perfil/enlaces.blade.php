@@ -50,12 +50,10 @@
                 <span class="ic" x-html="red.svg"></span><span x-text="red.nombre"></span>
             </a>
         </template>
-        <button type="button" class="pe-btn" :class="p.forma" x-show="p.zelle" @click="accion('zelle', $event); if (!p.preview) zelleAbierto = true">
-            <span class="ic" style="color:#8b3fe0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/></svg></span><span class="ajusta" x-text="t('pagoZelle')">Pagar con Zelle</span></button>
-        <a class="pe-btn" :class="p.forma" x-show="p.cashapp" :href="'https://cash.app/$' + encodeURIComponent(String(p.cashapp || '').replace(/^\$/, ''))" target="_blank" rel="noopener" @click="accion('cashapp', $event)">
-            <span class="ic" style="color:#00b82b;font-weight:800">$</span><span class="ajusta" x-text="t('pagarCon') + ' Cash App'">Pagar con Cash App</span></a>
-        <a class="pe-btn" :class="p.forma" x-show="p.venmo" :href="'https://venmo.com/u/' + encodeURIComponent(String(p.venmo || '').replace(/^@/, ''))" target="_blank" rel="noopener" @click="accion('venmo', $event)">
-            <span class="ic" style="color:#008cff;font-weight:800">V</span><span class="ajusta" x-text="t('pagarCon') + ' Venmo'">Pagar con Venmo</span></a>
+        <template x-for="m in (p.pagos || [])" :key="m.type">
+            <a class="pe-btn" :class="p.forma" :href="dtPagoUrl(m) || '#'" :target="dtPagoUrl(m) ? '_blank' : null" rel="noopener" @click="pagar(m, $event)">
+                <span class="ic" :style="'font-weight:800;color:' + dtPago(m).acento" x-text="dtPago(m).icono"></span><span class="ajusta" x-text="t('pagarCon') + ' ' + dtPago(m).nombre"></span></a>
+        </template>
         <button type="button" class="pe-btn" :class="p.forma" @click="compartir($event)">
             <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg></span><span x-text="copiado ? t('copiadoEnlace') : t('compartirTarjeta')"></span>
         </button>

@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Market;
 use App\Models\Profile;
 use App\Services\GeminiBio;
 use App\Support\ImageStore;
+use App\Support\MediosPago;
 use App\Support\RedesSociales;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
@@ -21,7 +23,9 @@ class ProfileController extends Controller
             // Busca el perfil exacto si se pasó un ID en la URL
             $perfil = Profile::where('id', $request->id)->where('user_id', Auth::id())->first();
         }
-        return view('editor', compact('perfil'));
+        $mercados = Market::opciones();
+
+        return view('editor', compact('perfil', 'mercados'));
     }
 
     public function validarNickname(Request $request)
@@ -61,12 +65,20 @@ class ProfileController extends Controller
             // Solo se actualizan los campos que llegan en la petición: el editor los envía todos,
             // la pantalla de Configuración envía una parte y el resto se conserva.
             $campos = ['nombre_perfil', 'design_config', 'nombre', 'correo_contacto', 'profesion', 'bio',
-                       'telefono', 'direccion', 'zelle', 'cashapp', 'venmo'];
+                       'telefono', 'direccion'];
             foreach ($campos as $campo) {
                 // nombre_perfil es obligatorio en la BD: vacío conserva el actual (o el valor por defecto)
                 if ($request->has($campo) && !($campo === 'nombre_perfil' && blank($request->input($campo)))) {
                     $perfil->{$campo} = $request->input($campo);
                 }
+            }
+
+            // País y medios de pago: solo los del país elegido (Nequi y Llave Bre-B en CO; Zelle, Cash App y Venmo en US)
+            if ($request->has('pais')) {
+                $perfil->pais = MediosPago::pais($request->input('pais'));
+            }
+            if ($request->has('payment_methods')) {
+                $perfil->payment_methods = MediosPago::sanear($request->input('payment_methods'), $perfil->pais) ?: null;
             }
 
             // Solo redes del catálogo; el SVG se reconstruye en el servidor (anti-XSS)

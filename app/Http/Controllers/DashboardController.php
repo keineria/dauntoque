@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Market;
 use App\Models\Profile;
 use App\Support\ImageStore;
+use App\Support\MediosPago;
 use App\Support\RedesSociales;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -30,8 +32,8 @@ class DashboardController extends Controller
             'bio' => $perfil->bio ?? '',
             'telefono' => $perfil->telefono ?? '',
             'direccion' => $perfil->direccion ?? '',
-            'zelle' => $perfil->zelle ?? '',
-            'cashapp' => $perfil->cashapp ?? '',
+            'pais' => MediosPago::pais($perfil->pais),
+            'payment_methods' => MediosPago::publicos($perfil->payment_methods),
             'titulo_galeria' => $perfil->titulo_galeria ?? 'Servicios',
             'foto_portada' => $perfil->foto_portada ?? null,
             'foto_perfil' => $perfil->foto_perfil ?? null,
@@ -99,5 +101,8 @@ class DashboardController extends Controller
     {
         return view('dashboard.analiticas', $this->cargarDatos() + ['stats' => AnaliticasController::resumen(Auth::id())]);
     }
-    public function configuracion() { return view('dashboard.configuracion', $this->cargarDatos()); }
+    public function configuracion()
+    {
+        return view('dashboard.configuracion', $this->cargarDatos() + ['mercados' => Market::opciones()]);
+    }
 }

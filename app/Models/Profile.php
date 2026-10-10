@@ -12,14 +12,16 @@ class Profile extends Model
 
     protected $fillable = [
         'user_id', 'nickname', 'tipo_perfil', 'nombre', 'profesion', 'bio',
-        'plantilla', 'alineacion', 'telefono', 'correo_contacto', 'direccion',
+        'plantilla', 'alineacion', 'telefono', 'correo_contacto', 'direccion', 'pais', 'payment_methods',
         'zelle', 'cashapp', 'venmo', 'redes_sociales', 'galeria', 'nfc_uid', 'activo',
         'foto_perfil', 'foto_portada', 'titulo_galeria' // <-- Archivos nuevos autorizados
     ];
 
+    // zelle, cashapp y venmo ya no se usan: quedan de respaldo de payment_methods (ver config/pagos.php)
     protected $casts = [
         'redes_sociales' => 'array',
         'galeria' => 'array',
+        'payment_methods' => 'array',
     ];
 
     public function user()

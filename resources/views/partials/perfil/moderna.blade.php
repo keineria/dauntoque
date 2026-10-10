@@ -61,23 +61,15 @@
             </div>
         </section>
 
-        <section class="pp-card" x-show="p.zelle || p.cashapp || p.venmo">
+        <section class="pp-card" x-show="(p.pagos || []).length">
             <h2 class="pp-h"><span x-text="t('pagos')">Pagos</span></h2>
-            <button type="button" class="pp-fila" :class="p.forma" x-show="p.zelle" @click="accion('zelle', $event); if (!p.preview) zelleAbierto = true">
-                <span class="ic" style="background:#6d1ed41f;color:#8b3fe0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/></svg></span>
-                <span class="tx"><b>Zelle</b><small x-text="p.zelle"></small></span>
-                <svg class="fl" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-            </button>
-            <a class="pp-fila" :class="p.forma" x-show="p.cashapp" :href="'https://cash.app/$' + encodeURIComponent(String(p.cashapp || '').replace(/^\$/, ''))" target="_blank" rel="noopener" @click="accion('cashapp', $event)">
-                <span class="ic" style="background:#00d6321f;color:#00b82b"><b style="font-size:16px">$</b></span>
-                <span class="tx"><b>Cash App</b><small x-text="p.cashapp"></small></span>
-                <svg class="fl" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-            </a>
-            <a class="pp-fila" :class="p.forma" x-show="p.venmo" :href="'https://venmo.com/u/' + encodeURIComponent(String(p.venmo || '').replace(/^@/, ''))" target="_blank" rel="noopener" @click="accion('venmo', $event)">
-                <span class="ic" style="background:#008cff1f;color:#008cff"><b style="font-size:15px">V</b></span>
-                <span class="tx"><b>Venmo</b><small x-text="p.venmo"></small></span>
-                <svg class="fl" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-            </a>
+            <template x-for="m in (p.pagos || [])" :key="m.type">
+                <a class="pp-fila" :class="p.forma" :href="dtPagoUrl(m) || '#'" :target="dtPagoUrl(m) ? '_blank' : null" rel="noopener" @click="pagar(m, $event)">
+                    <span class="ic" :style="`background:${dtPago(m).acento}1f;color:${dtPago(m).acento}`"><b style="font-size:16px" x-text="dtPago(m).icono"></b></span>
+                    <span class="tx"><b x-text="dtPago(m).nombre"></b><small x-text="m.value"></small></span>
+                    <svg class="fl" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+                </a>
+            </template>
         </section>
 
         <footer class="pp-pie">

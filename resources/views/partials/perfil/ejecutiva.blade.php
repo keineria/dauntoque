@@ -91,12 +91,12 @@
         </div>
     </section>
 
-    <section class="px-bloque" x-show="p.zelle || p.cashapp || p.venmo">
+    <section class="px-bloque" x-show="(p.pagos || []).length">
         <h2 class="px-h"><span x-text="t('pagos')">Pagos</span></h2>
         <div class="px-pagos">
-            <button type="button" :class="p.forma" style="background:linear-gradient(#8621a1,#741b8c)" x-show="p.zelle" @click="accion('zelle', $event); if (!p.preview) zelleAbierto = true">Zelle</button>
-            <a :class="p.forma" style="background:#00d632;color:#06210f" x-show="p.cashapp" :href="'https://cash.app/$' + encodeURIComponent(String(p.cashapp || '').replace(/^\$/, ''))" target="_blank" rel="noopener" @click="accion('cashapp', $event)">Cash App</a>
-            <a :class="p.forma" style="background:#008cff" x-show="p.venmo" :href="'https://venmo.com/u/' + encodeURIComponent(String(p.venmo || '').replace(/^@/, ''))" target="_blank" rel="noopener" @click="accion('venmo', $event)">Venmo</a>
+            <template x-for="m in (p.pagos || [])" :key="m.type">
+                <a :class="p.forma" :style="dtPagoEstilo(m)" :href="dtPagoUrl(m) || '#'" :target="dtPagoUrl(m) ? '_blank' : null" rel="noopener" @click="pagar(m, $event)" x-text="dtPago(m).nombre"></a>
+            </template>
         </div>
     </section>
 

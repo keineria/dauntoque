@@ -28,9 +28,6 @@
         .pc-btn.sec { background:var(--chip); border-color:var(--line); color:var(--text); }
         .pc-btn.wa { background:color-mix(in srgb, #25d366 18%, transparent); border-color:color-mix(in srgb, #25d366 45%, transparent); color:#4ade80; }
         .pp-corporativo .pc-btn.wa, .pp-minimalista .pc-btn.wa { color:#15803d; }
-        .pc-btn.zelle { background:linear-gradient(#8621a1, #741b8c); color:#fff; }
-        .pc-btn.cash { background:#00d632; color:#06210f; }
-        .pc-btn.venmo { background:#008cff; color:#fff; }
         .pc-btn.pri { height:54px; font-size:15px; background:var(--acc); color:var(--sobre); box-shadow:0 14px 30px -14px var(--acc); }
         .pc-pagos { display:flex; flex-direction:column; gap:10px; }
         .pc-pie { text-align:center; font-size:12px; color:var(--muted); display:flex; flex-direction:column; align-items:center; gap:8px; }
@@ -93,10 +90,10 @@
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12.05 0C5.5 0 .16 5.34.16 11.89c0 2.1.55 4.14 1.59 5.95L.06 24l6.3-1.65a11.88 11.88 0 0 0 5.68 1.45h.01c6.55 0 11.89-5.34 11.89-11.89A11.82 11.82 0 0 0 12.05 0zm6.94 16.88c-.29.82-1.71 1.57-2.36 1.67-.6.09-1.37.13-2.21-.14-.51-.16-1.16-.38-2-.74-3.51-1.52-5.81-5.06-5.98-5.29-.17-.23-1.43-1.9-1.43-3.63s.9-2.57 1.23-2.93c.32-.35.7-.44.94-.44l.67.01c.21.01.5-.08.79.6.29.7.99 2.42 1.08 2.6.09.17.15.38.03.61-.12.23-.17.38-.35.58-.17.2-.36.45-.52.61-.17.17-.35.36-.15.7.2.35.9 1.48 1.93 2.4 1.33 1.18 2.45 1.55 2.8 1.72.35.17.55.15.75-.09.2-.23.87-1.01 1.1-1.36.23-.35.46-.29.78-.17.32.12 2.03.96 2.38 1.13.35.17.58.26.67.41.09.14.09.84-.2 1.66z"/></svg><span class="ajusta" x-text="t('whatsapp')">WhatsApp</span></a>
         </div>
 
-        <div class="pc-pagos" x-show="p.zelle || p.cashapp || p.venmo">
-            <button type="button" class="pc-btn zelle" :class="p.forma" x-show="p.zelle" @click="accion('zelle', $event); if (!p.preview) zelleAbierto = true"><span class="ajusta" x-text="t('pagoZelle')">Pagar con Zelle</span></button>
-            <a class="pc-btn cash" :class="p.forma" x-show="p.cashapp" :href="'https://cash.app/$' + encodeURIComponent(String(p.cashapp || '').replace(/^\$/, ''))" target="_blank" rel="noopener" @click="accion('cashapp', $event)"><span class="ajusta" x-text="t('pagarCon') + ' Cash App'">Pagar con Cash App</span></a>
-            <a class="pc-btn venmo" :class="p.forma" x-show="p.venmo" :href="'https://venmo.com/u/' + encodeURIComponent(String(p.venmo || '').replace(/^@/, ''))" target="_blank" rel="noopener" @click="accion('venmo', $event)"><span class="ajusta" x-text="t('pagarCon') + ' Venmo'">Pagar con Venmo</span></a>
+        <div class="pc-pagos" x-show="(p.pagos || []).length">
+            <template x-for="m in (p.pagos || [])" :key="m.type">
+                <a class="pc-btn" :class="p.forma" :style="dtPagoEstilo(m)" :href="dtPagoUrl(m) || '#'" :target="dtPagoUrl(m) ? '_blank' : null" rel="noopener" @click="pagar(m, $event)"><span class="ajusta" x-text="t('pagarCon') + ' ' + dtPago(m).nombre"></span></a>
+            </template>
         </div>
 
         <template x-if="p.estructura !== 'feria'">

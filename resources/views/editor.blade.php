@@ -40,6 +40,11 @@
         .ed-red { border:1px solid var(--border); border-radius:8px; background:var(--card); padding:8px 4px; display:flex; flex-direction:column; align-items:center; gap:4px; font-size:10px; font-weight:600; color:var(--muted); cursor:pointer; text-transform:uppercase; letter-spacing:.04em; }
         .ed-red:hover { border-color:var(--primary); color:var(--text); }
         .ed-red svg, .ed-ico-red svg { width:18px; height:18px; }
+        .ed-paises { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:20px; }
+        .ed-pais { display:flex; align-items:center; gap:10px; padding:12px; border:1px solid var(--border); border-radius:10px; background:var(--card); color:var(--muted); font-size:13.5px; font-weight:600; cursor:pointer; text-align:left; }
+        .ed-pais b { width:30px; height:30px; flex:none; border-radius:8px; display:grid; place-items:center; background:var(--surface); font-size:11px; letter-spacing:.04em; color:var(--text); }
+        .ed-pais.on { border-color:var(--primary); background:var(--primary-soft); color:var(--text); box-shadow:0 0 0 3px var(--primary-soft); }
+        .ed-pais.on b { background:var(--primary); color:#fff; }
         .ed-preview { width:50%; display:flex; align-items:center; justify-content:center; background:var(--surface); border-left:1px solid var(--border); position:relative; }
         .ed-preview-label { position:absolute; top:18px; left:24px; font-size:12px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; }
 
@@ -214,12 +219,21 @@
 
                         {{-- PASO 7: billeteras --}}
                         <div x-show="paso === 7" x-cloak>
-                            <span class="dt-label">Billeteras digitales (opcional)</span>
-                            <div style="display:flex;flex-direction:column;gap:10px">
-                                <div class="dt-inline"><span style="color:#7a3fd6">Zelle</span><input type="text" x-model="zelle" placeholder="Correo o teléfono" aria-label="Zelle"></div>
-                                <div class="dt-inline"><span style="color:#1a9c3e">CashApp</span><input type="text" x-model="cashapp" placeholder="$Cashtag" aria-label="CashApp"></div>
-                                <div class="dt-inline"><span style="color:#008cff">Venmo</span><input type="text" x-model="venmo" placeholder="@usuario" aria-label="Venmo"></div>
+                            <span class="dt-label">¿Dónde cobras?</span>
+                            <div class="ed-paises" role="radiogroup" aria-label="País de tus cobros">
+                                <template x-for="(nombrePais, codigo) in mercados" :key="codigo">
+                                    <button type="button" class="ed-pais" :class="pais === codigo ? 'on' : ''" role="radio" :aria-checked="pais === codigo" @click="pais = codigo">
+                                        <b x-text="codigo"></b><span x-text="nombrePais"></span>
+                                    </button>
+                                </template>
                             </div>
+                            <span class="dt-label">Medios de pago (opcional)</span>
+                            <div style="display:flex;flex-direction:column;gap:10px">
+                                <template x-for="tipo in mediosPais" :key="tipo">
+                                    <div class="dt-inline"><span :style="'color:' + mediosPago[tipo].acento" x-text="mediosPago[tipo].nombre"></span><input type="text" x-model="pagos[tipo]" :placeholder="mediosPago[tipo].placeholder" :inputmode="mediosPago[tipo].inputmode" :aria-label="mediosPago[tipo].nombre"></div>
+                                </template>
+                            </div>
+                            <p class="dt-sub" style="font-size:12px;margin:10px 0 0" x-text="pais === 'CO' ? 'Tus clientes verán el botón y podrán copiar tu número o tu llave para pagarte.' : 'Zelle se copia; Cash App y Venmo abren la app con tu usuario.'"></p>
                         </div>
 
                         {{-- PASO 8: diseño --}}
@@ -365,26 +379,23 @@
         </div>
     </div>
 
-    <!-- MODALES EXTRAS (Zelle y Lightbox) -->
-    <div x-show="modalZelleAbierto" x-transition.opacity class="fixed inset-0 bg-black/90 z-[9999] flex flex-col justify-end backdrop-blur-sm" style="display: none;">
-        <div class="bg-[#121214] w-full rounded-t-2xl p-5 border-t border-gray-800 relative" @click.away="modalZelleAbierto = false">
-            <button @click="modalZelleAbierto = false" class="absolute top-4 right-4 text-gray-500 hover:text-white text-2xl">&times;</button>
-            <div class="flex items-center justify-center gap-2 text-white font-bold text-sm mb-4">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#a855f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"></rect><circle cx="12" cy="12" r="2"></circle><path d="M6 12h.01M18 12h.01"></path></svg> Zelle Transfer
-            </div>
-            <div class="bg-[#25d366]/10 border border-[#25d366]/40 rounded-xl p-3 mb-4 text-center">
-                <span class="text-[#f59e0b] font-black text-sm block mb-1" x-text="zelle"></span>
-                <span class="text-[#25d366] text-[10px] font-bold">✓ Copiado al portapapeles</span>
-            </div>
-        </div>
-    </div>
-
+    <!-- Lightbox -->
     <div x-show="lightboxAbierto" x-transition.opacity class="fixed inset-0 bg-black/95 z-[9999] flex items-center justify-center p-4 backdrop-blur-md" style="display: none;" @click="lightboxAbierto = false">
         <button class="absolute top-4 right-4 text-white text-4xl font-light" @click="lightboxAbierto = false">&times;</button>
         <img :src="imgActivaLightbox" class="w-full rounded-xl object-contain max-h-full">
     </div>
 
     <script>
+        // CO o US según la zona horaria del navegador; si no se reconoce, por la región del idioma (es-CO, en-US)
+        function dtPaisDetectado(paises) {
+            let zona = '';
+            try { zona = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) {}
+            if (zona === 'America/Bogota') return 'CO';
+            if (/^(America\/(New_York|Chicago|Denver|Los_Angeles|Phoenix|Anchorage|Detroit|Boise|Indiana|Kentucky|North_Dakota|Puerto_Rico)|Pacific\/Honolulu)/.test(zona)) return 'US';
+            const region = ((navigator.language || '').split('-')[1] || '').toUpperCase();
+            return paises.includes(region) ? region : 'CO';
+        }
+
         function perfilDigital() {
             return {
                 id_perfil_editar: null, 
@@ -395,12 +406,20 @@
                 nickname: '', nickValidado: false, nickError: '', 
                 nombre: '', profesion: '', bio: '',
                 telefono: '', correo: '', direccion: '', 
-                zelle: '', cashapp: '', venmo: '',
-                
+                // País y medios de pago (config/pagos.php): Nequi y Llave Bre-B en CO; Zelle, Cash App y Venmo en US
+                mercados: @json($mercados ?? []),
+                porPais: @json(config('pagos.por_pais')),
+                mediosPago: @json(config('pagos.medios')),
+                pais: '', pagos: { nequi: '', llave_breb: '', zelle: '', cashapp: '', venmo: '' },
+                get mediosPais() { return this.porPais[this.pais] || []; },
+                get listaPagos() {
+                    return this.mediosPais.filter(t => String(this.pagos[t] || '').trim()).map(t => ({ type: t, value: String(this.pagos[t]).trim() }));
+                },
+
                 fotoPreview: null, galeriaPreviews: [], toastError: '',
                 validandoNick: false, guardando: false, generandoIA: false, 
                 cropperModalAbierto: false, modalExitoAbierto: false, imgParaRecortar: '',
-                modalZelleAbierto: false, lightboxAbierto: false, imgActivaLightbox: '',
+                lightboxAbierto: false, imgActivaLightbox: '',
                 
                 modalPreviewMovil: false, tarjetaVinculada: false, 
                 
@@ -464,7 +483,7 @@
                         tipo: this.tipoPerfil, alineacion: this.config.alineacion, estructura: this.config.layout_estructura,
                         tema: this.config.tema_base || this.plantilla, color: this.config.color_primario, forma: this.config.forma_botones,
                         telefono: this.telefono, correo: this.correo, direccion: this.direccion,
-                        zelle: this.zelle, cashapp: this.cashapp, venmo: this.venmo,
+                        pagos: this.listaPagos,
                         redes: this.redesSeleccionadas, galeria: this.galeriaPreviews,
                         enlace: '#', vcf: '#', preview: true,
                     };
@@ -483,9 +502,8 @@
                         this.telefono = @json($perfil->telefono) || '';
                         this.correo = @json($perfil->correo_contacto) || '';
                         this.direccion = @json($perfil->direccion) || '';
-                        this.zelle = @json($perfil->zelle) || '';
-                        this.cashapp = @json($perfil->cashapp) || '';
-                        this.venmo = @json($perfil->venmo) || '';
+                        this.pais = @json($perfil->pais) || '';
+                        (@json($perfil->payment_methods) || []).forEach(m => { if (m && m.type in this.pagos) this.pagos[m.type] = m.value || ''; });
                         this.tipoPerfil = @json($perfil->tipo_perfil) || 'corporativo';
                         this.nombrePerfil = @json($perfil->nombre_perfil) || 'Mi Tarjeta Principal';
                         this.fotoPreview = @json($perfil->foto_perfil);
@@ -506,6 +524,9 @@
                         this.modoActual = 'editar';
                         this.tarjetaVinculada = true;
                     @endif
+
+                    // Perfil nuevo: el país sale de la zona horaria (o del idioma) del navegador
+                    if (!this.porPais[this.pais]) this.pais = dtPaisDetectado(Object.keys(this.porPais));
 
                     if (urlParams.has('step')) {
                         this.paso = parseInt(urlParams.get('step'));
@@ -664,9 +685,8 @@
                     formData.append('telefono', this.telefono);
                     formData.append('correo_contacto', this.correo);
                     formData.append('direccion', this.direccion);
-                    formData.append('zelle', this.zelle);
-                    formData.append('cashapp', this.cashapp);
-                    formData.append('venmo', this.venmo);
+                    formData.append('pais', this.pais);
+                    formData.append('payment_methods', JSON.stringify(this.listaPagos));
                     formData.append('foto_perfil', this.fotoPreview || '');
                     formData.append('redes_sociales', JSON.stringify(this.redesSeleccionadas));
                     formData.append('galeria', JSON.stringify(this.galeriaPreviews));

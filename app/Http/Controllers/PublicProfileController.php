@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Profile;
 use App\Support\ImageStore;
+use App\Support\MediosPago;
 use App\Support\RedesSociales;
 
 class PublicProfileController extends Controller
@@ -45,9 +46,7 @@ class PublicProfileController extends Controller
             'telefono' => $perfil->telefono,
             'correo' => $perfil->correo_contacto,
             'direccion' => $perfil->direccion,
-            'zelle' => $perfil->zelle,
-            'cashapp' => $perfil->cashapp,
-            'venmo' => $perfil->venmo,
+            'pagos' => MediosPago::publicos($perfil->payment_methods),
             // El SVG de cada red sale del catálogo del servidor, nunca de lo guardado (anti-XSS)
             'redes' => RedesSociales::sanear($perfil->redes_sociales),
             'galeria' => array_values(array_filter((array) $galeria, fn ($img) => ImageStore::esPropia($img))),

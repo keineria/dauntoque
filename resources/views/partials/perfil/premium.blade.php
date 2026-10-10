@@ -115,13 +115,13 @@
             </div>
         </section>
 
-        <section x-show="p.zelle || p.cashapp || p.venmo">
+        <section x-show="(p.pagos || []).length">
             <h2 class="pr-h centro" x-text="t('pagos')">Pagos</h2>
             <div class="pr-linea"></div>
             <div class="pr-pagos">
-                <button type="button" class="pr-pago" :class="p.forma" style="background:linear-gradient(#8621a1,#741b8c)" x-show="p.zelle" @click="accion('zelle', $event); if (!p.preview) zelleAbierto = true"><span class="ajusta" x-text="t('pagarCon') + ' Zelle'"></span></button>
-                <a class="pr-pago" :class="p.forma" style="background:#00d632;color:#06210f" x-show="p.cashapp" :href="'https://cash.app/$' + encodeURIComponent(String(p.cashapp || '').replace(/^\$/, ''))" target="_blank" rel="noopener" @click="accion('cashapp', $event)"><span class="ajusta" x-text="t('pagarCon') + ' Cash App'"></span></a>
-                <a class="pr-pago" :class="p.forma" style="background:#008cff" x-show="p.venmo" :href="'https://venmo.com/u/' + encodeURIComponent(String(p.venmo || '').replace(/^@/, ''))" target="_blank" rel="noopener" @click="accion('venmo', $event)"><span class="ajusta" x-text="t('pagarCon') + ' Venmo'"></span></a>
+                <template x-for="m in (p.pagos || [])" :key="m.type">
+                    <a class="pr-pago" :class="p.forma" :style="dtPagoEstilo(m)" :href="dtPagoUrl(m) || '#'" :target="dtPagoUrl(m) ? '_blank' : null" rel="noopener" @click="pagar(m, $event)"><span class="ajusta" x-text="t('pagarCon') + ' ' + dtPago(m).nombre"></span></a>
+                </template>
             </div>
         </section>
     </div>

@@ -42,7 +42,7 @@
             <b>{{ $fmt($stats['whatsapp']) }}</b>
         </div>
         <div class="dt-stat">
-            <span>Clics en Zelle / pagos</span>
+            <span>Clics en pagos</span>
             <b>{{ $fmt($stats['pagos']) }}</b>
         </div>
     </div>

@@ -66,7 +66,7 @@ class AnaliticasController extends Controller
             'tasaVcf' => $vistas ? round($vcf * 100 / $vistas) : null,
             'whatsapp' => $contar(['whatsapp']),
             'llamadas' => $contar(['llamada']),
-            'pagos' => $contar(['zelle', 'cashapp', 'venmo']),
+            'pagos' => $contar(array_keys(config('pagos.medios'))),
             'semana' => $semana,
             'cambioSemanal' => $semanaAnterior ? round(($semana - $semanaAnterior) * 100 / $semanaAnterior) : null,
             'redes' => $redes,

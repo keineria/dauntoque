@@ -15,7 +15,10 @@ class ProfileEvent extends Model
     {
         $redes = array_map(fn ($id) => 'red_social_' . $id, array_keys(config('redes', [])));
 
-        return array_merge(['vista_perfil', 'descarga_vcf', 'llamada', 'whatsapp', 'correo', 'compartir', 'zelle', 'cashapp', 'venmo'], $redes);
+        // Los clics en pagos se registran con el tipo del medio (nequi, llave_breb, zelle, cashapp, venmo)
+        $pagos = array_keys(config('pagos.medios', []));
+
+        return array_merge(['vista_perfil', 'descarga_vcf', 'llamada', 'whatsapp', 'correo', 'compartir'], $pagos, $redes);
     }
 
     public function profile()

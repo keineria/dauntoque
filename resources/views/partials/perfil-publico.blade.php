@@ -1,7 +1,7 @@
 {{--
     Cuerpo del perfil público. Una sola plantilla para la página pública y para la vista previa del editor.
     Necesita en Alpine un objeto `p` con: nombre, profesion, bio, foto, tipo, alineacion, estructura, tema, color, forma,
-    telefono, correo, direccion, zelle, cashapp, venmo, redes [{id, nombre, svg, usuario}], galeria [], enlace, vcf, preview.
+    telefono, correo, direccion, pagos [{type, value}], redes [{id, nombre, svg, usuario}], galeria [], enlace, vcf, preview.
     Cada diseño vive en partials/perfil/*.blade.php; aquí van los colores por estilo, el idioma (t()), el ajuste de textos
     y las ventanas compartidas.
 --}}
@@ -111,12 +111,12 @@
     window.DT_TXT = {
         es: { guardar: 'Guardar contacto', whatsapp: 'WhatsApp', escribeme: 'Escríbeme por WhatsApp', reservar: 'Reservar por WhatsApp', llamar: 'Llamar', correo: 'Correo', enviarCorreo: 'Enviar un correo',
               compartir: 'Compartir', compartirTarjeta: 'Compartir mi tarjeta', copiadoEnlace: 'Enlace copiado', sobreMi: 'Sobre mí', perfil: 'Perfil', redes: 'Redes sociales', portafolio: 'Portafolio',
-              trabajos: 'Mis trabajos', pagos: 'Pagos', contacto: 'Contacto', telefono: 'Teléfono', ubicacion: 'Ubicación', verPerfil: 'Ver perfil', pagarCon: 'Pagar con', pagoZelle: 'Pagar con Zelle',
+              trabajos: 'Mis trabajos', pagos: 'Pagos', contacto: 'Contacto', telefono: 'Teléfono', ubicacion: 'Ubicación', verPerfil: 'Ver perfil', pagarCon: 'Pagar con',
               abreBanco: 'Abre tu banco y envía el pago a:', cerrar: 'Cerrar', copiar: 'Copiar', copiado: 'Copiado ✓', tarjetaPor: 'Tarjeta digital por', quieresUna: '¿Quieres una así? Crea la tuya',
               creaLaTuya: 'Crea la tuya', bienvenida: 'Bienvenido al perfil de', tuNombre: 'Tu nombre', tuProfesion: 'Tu profesión', tuBio: 'Tu biografía aparecerá aquí.', verImagen: 'Ver imagen', otroIdioma: 'EN' },
         en: { guardar: 'Save contact', whatsapp: 'WhatsApp', escribeme: 'Message me on WhatsApp', reservar: 'Book on WhatsApp', llamar: 'Call', correo: 'Email', enviarCorreo: 'Send an email',
               compartir: 'Share', compartirTarjeta: 'Share my card', copiadoEnlace: 'Link copied', sobreMi: 'About me', perfil: 'About', redes: 'Social media', portafolio: 'Portfolio',
-              trabajos: 'My work', pagos: 'Payments', contacto: 'Contact', telefono: 'Phone', ubicacion: 'Location', verPerfil: 'View profile', pagarCon: 'Pay with', pagoZelle: 'Pay with Zelle',
+              trabajos: 'My work', pagos: 'Payments', contacto: 'Contact', telefono: 'Phone', ubicacion: 'Location', verPerfil: 'View profile', pagarCon: 'Pay with',
               abreBanco: 'Open your bank app and send the payment to:', cerrar: 'Close', copiar: 'Copy', copiado: 'Copied ✓', tarjetaPor: 'Digital card by', quieresUna: 'Want one like this? Create yours',
               creaLaTuya: 'Create yours', bienvenida: 'Welcome to the profile of', tuNombre: 'Your name', tuProfesion: 'Your profession', tuBio: 'Your bio will appear here.', verImagen: 'View image', otroIdioma: 'ES' },
     };
@@ -151,16 +151,28 @@
         return (0.2126 * r + 0.7152 * g + 0.0722 * b) > 0.36 ? '#0b0b0c' : '#ffffff';
     }
     function dtSoloDigitos(t) { return String(t || '').replace(/[^0-9]/g, ''); }
+    // Medios de pago (config/pagos.php). Cada medio del perfil llega como { type, value }
+    window.DT_PAGOS = @json(config('pagos.medios'));
+    function dtPago(m) { return window.DT_PAGOS[m && m.type] || { nombre: '', icono: '', fondo: '#444', texto: '#fff', acento: '#888', accion: 'copiar' }; }
+    function dtPagoEstilo(m) { const c = dtPago(m); return `background:${c.fondo};color:${c.texto}`; }
+    // Enlace directo a la app (Cash App, Venmo); null si el dato se copia (Nequi, Llave Bre-B, Zelle)
+    function dtPagoUrl(m) {
+        const c = dtPago(m);
+        if (c.accion !== 'enlace') return null;
+        const valor = String(m.value || '').trim();
+        return c.enlace + encodeURIComponent(c.quitar && valor.startsWith(c.quitar) ? valor.slice(c.quitar.length) : valor);
+    }
 </script>
 @endonce
 
 {{-- Diseños disponibles (design_config.layout_estructura): clasica (y feria), premium, boutique, moderna, enlaces, ejecutiva (Deportivo) --}}
 <div class="pp" :class="['pp-' + (p.tema || 'crystal'), p.preview ? 'pp-preview' : '']"
      :style="`--acc:${p.color || '#3b82f6'}; --sobre:${dtSobre(p.color || '#3b82f6')}`"
-     x-data="{ zelleAbierto: false, fotoGrande: null, copiado: false, barraVisible: false, idioma: dtIdiomaInicial(p.preview), bienvenida: !p.preview,
+     x-data="{ pagoAbierto: null, fotoGrande: null, copiado: false, barraVisible: false, idioma: dtIdiomaInicial(p.preview), bienvenida: !p.preview,
                t(clave) { return (window.DT_TXT[this.idioma] || window.DT_TXT.es)[clave] || clave; },
                cambiarIdioma() { this.idioma = this.idioma === 'es' ? 'en' : 'es'; try { localStorage.setItem('dt-idioma', this.idioma); } catch (e) {} this.$nextTick(() => dtAjustar(this.$el)); },
                accion(nombre, e) { if (p.preview) { e && e.preventDefault(); return; } if (window.trackClick) trackClick(nombre); },
+               pagar(m, e) { this.accion(m.type, e); if (p.preview || dtPagoUrl(m)) return; e.preventDefault(); this.copiado = false; this.pagoAbierto = m; },
                async compartir(e) {
                    this.accion('compartir', e); if (p.preview) return;
                    const datos = { title: p.nombre, text: p.profesion || p.nombre, url: p.enlace };
@@ -208,15 +220,15 @@
         <a class="pp-btn pri" :class="p.forma" :href="p.vcf" @click="accion('descarga_vcf', $event)" x-text="t('guardar')">Guardar contacto</a>
     </div>
 
-    {{-- Zelle: dato para copiar --}}
-    <div class="pp-modal" x-show="zelleAbierto" x-transition.opacity x-cloak @click.self="zelleAbierto = false">
+    {{-- Nequi, Llave Bre-B y Zelle: el dato para copiar --}}
+    <div class="pp-modal" x-show="pagoAbierto" x-transition.opacity x-cloak @click.self="pagoAbierto = null">
         <div class="pp-hoja">
-            <h2 class="pp-h" style="margin:0" x-text="t('pagoZelle')">Pagar con Zelle</h2>
-            <p style="margin:6px 0 0;font-size:13px;color:var(--muted)" x-text="t('abreBanco')"></p>
-            <div class="pp-copia" x-text="p.zelle"></div>
+            <h2 class="pp-h" style="margin:0" x-text="t('pagarCon') + ' ' + dtPago(pagoAbierto).nombre"></h2>
+            <p style="margin:6px 0 0;font-size:13px;color:var(--muted)" x-text="(dtPago(pagoAbierto).ayuda || {})[idioma] || t('abreBanco')"></p>
+            <div class="pp-copia" x-text="pagoAbierto && pagoAbierto.value"></div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-                <button type="button" class="pp-btn sec" @click="zelleAbierto = false" x-text="t('cerrar')"></button>
-                <button type="button" class="pp-btn pri" @click="copiar(p.zelle)" x-text="copiado ? t('copiado') : t('copiar')"></button>
+                <button type="button" class="pp-btn sec" @click="pagoAbierto = null" x-text="t('cerrar')"></button>
+                <button type="button" class="pp-btn pri" @click="copiar(pagoAbierto.value)" x-text="copiado ? t('copiado') : t('copiar')"></button>
             </div>
         </div>
     </div>
