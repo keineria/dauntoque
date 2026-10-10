@@ -26,6 +26,7 @@
         <p style="margin:22px 0 6px;font-size:15px;font-weight:700">Qué sigue</p>
         <ol style="margin:0;padding-left:20px;font-size:14px;line-height:1.6;color:#151816">
             <li>Crea tu perfil con el botón de arriba (usa este mismo correo).</li>
+            <li>Por la oferta de lanzamiento puedes crear un segundo perfil (por ejemplo, uno ejecutivo y otro personal) y elegir desde tu panel cuál se abre con tu tarjeta.</li>
             <li>Preparamos tu tarjeta y te escribimos al {{ $pedido->celular }} con la guía de envío.</li>
             <li>Cuando llegue, acércala a tu celular: se enlaza a tu perfil y listo.</li>
         </ol>

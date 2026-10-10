@@ -72,4 +72,20 @@
     });
     anclas.forEach(function (a) { of.observe(a); });
   }
+
+  // Dos perfiles: alterna entre el perfil ejecutivo y el personal; cambia solo cada 4 s hasta que la persona toque
+  var dos = document.querySelector('[data-dos]');
+  if (dos) {
+    var modos = dos.querySelectorAll('[data-modo]');
+    var vistas = dos.querySelectorAll('[data-perfil-modo]');
+    var verModo = function (n) {
+      modos.forEach(function (b) { b.setAttribute('aria-selected', b.dataset.modo === n ? 'true' : 'false'); });
+      vistas.forEach(function (v) { v.hidden = v.dataset.perfilModo !== n; });
+    };
+    var giro = matchMedia('(prefers-reduced-motion: reduce)').matches ? null
+      : setInterval(function () { verModo(dos.querySelector('[data-modo][aria-selected="false"]').dataset.modo); }, 4000);
+    modos.forEach(function (b) {
+      b.addEventListener('click', function () { clearInterval(giro); verModo(b.dataset.modo); });
+    });
+  }
 })();

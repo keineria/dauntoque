@@ -135,6 +135,7 @@
         <ul>
             <li>Tarjeta física con chip NFC</li>
             <li>Perfil web con WhatsApp, redes, portafolio y cobros</li>
+            <li><span><b>Segundo perfil de regalo</b> (ejecutivo y personal) · oferta de lanzamiento</span></li>
             <li>Panel con visitas, contactos guardados y pagos</li>
             <li>Envío gratis a toda Colombia</li>
             <li>Garantía de 30 días</li>

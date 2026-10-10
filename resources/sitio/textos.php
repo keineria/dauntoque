@@ -41,6 +41,16 @@ return [
             'visorP' => 'Toca un perfil para verlo en vivo, tal como lo ve tu cliente.',
             'visorAbrir' => 'Abrir en otra pestaña',
 
+            'dosOferta' => 'Oferta de lanzamiento · Por tiempo limitado',
+            'dosH' => 'Dos perfiles en una sola tarjeta. El segundo va de regalo.',
+            'dosP' => 'De lunes a viernes eres el ejecutivo que cierra tratos. El fin de semana quieres mostrar tus gustos o presentarte a alguien que quieres conocer. Con tu compra creas dos perfiles y activas en tu tarjeta el que quieras, cuando quieras.',
+            'dosModos' => ['Ejecutivo', 'Personal'],
+            'dosPerfiles' => [
+                ['nombre' => 'Andrés Gómez', 'rol' => 'Gerente comercial', 'chips' => ['Guardar contacto', 'WhatsApp', 'Portafolio', 'Pagar']],
+                ['nombre' => 'Andrés 🌴', 'rol' => 'Café, montaña y buena música', 'chips' => ['Instagram', 'Spotify', 'Mis planes', 'Escríbeme']],
+            ],
+            'dosPuntos' => ['Uno para el trabajo, otro para tu vida', 'Cambias el perfil activo desde tu panel en segundos', 'Incluido con tu tarjeta solo durante el lanzamiento'],
+
             'beneficiosH' => 'Diseñada para cerrar ventas',
             'beneficios' => [
                 ['Contacto al instante', 'Tu cliente te guarda en su agenda con un toque, sin errores de tipeo.'],
@@ -87,6 +97,7 @@ return [
             'productoSub' => 'Elige Matte Black o Crystal al hacer tu pedido.',
             'incluye' => [
                 'Tarjeta física con chip NFC NTAG215',
+                'Segundo perfil de regalo (ejecutivo y personal) por lanzamiento',
                 'Perfil web con tu foto, WhatsApp, redes y portafolio',
                 'Botones de cobro con :pagos',
                 'Panel para editar tu perfil cuando quieras',
@@ -177,6 +188,16 @@ return [
             'visorP' => 'Tap a profile to see it live, exactly as your client sees it.',
             'visorAbrir' => 'Open in a new tab',
 
+            'dosOferta' => 'Launch offer · Limited time',
+            'dosH' => 'Two profiles on one card. The second one is free.',
+            'dosP' => 'Monday to Friday you are the executive closing deals. On the weekend you want to show what you love or introduce yourself to someone you want to meet. With your purchase you create two profiles and switch the one on your card whenever you like.',
+            'dosModos' => ['Executive', 'Personal'],
+            'dosPerfiles' => [
+                ['nombre' => 'Andrew Gomez', 'rol' => 'Sales manager', 'chips' => ['Save contact', 'WhatsApp', 'Portfolio', 'Pay']],
+                ['nombre' => 'Andrew 🌴', 'rol' => 'Coffee, hiking and good music', 'chips' => ['Instagram', 'Spotify', 'My plans', 'Text me']],
+            ],
+            'dosPuntos' => ['One for work, one for your life', 'Switch the active profile from your dashboard in seconds', 'Included with your card during launch only'],
+
             'beneficiosH' => 'Built to close sales',
             'beneficios' => [
                 ['Instant contact', 'Your client saves you to their contacts with one tap, no typos.'],
@@ -223,6 +244,7 @@ return [
             'productoSub' => 'Choose Matte Black or Crystal when you order.',
             'incluye' => [
                 'Physical card with NFC NTAG215 chip',
+                'Free second profile (work and personal) during launch',
                 'Web profile with your photo, WhatsApp, socials and portfolio',
                 'Payment buttons for :pagos',
                 'Dashboard to edit your profile anytime',

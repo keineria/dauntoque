@@ -78,6 +78,35 @@
         </div>
     </section>
 
+    {{-- 2b. Gancho: segundo perfil de regalo (ejecutivo y personal) --}}
+    <section class="seccion negra" id="dos-perfiles">
+        <div class="envoltura dos-perfiles" data-dos>
+            <div class="dp-texto">
+                <span class="cinta">{{ $i['dosOferta'] }}</span>
+                <div class="cabeza" style="margin:14px 0 0">
+                    <h2>{{ $i['dosH'] }}</h2>
+                    <p>{{ $i['dosP'] }}</p>
+                </div>
+                <div class="dp-modos" role="tablist">
+                    @foreach ($i['dosModos'] as $n => $modo)
+                        <button type="button" role="tab" data-modo="{{ $n }}" aria-selected="{{ $n === 0 ? 'true' : 'false' }}">{{ $modo }}</button>
+                    @endforeach
+                </div>
+            </div>
+            <div class="dp-telefono" aria-live="polite">
+                @foreach ($i['dosPerfiles'] as $n => $perfil)
+                    <div class="dp-perfil {{ $n === 0 ? 'ejecutivo' : 'personal' }}" data-perfil-modo="{{ $n }}" @if($n !== 0) hidden @endif>
+                        <div class="dp-avatar">{{ \Illuminate\Support\Str::substr($perfil['nombre'], 0, 1) }}</div>
+                        <b>{{ $perfil['nombre'] }}</b>
+                        <span>{{ $perfil['rol'] }}</span>
+                        <ul>@foreach ($perfil['chips'] as $c)<li>{{ $c }}</li>@endforeach</ul>
+                    </div>
+                @endforeach
+            </div>
+            <ul class="dp-puntos">@foreach ($i['dosPuntos'] as $punto)<li>{{ $punto }}</li>@endforeach</ul>
+        </div>
+    </section>
+
     <section class="seccion gris">
         <div class="envoltura visor" data-visor>
             <div>
