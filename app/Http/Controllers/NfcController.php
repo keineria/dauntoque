@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Chip;
+use App\Models\Market;
 use App\Models\Profile;
 use App\Models\Tarjeta;
 use Illuminate\Http\Request;
@@ -16,13 +18,18 @@ class NfcController extends Controller
 
         if ($tarjetaEnUso) {
             // ¡LA MAGIA REAL! Si la tarjeta ya está activa, lo enviamos a su link maestro
-            // (portal.dauntoque.com/nickname del primer perfil), que muestra el perfil activo
-            $urlPublica = url('/' . Profile::maestroDe($tarjetaEnUso->user_id)->nickname);
+            // (dauntoque.com/nickname del primer perfil), que muestra el perfil activo
+            $urlPublica = Profile::urlPublica(Profile::maestroDe($tarjetaEnUso->user_id)->nickname);
 
             return redirect()->away($urlPublica);
         }
 
-        // 2. Si la tarjeta es virgen (nueva), guardamos su código temporalmente
+        // 2. Solo se activan chips vendidos (registrados en /admin/chips); los demás ven cómo pedir ayuda
+        if (! Chip::habilitado($hash)) {
+            return response()->view('nfc.no-habilitada', ['codigo' => $hash, 'whatsapp' => Market::where('code', 'CO')->value('whatsapp')], 404);
+        }
+
+        // 3. Si la tarjeta es virgen (nueva), guardamos su código temporalmente
         session(['nfc_pendiente' => $hash]);
 
         // Si la persona que escanea no tiene cuenta, lo mandamos al registro
@@ -39,7 +46,7 @@ class NfcController extends Controller
             return redirect('/dashboard')->with('status', '¡Casi listo! Crea tu primer perfil para terminar de enlazar tu tarjeta física.');
         }
 
-        // 3. VINCULACIÓN EXITOSA (El primer escaneo que detona el Confeti)
+        // 4. VINCULACIÓN EXITOSA (El primer escaneo que detona el Confeti)
         Tarjeta::vincular($perfil, $hash);
         session()->forget('nfc_pendiente');
 

@@ -119,7 +119,7 @@
                 <div style="min-width:0">
                     <h3 style="margin:0;font-size:20px">{{ $publico['nombre'] ?: 'Sin nombre' }}</h3>
                     <p class="dt-sub" style="margin:2px 0 14px">{{ $publico['nombrePerfil'] }}</p>
-                    <p style="margin:0 0 16px;font-family:ui-monospace,Consolas,monospace;font-size:13px;overflow-wrap:anywhere">portal.dauntoque.com/{{ $publico['nickname'] }}</p>
+                    <p style="margin:0 0 16px;font-family:ui-monospace,Consolas,monospace;font-size:13px;overflow-wrap:anywhere">{{ \App\Models\Profile::prefijoPublico() }}{{ $publico['nickname'] }}</p>
                     <div style="display:flex;flex-wrap:wrap;gap:8px">
                         <a href="/{{ $publico['nickname'] }}" target="_blank" class="dt-btn">Ver perfil público</a>
                         <a href="/editor?id={{ $publico['id'] }}" class="dt-btn pri">Editar perfil</a>

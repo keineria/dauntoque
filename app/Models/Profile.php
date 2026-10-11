@@ -54,4 +54,16 @@ class Profile extends Model
     {
         return static::where('user_id', $userId)->orderBy('id', 'asc')->first();
     }
+
+    /** Dirección que abre la tarjeta y se comparte: dauntoque.com/keiner (config perfiles.url_publica). */
+    public static function urlPublica(string $nickname): string
+    {
+        return config('perfiles.url_publica') . '/' . $nickname;
+    }
+
+    /** Lo mismo sin https://, para mostrarlo: "dauntoque.com/" + nickname. */
+    public static function prefijoPublico(): string
+    {
+        return preg_replace('#^https?://#', '', config('perfiles.url_publica')) . '/';
+    }
 }

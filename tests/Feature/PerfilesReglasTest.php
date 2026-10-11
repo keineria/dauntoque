@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Chip;
 use App\Models\Profile;
 use App\Models\ProfileEvent;
 use App\Models\Tarjeta;
@@ -72,6 +73,28 @@ class PerfilesReglasTest extends TestCase
         $this->get('/laura')->assertOk()->assertSee('Laura Pinta');
     }
 
+    public function test_con_dominio_publico_la_tarjeta_abre_dauntoque_com_nickname(): void
+    {
+        config(['perfiles.url_publica' => 'https://dauntoque.com']);
+        [$usuario] = $this->usuarioConDosPerfiles();
+        Chip::firstOrCreate(['codigo' => 'chip-pub']);
+        $this->actingAs($usuario)->get('/activar/chip-pub')->assertRedirect('/dashboard');
+
+        $this->get('/activar/chip-pub')->assertRedirect('https://dauntoque.com/laura');
+        $this->get('/laura')->assertOk()->assertSee('dauntoque.com/laura');
+        $this->actingAs($usuario)->get('/dashboard')->assertSee('dauntoque.com/laura');
+    }
+
+    public function test_el_sitio_publicado_manda_al_portal_lo_que_no_es_suyo(): void
+    {
+        $htaccess = \App\Console\Commands\GenerarSitio::htaccess('https://portal.dauntoque.com');
+        $this->assertStringContainsString('RewriteRule ^(.+)$ https://portal.dauntoque.com/$1 [R=302,L]', $htaccess);
+        $this->assertStringContainsString('!^/\\.well-known/', $htaccess);
+
+        $usuario = User::factory()->create();
+        $this->actingAs($usuario)->getJson('/perfil/validar-nickname?nickname=es-co')->assertJson(['disponible' => false]);
+    }
+
     // 2. El chip se muda entre cuentas
 
     public function test_el_chip_pasa_a_la_cuenta_que_lo_vincula_y_conserva_sus_fechas(): void
@@ -79,10 +102,12 @@ class PerfilesReglasTest extends TestCase
         Carbon::setTestNow('2026-10-14 10:00:00');
         $beto = User::factory()->create();
         $this->crear($beto, 'beto', 'Beto')->assertOk();
+        Chip::firstOrCreate(['codigo' => 'chip-uno']);
         $this->actingAs($beto)->get('/activar/chip-uno')->assertRedirect('/dashboard');
 
         // Beto cambia su tarjeta por otra: la vieja queda libre y no deja contador en su panel
         Carbon::setTestNow('2026-11-01 10:00:00');
+        Chip::firstOrCreate(['codigo' => 'chip-dos']);
         $this->actingAs($beto)->get('/activar/chip-dos')->assertRedirect('/dashboard');
         $this->assertSame('chip-dos', Profile::where('user_id', $beto->id)->first()->nfc_uid);
         $this->assertSame(['chip-dos'], Tarjeta::where('user_id', $beto->id)->vinculadas()->pluck('nfc_uid')->all());
@@ -106,6 +131,7 @@ class PerfilesReglasTest extends TestCase
     public function test_la_tarjeta_abre_el_link_maestro_que_muestra_el_perfil_activo(): void
     {
         [$usuario, $uno, $dos] = $this->usuarioConDosPerfiles();
+        Chip::firstOrCreate(['codigo' => 'chip-abc']);
         $this->actingAs($usuario)->get('/activar/chip-abc')->assertRedirect('/dashboard');
         $this->actingAs($usuario)->postJson("/perfil/{$dos->id}/activar")->assertOk();
 

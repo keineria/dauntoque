@@ -46,7 +46,7 @@
         <div style="min-width:0;position:relative;z-index:1">
             <h1 class="px-nombre pp-nombre" x-text="p.nombre || t('tuNombre')"></h1>
             <p class="px-prof" x-show="p.tipo !== 'empresa' && (p.profesion || p.preview)" x-text="p.profesion || t('tuProfesion')"></p>
-            <p class="px-marca" x-text="p.preview ? 'portal.dauntoque.com' : String(p.enlace || '').replace(/^https?:\/\//, '')"></p>
+            <p class="px-marca" x-text="p.preview ? @js(rtrim(\App\Models\Profile::prefijoPublico(), '/')) : String(p.enlace || '').replace(/^https?:\/\//, '')"></p>
         </div>
     </section>
 

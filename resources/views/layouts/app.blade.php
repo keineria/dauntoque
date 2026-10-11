@@ -34,6 +34,11 @@
             <a href="/dashboard/configuracion" class="dt-nav {{ request()->is('dashboard/configuracion') ? 'on' : '' }}">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>Datos del perfil
             </a>
+            @if ($usuarioPanel?->esAdmin())
+                <a href="/admin/chips" class="dt-nav {{ request()->is('admin/*') ? 'on' : '' }}">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M9 9h6v6H9z"/></svg>Chips (admin)
+                </a>
+            @endif
 
             @if($perfilesMenu->isNotEmpty())
                 <div class="dt-sep"></div>

@@ -126,7 +126,7 @@
                         <div x-show="paso === 1 && modoActual === 'crear'">
                             <label class="dt-label" for="ed-nick">Tu usuario único</label>
                             <div style="display:flex;gap:8px">
-                                <div class="dt-inline" style="flex:1"><span>portal.dauntoque.com/</span><input id="ed-nick" type="text" x-model="nickname" @input="nickValidado = false; nickError = ''" placeholder="carlos" style="text-transform:lowercase"></div>
+                                <div class="dt-inline" style="flex:1"><span>{{ \App\Models\Profile::prefijoPublico() }}</span><input id="ed-nick" type="text" x-model="nickname" @input="nickValidado = false; nickError = ''" placeholder="carlos" style="text-transform:lowercase"></div>
                                 <button @click="validarNickname" class="dt-btn" style="height:40px">
                                     <span x-show="!validandoNick">Validar</span><span x-show="validandoNick">…</span>
                                 </button>

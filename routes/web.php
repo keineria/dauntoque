@@ -40,6 +40,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard/perfiles', [DashboardController::class, 'perfiles']);
     Route::get('/dashboard/analiticas', [DashboardController::class, 'analiticas']);
     Route::get('/dashboard/configuracion', [DashboardController::class, 'configuracion']);
+    Route::middleware('admin')->prefix('admin')->group(function () {
+        Route::get('/chips', [App\Http\Controllers\AdminChipsController::class, 'index']);
+        Route::post('/chips', [App\Http\Controllers\AdminChipsController::class, 'guardar']);
+        Route::post('/chips/generar', [App\Http\Controllers\AdminChipsController::class, 'generar']);
+        Route::delete('/chips/{chip}', [App\Http\Controllers\AdminChipsController::class, 'eliminar']);
+    });
     Route::post('/renovar/{tarjeta}', [App\Http\Controllers\RenovacionController::class, 'crear']);
     Route::post('/api/ia/generar-bio', [App\Http\Controllers\ProfileController::class, 'generarBioIA']);
 

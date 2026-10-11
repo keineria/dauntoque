@@ -51,7 +51,7 @@ class PublicProfileController extends Controller
             // El SVG de cada red sale del catálogo del servidor, nunca de lo guardado (anti-XSS)
             'redes' => RedesSociales::sanear($perfil->redes_sociales),
             'galeria' => array_values(array_filter((array) $galeria, fn ($img) => ImageStore::esPropia($img))),
-            'enlace' => url('/' . $linkMaestro),
+            'enlace' => Profile::urlPublica($linkMaestro),
             'vcf' => url('/' . $linkMaestro . '/vcf'),
             'preview' => false,
         ];
@@ -79,7 +79,7 @@ class PublicProfileController extends Controller
         if($perfil->direccion) $vcf .= "ADR;TYPE=WORK:;;" . $linea($perfil->direccion) . ";;;;\r\n";
 
         // URL Limpia en la agenda del celular
-        $vcf .= "URL:" . url('/' . $linkMaestro) . "\r\n";
+        $vcf .= "URL:" . Profile::urlPublica($linkMaestro) . "\r\n";
 
         // Solo se incrusta la foto si es una imagen propia del portal (nunca otros archivos del servidor).
         // El tipo sale del contenido real (no de la extensión) y la línea se dobla a 75 caracteres.

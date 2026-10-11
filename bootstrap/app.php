@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         // Bold no envía token CSRF: el webhook se valida con su firma
         $middleware->validateCsrfTokens(except: ['webhooks/bold']);
+        $middleware->alias(['admin' => \App\Http\Middleware\SoloAdmin::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
