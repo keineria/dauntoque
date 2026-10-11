@@ -109,6 +109,9 @@ class GenerarSitio extends Command
             File::put($destino . '/portal.php', strtr(File::get(resource_path('sitio/servidor/portal.php')), ['__PORTAL__' => $portal]));
         }
 
+        // Versión de cada archivo en sus enlaces (sitio.css?v=…): así Cloudflare y el navegador no muestran los viejos
+        $this->versionarEnlaces($destino, $base);
+
         $this->info(count($paginas) . " páginas generadas en $destino");
 
         return self::SUCCESS;
@@ -144,6 +147,29 @@ class GenerarSitio extends Command
             . "RewriteCond %{REQUEST_FILENAME} !-f\n"
             . "RewriteCond %{REQUEST_FILENAME} !-d\n"
             . "RewriteRule ^ portal.php [L]\n";
+    }
+
+    /** Agrega ?v=<huella del archivo> a sitio.css, sitio.js y media/… en todas las páginas generadas. */
+    private function versionarEnlaces(string $destino, string $base): void
+    {
+        $huellas = [];
+        $patron = '#(?<=["\'(])' . preg_quote($base, '#') . '/((?:media/[^"\'()?\s]+)|sitio\.css|sitio\.js)(?=["\')])#';
+
+        foreach (File::allFiles($destino) as $archivo) {
+            if ($archivo->getExtension() !== 'html') {
+                continue;
+            }
+            $html = preg_replace_callback($patron, function ($m) use ($destino, $base, &$huellas) {
+                $ruta = $destino . '/' . $m[1];
+                if (!is_file($ruta)) {
+                    return $m[0];
+                }
+                $huellas[$m[1]] ??= substr(md5_file($ruta), 0, 8);
+
+                return $base . '/' . $m[1] . '?v=' . $huellas[$m[1]];
+            }, File::get($archivo->getPathname()));
+            File::put($archivo->getPathname(), $html);
+        }
     }
 
     /** COP 299900 -> "$299.900"; USD 119 -> "$119". */
