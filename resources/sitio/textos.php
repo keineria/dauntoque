@@ -178,6 +178,18 @@ return [
                     ['Qué funciona', 'Ves qué botones tocan más tus clientes: WhatsApp, portafolio, redes o pagos.'],
                     ['Cambia cuando quieras', 'Actualizas foto, datos, colores y medios de pago sin cambiar la tarjeta.'],
                 ],
+                // Analíticas con IA: todavía no existen en el portal, van como "Próximamente"
+                'ia' => [
+                    'chip' => 'Analíticas con IA',
+                    'pronto' => 'Próximamente',
+                    'h' => 'Tu resumen de la semana, escrito por la IA',
+                    'p' => 'La IA lee tus visitas y clics y te dice en palabras simples qué funcionó y qué hacer hoy.',
+                    'puntos' => [
+                        ['chart', 'WhatsApp fue tu botón más tocado esta semana: 32 % más que la anterior.'],
+                        ['user', '3 personas guardaron tu contacto y no te escribieron. Salúdalas hoy.'],
+                        ['cal', 'Los jueves te visitan el doble. Publica tus novedades ese día.'],
+                    ],
+                ],
             ],
 
             'viajeEyebrow' => 'De la compra al primer toque',
@@ -212,6 +224,7 @@ return [
                 ['Cobra el flete en el acto', 'En transporte no hay tiempo que perder. Toco el celular del cliente, se abre mi perfil, cobro el flete por Zelle y arrancamos.', 'Transporte · EE. UU.'],
                 ['Justifica sus precios', 'Cuando voy a cotizar una remodelación, saco la Matte Black y el cliente ve mis obras pasadas en un segundo. Me da autoridad.', 'Remodelaciones'],
                 ['Su trabajo habla por él', 'Desde 2004 corto cabello. Ahora el cliente ve mis cortes en el perfil, guarda mi número y vuelve. Me paga por Zelle sin buscar efectivo.', 'Barbería · EE. UU.'],
+                ['Cierra desde el primer saludo', 'En cada reunión acerco la tarjeta y el cliente ya tiene mi contacto, mi Instagram y cómo pagarme. Llego con imagen de experto y cierro más rápido.', 'Ventas y tecnología · EE. UU.'],
             ],
 
             'comparaEyebrow' => 'Papel, QR o NFC',
@@ -485,6 +498,17 @@ return [
                     ['What works', 'See which buttons your clients tap most: WhatsApp, portfolio, socials or payments.'],
                     ['Change it anytime', 'Update your photo, details, colors and payment methods without changing the card.'],
                 ],
+                'ia' => [
+                    'chip' => 'AI analytics',
+                    'pronto' => 'Coming soon',
+                    'h' => 'Your weekly summary, written by AI',
+                    'p' => 'AI reads your views and clicks and tells you in plain words what worked and what to do today.',
+                    'puntos' => [
+                        ['chart', 'WhatsApp was your most tapped button this week: 32% more than last week.'],
+                        ['user', '3 people saved your contact but never texted you. Say hi today.'],
+                        ['cal', 'Thursdays bring you twice the visits. Post your news that day.'],
+                    ],
+                ],
             ],
 
             'viajeEyebrow' => 'From order to first tap',
@@ -518,6 +542,7 @@ return [
                 ['Gets paid for the job on the spot', 'In transportation there is no time to waste. I tap the client\'s phone, my profile opens, I get paid via Zelle and we roll.', 'Transportation · USA'],
                 ['Backs up his prices', 'When I go quote a remodel, I pull out the Matte Black and the client sees my past work in a second. It gives me authority.', 'Remodeling'],
                 ['His work speaks for him', 'I\'ve been cutting hair since 2004. Now clients see my cuts on my profile, save my number and come back. They pay me via Zelle, no cash needed.', 'Barbershop · USA'],
+                ['Closes from the first hello', 'At every meeting I tap my card and the client already has my contact, my Instagram and how to pay me. I show up looking like the expert and close faster.', 'Sales & tech · USA'],
             ],
 
             'comparaEyebrow' => 'Paper, QR or NFC',
