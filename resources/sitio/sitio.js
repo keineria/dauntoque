@@ -157,4 +157,31 @@
       escenario.addEventListener('pointerleave', function () { tarjeta3d.style.transform = ''; });
     }
   }
+  // Casos reales: carrusel de 4 por vista que avanza solo en bucle y se detiene con el mouse, el foco o el dedo
+  const carrusel = document.querySelector('[data-carrusel]');
+  if (carrusel) {
+    const originales = Array.prototype.slice.call(carrusel.children);
+    // Copias de las primeras tarjetas al final: al llegar a ellas se salta sin animación al inicio real
+    originales.slice(0, 4).forEach(function (t) {
+      const copia = t.cloneNode(true); copia.setAttribute('aria-hidden', 'true');
+      copia.querySelectorAll('a').forEach(function (a) { a.tabIndex = -1; });
+      carrusel.appendChild(copia);
+    });
+    let pausado = false;
+    const paso = function () { return originales[1].offsetLeft - originales[0].offsetLeft; };
+    const avanzar = function () {
+      if (pausado || document.hidden) return;
+      const fin = originales.length * paso();
+      if (carrusel.scrollLeft >= fin - 2) carrusel.scrollTo({ left: carrusel.scrollLeft - fin, behavior: 'auto' });
+      carrusel.scrollTo({ left: carrusel.scrollLeft + paso(), behavior: 'smooth' });
+    };
+    carrusel.addEventListener('scroll', function () {
+      const fin = originales.length * paso();
+      if (carrusel.scrollLeft >= fin - 2) carrusel.scrollTo({ left: carrusel.scrollLeft - fin, behavior: 'auto' });
+    }, { passive: true });
+    ['mouseenter', 'focusin', 'touchstart'].forEach(function (ev) { carrusel.addEventListener(ev, function () { pausado = true; }, { passive: true }); });
+    ['mouseleave', 'focusout'].forEach(function (ev) { carrusel.addEventListener(ev, function () { pausado = false; }); });
+    carrusel.addEventListener('touchend', function () { setTimeout(function () { pausado = false; }, 4000); }, { passive: true });
+    if (!reducir) setInterval(avanzar, 3500);
+  }
 })();

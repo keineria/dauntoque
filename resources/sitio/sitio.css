@@ -370,19 +370,22 @@ button { font-family: inherit; }
 @media (max-width: 900px) { .acabados { grid-template-columns: 1fr; } .estudio { min-height: 260px; } }
 
 /* Casos reales */
-.casos { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+.casos { display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; padding-bottom: 4px; }
+.casos::-webkit-scrollbar { display: none; }
+.casos > .caso { flex: 0 0 calc((100% - 48px) / 4); scroll-snap-align: start; }
 .caso-fotos { position: relative; }
-.caso-fotos .caso-extra { position: absolute; right: 14px; bottom: 14px; width: 34%; aspect-ratio: 1; border-radius: 14px; border: 3px solid var(--ink-2); box-shadow: 0 12px 30px -10px rgba(0, 0, 0, .6); object-position: center; height: auto; }
+.caso-fotos .caso-extra { position: absolute; right: 10px; bottom: 10px; width: 32%; aspect-ratio: 1; border-radius: 10px; border: 2px solid var(--ink-2); box-shadow: 0 10px 24px -10px rgba(0, 0, 0, .6); object-position: center; height: auto; }
 .caso { background: var(--ink-2); border: 1px solid var(--line-d); border-radius: 20px; overflow: hidden; display: grid; grid-template-rows: auto 1fr; }
 .caso img { width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; object-position: center 25%; }
-.caso > div { padding: 20px; display: grid; gap: 12px; align-content: start; }
-.caso blockquote { margin: 0; font-size: 16px; line-height: 1.5; }
+.caso > div { padding: 16px; display: grid; gap: 10px; align-content: start; }
+.caso blockquote { margin: 0; font-size: 14.5px; line-height: 1.5; }
 .caso .quien { display: flex; justify-content: space-between; align-items: end; gap: 10px; margin-top: auto; font-size: 14px; flex-wrap: wrap; }
 .caso .quien > span { display: grid; }
 .caso .quien b { font: 700 15px var(--f-display); }
 .caso .quien a { color: var(--signal-2); font: 600 13px var(--f-body); white-space: nowrap; }
 .dato { font: 700 13px var(--f-mono); color: var(--signal-2); background: color-mix(in srgb, var(--signal) 12%, transparent); padding: 6px 10px; border-radius: 8px; justify-self: start; }
-@media (max-width: 900px) { .casos { grid-template-columns: 1fr; } .caso { grid-template-columns: 160px 1fr; grid-template-rows: auto; } .caso img { height: 100%; aspect-ratio: auto; } .caso-fotos { height: 100%; } .caso-fotos .caso-extra { width: 30%; right: 10px; bottom: 10px; border-radius: 10px; border-width: 2px; } }
+@media (max-width: 1000px) { .casos > .caso { flex-basis: calc((100% - 16px) / 2); } }
+@media (max-width: 600px) { .casos > .caso { flex-basis: 82%; } }
 @media (max-width: 520px) { .caso { grid-template-columns: 1fr; } .caso img { aspect-ratio: 16 / 10; height: auto; } }
 
 /* Comparación y calculadora */
@@ -545,6 +548,15 @@ button { font-family: inherit; }
   .ia-wrap { grid-template-columns: 1fr; }
   .apps { grid-template-columns: 1fr; }
 }
+
+/* Analíticas con IA (próximamente) dentro de Tu panel */
+.ia-resumen { margin-top: 22px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 24px; align-items: center; padding: 24px; border-radius: 18px; border: 1px solid color-mix(in srgb, var(--signal) 45%, transparent); background: linear-gradient(135deg, color-mix(in srgb, var(--signal) 13%, var(--ink-2)), var(--ink-2) 65%); }
+.ia-resumen-top { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 12px; }
+.ia-chip { display: inline-flex; gap: 6px; align-items: center; padding: 5px 10px; border-radius: 999px; background: var(--ink-3); color: var(--signal-2); font: 600 12px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; }
+.ia-resumen h3 { font-size: 22px; margin-bottom: 6px; }
+.ia-resumen-lista { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.ia-resumen-lista li { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 12px; align-items: center; padding: 10px 12px; border-radius: 12px; background: var(--ink); border: 1px solid var(--line-d); font-size: 14.5px; }
+@media (max-width: 900px) { .ia-resumen { grid-template-columns: 1fr; padding: 18px; } }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }

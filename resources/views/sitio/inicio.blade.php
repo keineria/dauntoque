@@ -14,6 +14,7 @@
         ['foto' => 'caso-brey', 'extra' => 'caso-brey-cara', 'nombre' => 'Breynner Logistics', 'url' => 'https://brey.dauntoque.com'],
         ['foto' => 'caso-carlos', 'extra' => 'caso-carlos-obra', 'nombre' => 'Carlos Mendoza', 'url' => 'https://carlos.dauntoque.com'],
         ['foto' => 'caso-camilo', 'extra' => 'caso-camilo-corte', 'nombre' => 'Palacio Barbershop', 'url' => 'https://camilo.dauntoque.com'],
+        ['foto' => 'caso-yasser', 'extra' => 'caso-yasser-extra', 'nombre' => 'Yasser Alvarado', 'url' => 'https://yass.dauntoque.com'],
     ];
     // Caras de la prueba social del héroe (las de los casos y una más)
     $caras = array_merge(array_column($casos, 'foto'), ['caso-angela']);
@@ -298,6 +299,19 @@
                 </div>
             </div>
             <div class="notas-panel">@foreach ($pn['notas'] as [$b, $txt])<div><b>{{ $b }}</b><p>{{ $txt }}</p></div>@endforeach</div>
+            @php $pia = $pn['ia']; @endphp
+            <div class="ia-resumen">
+                <div class="ia-resumen-txt">
+                    <div class="ia-resumen-top"><span class="ia-chip"><svg width="14" height="14" aria-hidden="true"><use href="#spark"/></svg>{{ $pia['chip'] }}</span><span class="app-pronto">{{ $pia['pronto'] }}</span></div>
+                    <h3>{{ $pia['h'] }}</h3>
+                    <p class="mut">{{ $pia['p'] }}</p>
+                </div>
+                <ul class="ia-resumen-lista">
+                    @foreach ($pia['puntos'] as [$ico, $txt])
+                        <li><span class="app-ic"><svg width="18" height="18" aria-hidden="true"><use href="#{{ $ico }}"/></svg></span>{{ $txt }}</li>
+                    @endforeach
+                </ul>
+            </div>
         </div>
     </section>
 
@@ -393,7 +407,8 @@
                 <span class="eyebrow">{{ $i['casosEyebrow'] }}</span>
                 <h2>{{ $i['casosH'] }}</h2>
             </div>
-            <div class="casos">
+            {{-- Carrusel: 4 por vista, rota solo en bucle y se detiene con el mouse o al tocarlo (ver sitio.js) --}}
+            <div class="casos" data-carrusel tabindex="0" aria-label="{{ $i['casosH'] }}">
                 @foreach ($casos as $n => $c)
                     @php [$dato, $cita, $rol] = $i['casos'][$n]; @endphp
                     <article class="caso">
