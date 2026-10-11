@@ -84,12 +84,9 @@
         <div x-show="qr" x-cloak @keydown.escape.window="qr = null" @click.self="qr = null" style="position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.6);display:grid;place-items:center;padding:16px">
             <div class="dt-panel" style="width:min(360px,100%);text-align:center">
                 <div class="dt-panel-h"><h2>QR del chip</h2><button type="button" class="dt-btn" @click="qr = null" aria-label="Cerrar">✕</button></div>
-                <template x-if="qr">
-                    <div>
-                        <x-qr modelo="qr.url" nombre="qr-chip" tam="220" style="display:inline-block" />
-                        <p class="dt-sub" style="margin:12px 0 0;font-family:ui-monospace,Consolas,monospace;font-size:12px;overflow-wrap:anywhere" x-text="qr.url"></p>
-                    </div>
-                </template>
+                {{-- Sin <template>: el QR trae su script y dentro de un <template> no se ejecutaría --}}
+                <x-qr modelo="qr?.url" nombre="qr-chip" tam="220" style="display:inline-block" />
+                <p class="dt-sub" style="margin:12px 0 0;font-family:ui-monospace,Consolas,monospace;font-size:12px;overflow-wrap:anywhere" x-text="qr?.url"></p>
                 <p class="dt-sub" style="margin:10px 0 0;font-size:13px">Lleva al mismo enlace grabado en el chip. Imprímelo atrás de la tarjeta con el SVG.</p>
             </div>
         </div>
