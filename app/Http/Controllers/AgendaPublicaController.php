@@ -72,6 +72,8 @@ class AgendaPublicaController extends Controller
             'servicios' => $servicios,
             'idioma' => $idioma,
             'zona' => config('agenda.zonas.' . $ajustes->zona_horaria, $ajustes->zona_horaria),
+            'limiteHoras' => $ajustes->limite_cancelar_horas,
+            'politica' => $ajustes->politica_cancelacion,
             'urlHoras' => url('/' . $maestro . '/agenda/horas'),
             'urlReservar' => url('/' . $maestro . '/agenda'),
             'urlPerfil' => Profile::urlPublica($maestro),
@@ -132,6 +134,7 @@ class AgendaPublicaController extends Controller
             'zonaNombre' => config('agenda.zonas.' . $ajustes->zona_horaria, $ajustes->zona_horaria),
             'puedeCambiar' => $cita->clientePuedeCambiar($ajustes->limite_cancelar_horas),
             'limiteHoras' => $ajustes->limite_cancelar_horas,
+            'politica' => $ajustes->politica_cancelacion,
             'listo' => $request->query('listo'),
             'urlReservar' => $maestro && Agenda::modoPublico($cita->user_id) === 'activa' ? Profile::urlPublica($maestro) . '/agenda' : null,
         ]);

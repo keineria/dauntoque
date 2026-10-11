@@ -287,6 +287,18 @@ class AgendaTest extends TestCase
         $this->actingAs($nuevo)->get('/dashboard/apps')->assertOk()->assertSee('<div class="dt-small">Apps activas</div>', false)->assertSee('Abrir');
     }
 
+    public function test_el_dueno_escribe_su_politica_de_cancelacion(): void
+    {
+        $this->actingAs($this->dueno)->post('/dashboard/agenda/reglas', [
+            'zona_horaria' => 'America/Bogota', 'intervalo_min' => 30, 'antelacion_min' => 120, 'dias_adelante' => 30,
+            'limite_cancelar_horas' => 24, 'politica_cancelacion' => 'Si no llegas, la próxima se paga antes.',
+        ])->assertRedirect();
+
+        $this->get('/barberia/agenda')->assertOk()->assertSee('hasta 24 horas antes')->assertSee('Si no llegas, la próxima se paga antes.');
+        $this->reservar('2026-10-13', '09:00');
+        $this->get('/cita/' . Cita::first()->token)->assertOk()->assertSee('Política de cancelación')->assertSee('Si no llegas, la próxima se paga antes.');
+    }
+
     public function test_el_dueno_guarda_servicios_y_horario(): void
     {
         $this->actingAs($this->dueno)->post('/dashboard/agenda/servicios', ['nombre' => 'Barba', 'duracion_min' => 20, 'precio' => 15000, 'requiere_aprobacion' => '1']);

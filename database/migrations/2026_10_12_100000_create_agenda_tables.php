@@ -33,6 +33,7 @@ return new class extends Migration
             $table->unsignedSmallInteger('dias_adelante')->default(30);
             $table->unsignedSmallInteger('limite_cancelar_horas')->default(4);
             $table->text('mensaje_whatsapp')->nullable();
+            $table->text('politica_cancelacion')->nullable();
             // Google Calendar: el refresh token va cifrado (cast encrypted)
             $table->text('google_token')->nullable();
             $table->string('google_correo')->nullable();

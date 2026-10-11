@@ -186,6 +186,7 @@ class AgendaPanelController extends Controller
             'dias_adelante' => 'required|integer|min:1|max:180',
             'limite_cancelar_horas' => 'required|integer|min:0|max:168',
             'mensaje_whatsapp' => 'nullable|string|max:500',
+            'politica_cancelacion' => 'nullable|string|max:600',
         ]);
         AgendaAjuste::de(Auth::id())->update($datos);
 

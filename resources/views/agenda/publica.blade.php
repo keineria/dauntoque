@@ -94,6 +94,10 @@
                 <label for="nota">{{ __('agenda.nota') }}</label>
                 <textarea class="ag-in" id="nota" name="nota" rows="2" maxlength="500">{{ old('nota') }}</textarea>
 
+                <p class="ag-muted" style="margin:14px 0 0">{{ trans_choice('agenda.limite', $limiteHoras, ['horas' => $limiteHoras, 'nombre' => $negocio['nombre']]) }}</p>
+                @if($politica)
+                    <p class="ag-muted" style="margin:6px 0 0;white-space:pre-line"><b>{{ __('agenda.politica') }}:</b> {{ $politica }}</p>
+                @endif
                 <button class="ag-btn" type="submit" :disabled="enviando" x-text="servicio && servicio.aprobacion ? @js(__('agenda.pedir')) : @js(__('agenda.confirmar'))"></button>
             </form>
         </div>

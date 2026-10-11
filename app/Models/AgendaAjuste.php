@@ -11,7 +11,7 @@ class AgendaAjuste extends Model
 
     protected $fillable = [
         'user_id', 'zona_horaria', 'intervalo_min', 'antelacion_min', 'dias_adelante', 'limite_cancelar_horas',
-        'mensaje_whatsapp', 'google_token', 'google_correo',
+        'mensaje_whatsapp', 'politica_cancelacion', 'google_token', 'google_correo',
     ];
 
     protected $casts = ['google_token' => 'encrypted'];

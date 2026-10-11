@@ -125,6 +125,10 @@
             <div><span class="dt-label">El cliente puede mover o cancelar hasta</span>
                 <select class="dt-input" name="limite_cancelar_horas">@foreach([0 => 'La hora de la cita', 1 => '1 hora antes', 2 => '2 horas antes', 4 => '4 horas antes', 12 => '12 horas antes', 24 => '24 horas antes', 48 => '48 horas antes'] as $v => $t)<option value="{{ $v }}" @selected($ajustes->limite_cancelar_horas == $v)>{{ $t }}</option>@endforeach</select>
             </div>
+            <div style="grid-column:1/-1"><span class="dt-label">Tu política de cancelación (opcional)</span>
+                <textarea class="dt-input" name="politica_cancelacion" rows="3" maxlength="600" placeholder="Ejemplo: si no llegas ni avisas, la próxima cita se paga por adelantado.">{{ $ajustes->politica_cancelacion }}</textarea>
+                <p class="dt-sub" style="font-size:12px">Tus clientes la ven antes de reservar y en su cita, junto al límite para mover o cancelar que elegiste arriba.</p>
+            </div>
             <div style="grid-column:1/-1"><span class="dt-label">Mensaje del botón de WhatsApp</span>
                 <textarea class="dt-input" name="mensaje_whatsapp" rows="3" maxlength="500">{{ $ajustes->mensaje_whatsapp ?: config('agenda.mensaje_whatsapp') }}</textarea>
                 <p class="dt-sub" style="font-size:12px">Se usa en el botón WhatsApp de cada cita. Escribe {nombre}, {servicio}, {fecha}, {hora} y {enlace} donde quieras esos datos.</p>

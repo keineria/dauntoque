@@ -89,7 +89,10 @@
                 </div>
             </div>
         @endif
-        <p class="ag-muted" style="margin-top:16px">{{ __('agenda.limite', ['horas' => $limiteHoras, 'nombre' => $negocio['nombre']]) }}</p>
+        <p class="ag-muted" style="margin-top:16px">{{ trans_choice('agenda.limite', $limiteHoras, ['horas' => $limiteHoras, 'nombre' => $negocio['nombre']]) }}</p>
+        @if($politica)
+            <p class="ag-muted" style="white-space:pre-line"><b>{{ __('agenda.politica') }}:</b> {{ $politica }}</p>
+        @endif
         @if(!$puedeCambiar && $negocio['whatsapp'])
             <a class="ag-btn wa" href="https://wa.me/{{ $negocio['whatsapp'] }}">WhatsApp</a>
         @endif
