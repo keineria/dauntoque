@@ -11,12 +11,12 @@
     $casos = [
         // 'extra' = segunda foto (su trabajo) en miniatura sobre la principal
         ['foto' => 'caso-kathe', 'nombre' => 'Kathe Glam & Nails', 'url' => 'https://kathe.dauntoque.com'],
-        ['foto' => 'caso-brey', 'nombre' => 'Breynner Logistics', 'url' => 'https://brey.dauntoque.com'],
+        ['foto' => 'caso-brey', 'extra' => 'caso-brey-cara', 'nombre' => 'Breynner Logistics', 'url' => 'https://brey.dauntoque.com'],
         ['foto' => 'caso-carlos', 'extra' => 'caso-carlos-obra', 'nombre' => 'Carlos Mendoza', 'url' => 'https://carlos.dauntoque.com'],
         ['foto' => 'caso-camilo', 'extra' => 'caso-camilo-corte', 'nombre' => 'Palacio Barbershop', 'url' => 'https://camilo.dauntoque.com'],
     ];
     // Caras de la prueba social del héroe (las de los casos y una más)
-    $caras = array_merge(array_column($casos, 'foto'), ['caso-quinto']);
+    $caras = array_merge(array_column($casos, 'foto'), ['caso-angela']);
     // Valor por separado de cada cosa incluida: partes del precio anterior que suman exactamente ese precio
     $valores = [];
     if ($mercado['antes']) {
