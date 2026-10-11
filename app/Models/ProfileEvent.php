@@ -18,7 +18,7 @@ class ProfileEvent extends Model
         // Los clics en pagos se registran con el tipo del medio (nequi, llave_breb, zelle, cashapp, venmo)
         $pagos = array_keys(config('pagos.medios', []));
 
-        return array_merge(['vista_perfil', 'descarga_vcf', 'llamada', 'whatsapp', 'correo', 'compartir'], $pagos, $redes);
+        return array_merge(['vista_perfil', 'descarga_vcf', 'llamada', 'whatsapp', 'correo', 'compartir', 'agenda'], $pagos, $redes);
     }
 
     public function profile()

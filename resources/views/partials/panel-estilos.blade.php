@@ -133,7 +133,7 @@
             .dt-page { padding:4px 16px 100px; }
             .dt-top { padding:0 16px; height:58px; }
             .dt-h1 { font-size:26px; }
-            .dt-tabbar { display:grid; grid-template-columns:repeat(4, 1fr); position:fixed; left:10px; right:10px; bottom:calc(10px + env(safe-area-inset-bottom, 0px)); z-index:50; background:rgba(16,16,22,.85); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border:1px solid var(--border); border-radius:22px; padding:6px; box-shadow:0 20px 40px rgba(0,0,0,.5); }
+            .dt-tabbar { display:grid; grid-template-columns:repeat(5, 1fr); position:fixed; left:10px; right:10px; bottom:calc(10px + env(safe-area-inset-bottom, 0px)); z-index:50; background:rgba(16,16,22,.85); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border:1px solid var(--border); border-radius:22px; padding:6px; box-shadow:0 20px 40px rgba(0,0,0,.5); }
             .dt-tabbar a { display:flex; flex-direction:column; align-items:center; gap:3px; padding:7px 2px; border-radius:16px; color:var(--muted); text-decoration:none; font-size:10.5px; font-weight:700; }
             .dt-tabbar a svg { width:20px; height:20px; }
             .dt-tabbar a.on { color:#60a5fa; background:rgba(59,130,246,.12); }

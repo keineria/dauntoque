@@ -55,6 +55,8 @@
     .pp-btn { height:50px; display:flex; align-items:center; justify-content:center; gap:8px; padding:0 10px; font-weight:700; font-size:14.5px; white-space:nowrap; text-decoration:none; border:0; cursor:pointer; transition:transform .12s, filter .12s; min-width:0; }
     .pp-acciones .pp-btn { font-size:14px; gap:6px; }
     .pp-btn:active { transform:scale(.98); }
+    .pp-agenda { display:flex; align-items:center; justify-content:center; gap:8px; width:100%; height:52px; margin:0 0 10px; padding:0 12px; border-radius:16px; background:var(--acc); color:var(--sobre); font-weight:800; font-size:15px; text-decoration:none; box-shadow:0 12px 28px -12px var(--acc); white-space:nowrap; }
+    .pp-agenda:active { transform:scale(.98); }
     .pp-btn:hover { filter:brightness(1.06); }
     .pp-btn.pri { background:var(--acc); color:var(--sobre); box-shadow:0 10px 24px -10px var(--acc); }
     .pp-btn.wa { background:#25d366; color:#06210f; }
@@ -113,12 +115,12 @@
               compartir: 'Compartir', compartirTarjeta: 'Compartir mi tarjeta', copiadoEnlace: 'Enlace copiado', sobreMi: 'Sobre mí', perfil: 'Perfil', redes: 'Redes sociales', portafolio: 'Portafolio',
               trabajos: 'Mis trabajos', pagos: 'Pagos', contacto: 'Contacto', telefono: 'Teléfono', ubicacion: 'Ubicación', verPerfil: 'Ver perfil', pagarCon: 'Pagar con',
               abreBanco: 'Abre tu banco y envía el pago a:', cerrar: 'Cerrar', copiar: 'Copiar', copiado: 'Copiado ✓', tarjetaPor: 'Tarjeta digital por', quieresUna: '¿Quieres una así? Crea la tuya',
-              creaLaTuya: 'Crea la tuya', bienvenida: 'Bienvenido al perfil de', tuNombre: 'Tu nombre', tuProfesion: 'Tu profesión', tuBio: 'Tu biografía aparecerá aquí.', verImagen: 'Ver imagen', otroIdioma: 'EN' },
+              creaLaTuya: 'Crea la tuya', bienvenida: 'Bienvenido al perfil de', tuNombre: 'Tu nombre', tuProfesion: 'Tu profesión', tuBio: 'Tu biografía aparecerá aquí.', verImagen: 'Ver imagen', otroIdioma: 'EN', agendar: 'Agendar cita' },
         en: { guardar: 'Save contact', whatsapp: 'WhatsApp', escribeme: 'Message me on WhatsApp', reservar: 'Book on WhatsApp', llamar: 'Call', correo: 'Email', enviarCorreo: 'Send an email',
               compartir: 'Share', compartirTarjeta: 'Share my card', copiadoEnlace: 'Link copied', sobreMi: 'About me', perfil: 'About', redes: 'Social media', portafolio: 'Portfolio',
               trabajos: 'My work', pagos: 'Payments', contacto: 'Contact', telefono: 'Phone', ubicacion: 'Location', verPerfil: 'View profile', pagarCon: 'Pay with',
               abreBanco: 'Open your bank app and send the payment to:', cerrar: 'Close', copiar: 'Copy', copiado: 'Copied ✓', tarjetaPor: 'Digital card by', quieresUna: 'Want one like this? Create yours',
-              creaLaTuya: 'Create yours', bienvenida: 'Welcome to the profile of', tuNombre: 'Your name', tuProfesion: 'Your profession', tuBio: 'Your bio will appear here.', verImagen: 'View image', otroIdioma: 'ES' },
+              creaLaTuya: 'Create yours', bienvenida: 'Welcome to the profile of', tuNombre: 'Your name', tuProfesion: 'Your profession', tuBio: 'Your bio will appear here.', verImagen: 'View image', otroIdioma: 'ES', agendar: 'Book an appointment' },
     };
     // Idioma: el que eligió el visitante, si no el del celular (español si empieza por "es", si no inglés)
     function dtIdiomaInicial(preview) {

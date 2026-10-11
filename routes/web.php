@@ -24,6 +24,20 @@ Route::get('/pedido/{pedido}', [App\Http\Controllers\CompraController::class, 'v
 // Analíticas del perfil público (visitas y clics); público, con CSRF y límite por IP
 Route::post('/api/analiticas/registrar', [AnaliticasController::class, 'registrar'])->middleware('throttle:60,1');
 
+// Agenda de citas: la cita del cliente (enlace de cada correo) y "Mis citas" con código al correo
+Route::controller(App\Http\Controllers\AgendaPublicaController::class)->prefix('cita/{token}')->group(function () {
+    Route::get('/', 'cita');
+    Route::get('/horas', 'horasCita')->middleware('throttle:60,1');
+    Route::get('/ics', 'ics');
+    Route::post('/cambiar', 'cambiar')->middleware('throttle:10,1');
+    Route::post('/responder', 'responder')->middleware('throttle:10,1');
+    Route::post('/cancelar', 'cancelar')->middleware('throttle:10,1');
+});
+Route::get('/mis-citas', [App\Http\Controllers\MisCitasController::class, 'mostrar']);
+Route::post('/mis-citas/codigo', [App\Http\Controllers\MisCitasController::class, 'enviarCodigo'])->middleware('throttle:5,1');
+Route::post('/mis-citas/entrar', [App\Http\Controllers\MisCitasController::class, 'verificar'])->middleware('throttle:10,1');
+Route::post('/mis-citas/salir', [App\Http\Controllers\MisCitasController::class, 'salir']);
+
 // Todas estas rutas ahora están protegidas por el candado de "auth"
 Route::middleware(['auth'])->group(function () {
 
@@ -40,6 +54,29 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard/perfiles', [DashboardController::class, 'perfiles']);
     Route::get('/dashboard/analiticas', [DashboardController::class, 'analiticas']);
     Route::get('/dashboard/configuracion', [DashboardController::class, 'configuracion']);
+    // Apps adicionales
+    Route::get('/dashboard/apps', [App\Http\Controllers\AppsController::class, 'index']);
+    // Agenda de citas (app adicional)
+    Route::controller(App\Http\Controllers\AgendaPanelController::class)->prefix('dashboard/agenda')->group(function () {
+        Route::get('/', 'index');
+        Route::post('/activar', 'activar');
+        Route::post('/citas', 'crear');
+        Route::post('/citas/{id}/aprobar', 'aprobar');
+        Route::post('/citas/{id}/rechazar', 'rechazar');
+        Route::post('/citas/{id}/cancelar', 'cancelar');
+        Route::post('/citas/{id}/mover', 'mover');
+        Route::post('/citas/{id}/responder', 'responder');
+        Route::get('/ajustes', 'ajustes');
+        Route::post('/reglas', 'guardarReglas');
+        Route::post('/servicios', 'guardarServicio');
+        Route::delete('/servicios/{id}', 'borrarServicio');
+        Route::post('/horario', 'guardarHorario');
+        Route::post('/bloqueos', 'guardarBloqueo');
+        Route::delete('/bloqueos/{id}', 'borrarBloqueo');
+        Route::get('/google/conectar', 'googleConectar');
+        Route::get('/google/volver', 'googleVolver');
+        Route::post('/google/desconectar', 'googleDesconectar');
+    });
     Route::middleware('admin')->prefix('admin')->group(function () {
         Route::get('/chips', [App\Http\Controllers\AdminChipsController::class, 'index']);
         Route::post('/chips', [App\Http\Controllers\AdminChipsController::class, 'guardar']);
@@ -58,3 +95,6 @@ require __DIR__.'/auth.php';
 // ==========================================
 Route::get('/{nickname}', [App\Http\Controllers\PublicProfileController::class, 'show']);
 Route::get('/{nickname}/vcf', [App\Http\Controllers\PublicProfileController::class, 'descargarVCF']);
+Route::get('/{nickname}/agenda', [App\Http\Controllers\AgendaPublicaController::class, 'mostrar']);
+Route::get('/{nickname}/agenda/horas', [App\Http\Controllers\AgendaPublicaController::class, 'horas'])->middleware('throttle:60,1');
+Route::post('/{nickname}/agenda', [App\Http\Controllers\AgendaPublicaController::class, 'reservar'])->middleware('throttle:10,1');

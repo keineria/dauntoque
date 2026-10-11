@@ -10,3 +10,6 @@ Artisan::command('inspire', function () {
 
 // Avisos de renovación del servicio anual. En el servidor necesita el cron de Laravel: * * * * * php artisan schedule:run
 Schedule::command('servicio:avisar')->dailyAt('09:00')->timezone('America/Bogota')->withoutOverlapping();
+
+// Recordatorios de la agenda de citas (24 horas y 2 horas antes). Usa el mismo cron de Laravel.
+Schedule::command('citas:recordar')->everyFiveMinutes()->withoutOverlapping();

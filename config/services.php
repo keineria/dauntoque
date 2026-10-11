@@ -43,6 +43,14 @@ return [
     ],
 
     // Pagos en Colombia (y en EE. UU. mientras se abre Stripe). Llaves en el panel de Bold > Integraciones.
+    // Google Calendar de la agenda (OAuth web). Ver docs: crear el cliente en Google Cloud Console
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('GOOGLE_REDIRECT_URI', rtrim(env('APP_URL', 'http://localhost'), '/') . '/dashboard/agenda/google/volver'),
+        'timeout' => 10,
+    ],
+
     'bold' => [
         'api_key' => env('BOLD_API_KEY'),
         // Llave secreta: firma los webhooks. En modo de pruebas Bold firma con una llave vacía.
