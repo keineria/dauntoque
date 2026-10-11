@@ -87,8 +87,8 @@ class PerfilesReglasTest extends TestCase
 
     public function test_el_sitio_publicado_manda_al_portal_lo_que_no_es_suyo(): void
     {
-        $htaccess = \App\Console\Commands\GenerarSitio::htaccess('https://portal.dauntoque.com');
-        $this->assertStringContainsString('RewriteRule ^(.+)$ https://portal.dauntoque.com/$1 [R=302,L]', $htaccess);
+        $htaccess = \App\Console\Commands\GenerarSitio::htaccess();
+        $this->assertStringContainsString('RewriteRule ^ portal.php [L]', $htaccess);
         $this->assertStringContainsString('!^/\\.well-known/', $htaccess);
 
         $usuario = User::factory()->create();
