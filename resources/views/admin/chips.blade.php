@@ -40,7 +40,7 @@
         </section>
     </div>
 
-    <section class="dt-panel">
+    <section class="dt-panel" x-data="{ qr: null }">
         <div class="dt-panel-h">
             <h2>Chips registrados</h2>
             <form method="GET" action="/admin/chips"><input name="buscar" value="{{ $buscar }}" type="search" placeholder="Buscar código o nota" class="dt-input" style="height:36px"></form>
@@ -62,9 +62,10 @@
                                 <span class="dt-chip">Sin activar</span>
                             @endif
                         </td>
-                        <td style="padding:8px;text-align:right">
+                        <td style="padding:8px;text-align:right;white-space:nowrap">
+                            <button type="button" class="dt-btn" @click="qr = {{ Js::from(['url' => $chip->url(), 'codigo' => $chip->codigo]) }}">QR</button>
                             @unless ($t)
-                                <form method="POST" action="/admin/chips/{{ $chip->id }}" onsubmit="return confirm('¿Borrar este chip del registro?')">
+                                <form method="POST" action="/admin/chips/{{ $chip->id }}" style="display:inline" onsubmit="return confirm('¿Borrar este chip del registro?')">
                                     @csrf @method('DELETE')
                                     <button type="submit" class="dt-btn">Borrar</button>
                                 </form>
@@ -78,5 +79,16 @@
             </table>
         </div>
         <div style="margin-top:12px">{{ $chips->links() }}</div>
+
+        {{-- QR del enlace del chip, para imprimirlo en el respaldo de la tarjeta --}}
+        <div x-show="qr" x-cloak @keydown.escape.window="qr = null" @click.self="qr = null" style="position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.6);display:grid;place-items:center;padding:16px">
+            <div class="dt-panel" style="width:min(360px,100%);text-align:center">
+                <div class="dt-panel-h"><h2>QR del chip</h2><button type="button" class="dt-btn" @click="qr = null" aria-label="Cerrar">✕</button></div>
+                {{-- Sin <template>: el QR trae su script y dentro de un <template> no se ejecutaría --}}
+                <x-qr modelo="qr?.url" nombre="qr-chip" tam="220" style="display:inline-block" />
+                <p class="dt-sub" style="margin:12px 0 0;font-family:ui-monospace,Consolas,monospace;font-size:12px;overflow-wrap:anywhere" x-text="qr?.url"></p>
+                <p class="dt-sub" style="margin:10px 0 0;font-size:13px">Lleva al mismo enlace grabado en el chip. Imprímelo atrás de la tarjeta con el SVG.</p>
+            </div>
+        </div>
     </section>
 @endsection
