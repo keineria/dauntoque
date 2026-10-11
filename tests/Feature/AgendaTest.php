@@ -274,6 +274,19 @@ class AgendaTest extends TestCase
         $this->actingAs($nuevo)->get('/dashboard/agenda/ajustes')->assertOk()->assertSee('Horario semanal');
     }
 
+    public function test_ver_apps_lista_la_agenda_y_al_activarla_sale_en_apps_activas(): void
+    {
+        $nuevo = User::factory()->create();
+        Profile::create(['user_id' => $nuevo->id, 'nickname' => 'otro-negocio', 'nombre' => 'Otro', 'pais' => 'CO']);
+
+        $this->actingAs($nuevo)->get('/dashboard/apps')->assertOk()
+            ->assertSee('Agenda de citas')->assertSee('$99.000 COP')->assertSee('Próximamente')
+            ->assertSee('Ver apps')->assertDontSee('<div class="dt-small">Apps activas</div>', false);
+
+        $this->actingAs($nuevo)->post('/dashboard/agenda/activar');
+        $this->actingAs($nuevo)->get('/dashboard/apps')->assertOk()->assertSee('<div class="dt-small">Apps activas</div>', false)->assertSee('Abrir');
+    }
+
     public function test_el_dueno_guarda_servicios_y_horario(): void
     {
         $this->actingAs($this->dueno)->post('/dashboard/agenda/servicios', ['nombre' => 'Barba', 'duracion_min' => 20, 'precio' => 15000, 'requiere_aprobacion' => '1']);

@@ -54,6 +54,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard/perfiles', [DashboardController::class, 'perfiles']);
     Route::get('/dashboard/analiticas', [DashboardController::class, 'analiticas']);
     Route::get('/dashboard/configuracion', [DashboardController::class, 'configuracion']);
+    // Apps adicionales
+    Route::get('/dashboard/apps', [App\Http\Controllers\AppsController::class, 'index']);
     // Agenda de citas (app adicional)
     Route::controller(App\Http\Controllers\AgendaPanelController::class)->prefix('dashboard/agenda')->group(function () {
         Route::get('/', 'index');
