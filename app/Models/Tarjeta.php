@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Carbon\CarbonInterface;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 /** Tarjeta física (chip NFC) y su servicio anual, que empieza al activarla. */
@@ -25,15 +26,50 @@ class Tarjeta extends Model
 
     /**
      * Registra la primera activación del chip y arranca su año de servicio.
-     * Si el chip ya estaba registrado (se mudó de perfil), conserva sus fechas.
+     * Si el chip ya estaba registrado (se mudó de perfil o de cuenta), conserva sus fechas;
+     * si lo vincula otra cuenta, la tarjeta pasa a esa cuenta.
      */
     public static function registrarActivacion(int $userId, string $nfcUid): self
     {
-        return static::firstOrCreate(['nfc_uid' => $nfcUid], [
+        $tarjeta = static::firstOrCreate(['nfc_uid' => $nfcUid], [
             'user_id' => $userId,
             'activada_en' => now(),
             'vence_en' => now()->addDays(config('servicio.dias')),
         ]);
+        if ($tarjeta->user_id !== $userId) {
+            $tarjeta->user_id = $userId;
+            $tarjeta->aviso_etapa = null;
+            $tarjeta->save();
+        }
+
+        return $tarjeta;
+    }
+
+    /**
+     * Vincula el chip al perfil activo del usuario (el chip abre su link maestro, que muestra ese perfil).
+     * El usuario lleva un solo chip a la vez: el que tenía antes queda libre para otra cuenta.
+     * Devuelve false si el chip ya está en el perfil de otra cuenta.
+     */
+    public static function vincular(Profile $perfil, string $nfcUid): bool
+    {
+        if (Profile::where('nfc_uid', $nfcUid)->where('user_id', '!=', $perfil->user_id)->exists()) {
+            return false;
+        }
+        Profile::where('user_id', $perfil->user_id)->where('id', '!=', $perfil->id)
+            ->whereNotNull('nfc_uid')->update(['nfc_uid' => null]);
+        $perfil->nfc_uid = $nfcUid;
+        $perfil->save();
+        static::registrarActivacion($perfil->user_id, $nfcUid);
+
+        return true;
+    }
+
+    /** Solo las tarjetas que hoy están en un perfil de su dueño (no las que se cambiaron por otro chip). */
+    public function scopeVinculadas(Builder $query): Builder
+    {
+        return $query->whereExists(fn ($q) => $q->selectRaw('1')->from('profiles')
+            ->whereColumn('profiles.nfc_uid', 'tarjetas.nfc_uid')
+            ->whereColumn('profiles.user_id', 'tarjetas.user_id'));
     }
 
     /**

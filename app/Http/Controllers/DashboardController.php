@@ -16,8 +16,9 @@ class DashboardController extends Controller
 {
     private function cargarDatos()
     {
-        $usuario = Auth::user(); 
-        $perfil = Profile::where('user_id', $usuario->id)->latest()->first(); 
+        $usuario = Auth::user();
+        // El perfil activo (el que se ve en público): es el que edita Configuración
+        $perfil = Profile::activoDe($usuario->id);
 
         if (!$perfil) {
             $perfil = new Profile();
@@ -84,10 +85,13 @@ class DashboardController extends Controller
             })->all();
     }
 
-    /** Tarjetas físicas del usuario con su contador de servicio (365 días desde la activación). */
+    /**
+     * Tarjetas físicas del usuario con su contador de servicio (365 días desde la activación).
+     * Solo la que está vinculada: un chip que cambió por otro no deja un contador viejo en el panel.
+     */
     private function tarjetas(int $userId): array
     {
-        return Tarjeta::where('user_id', $userId)->orderBy('activada_en')->get()
+        return Tarjeta::where('user_id', $userId)->vinculadas()->orderBy('activada_en')->get()
             ->map(fn (Tarjeta $t) => ['id' => $t->id, 'uid' => $t->nfc_uid] + $t->servicio())
             ->all();
     }
@@ -125,6 +129,11 @@ class DashboardController extends Controller
     }
     public function configuracion()
     {
+        // Sin perfil no hay qué editar: primero se crea en el editor (con su usuario)
+        if (!Profile::where('user_id', Auth::id())->exists()) {
+            return redirect('/dashboard')->with('status', 'Primero crea tu perfil; después podrás editar sus datos aquí.');
+        }
+
         return view('dashboard.configuracion', $this->cargarDatos() + ['mercados' => Market::opciones()]);
     }
 }

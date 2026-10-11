@@ -29,4 +29,10 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /** Dueño del negocio: entra al panel de administración (config/chips.php, ADMIN_CORREOS). */
+    public function esAdmin(): bool
+    {
+        return in_array(strtolower((string) $this->email), config('chips.admins'), true);
+    }
 }

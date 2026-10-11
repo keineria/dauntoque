@@ -100,7 +100,7 @@
                 <a href="/dashboard/perfiles" class="ed-back">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>Mis perfiles
                 </a>
-                <span class="dt-chip" x-text="modoActual === 'editar' ? 'Editando perfil' : 'Nuevo perfil'"></span>
+                <span class="dt-chip" x-text="modoActual === 'editar' ? 'Editando perfil' : 'Creando perfil nuevo'"></span>
             </header>
 
             <div class="ed-body">
@@ -126,7 +126,7 @@
                         <div x-show="paso === 1 && modoActual === 'crear'">
                             <label class="dt-label" for="ed-nick">Tu usuario único</label>
                             <div style="display:flex;gap:8px">
-                                <div class="dt-inline" style="flex:1"><span>portal.dauntoque.com/</span><input id="ed-nick" type="text" x-model="nickname" @input="nickValidado = false; nickError = ''" placeholder="carlos" style="text-transform:lowercase"></div>
+                                <div class="dt-inline" style="flex:1"><span>{{ \App\Models\Profile::prefijoPublico() }}</span><input id="ed-nick" type="text" x-model="nickname" @input="nickValidado = false; nickError = ''" placeholder="carlos" style="text-transform:lowercase"></div>
                                 <button @click="validarNickname" class="dt-btn" style="height:40px">
                                     <span x-show="!validandoNick">Validar</span><span x-show="validandoNick">…</span>
                                 </button>
@@ -425,7 +425,7 @@
                 
                 nombrePerfil: 'Mi Tarjeta Principal',
                 config: { tema_base: 'crystal', color_fondo: 'transparent', color_primario: '#3b82f6', alineacion: 'centro', forma_botones: 'rounded-2xl', layout_estructura: 'clasica' },
-                presets: { onyx: { tema_base: 'onyx', color_fondo: '#080808', color_primario: '#c8a96a', alineacion: 'centro', forma_botones: 'rounded-xl', layout_estructura: 'premium' }, medianoche: { tema_base: 'medianoche', color_fondo: '#060a14', color_primario: '#60a5fa', alineacion: 'centro', forma_botones: 'rounded-2xl', layout_estructura: 'premium' }, rose: { tema_base: 'rose', color_fondo: '#130b10', color_primario: '#e8a3b8', alineacion: 'centro', forma_botones: 'rounded-full', layout_estructura: 'boutique' }, esmeralda: { tema_base: 'esmeralda', color_fondo: '#05110d', color_primario: '#d4af37', alineacion: 'centro', forma_botones: 'rounded-xl', layout_estructura: 'premium' }, luxury: { tema_base: 'luxury', color_fondo: '#050505', color_primario: '#D4AF37', alineacion: 'centro', forma_botones: 'rounded-none', layout_estructura: 'clasica' }, sport: { tema_base: 'sport', color_fondo: '#000000', color_primario: '#ccff00', alineacion: 'izquierda', forma_botones: '-skew-x-12', layout_estructura: 'clasica' }, corporativo: { tema_base: 'corporativo', color_fondo: '#f8fafc', color_primario: '#0f172a', alineacion: 'izquierda', forma_botones: 'rounded-md', layout_estructura: 'clasica' }, crystal: { tema_base: 'crystal', color_fondo: 'transparent', color_primario: '#3b82f6', alineacion: 'centro', forma_botones: 'rounded-2xl', layout_estructura: 'clasica' }, minimalista: { tema_base: 'minimalista', color_fondo: '#ffffff', color_primario: '#000000', alineacion: 'centro', forma_botones: 'rounded-full', layout_estructura: 'clasica' }, feria: { tema_base: 'matte', color_fondo: '#09090b', color_primario: '#ff3b30', alineacion: 'centro', forma_botones: 'rounded-xl', layout_estructura: 'feria' } },
+                presets: { onyx: { tema_base: 'onyx', color_fondo: '#080808', color_primario: '#c8a96a', alineacion: 'centro', forma_botones: 'rounded-xl', layout_estructura: 'premium' }, medianoche: { tema_base: 'medianoche', color_fondo: '#060a14', color_primario: '#60a5fa', alineacion: 'centro', forma_botones: 'rounded-2xl', layout_estructura: 'premium' }, rose: { tema_base: 'rose', color_fondo: '#130b10', color_primario: '#e8a3b8', alineacion: 'centro', forma_botones: 'rounded-full', layout_estructura: 'boutique' }, esmeralda: { tema_base: 'esmeralda', color_fondo: '#05110d', color_primario: '#d4af37', alineacion: 'centro', forma_botones: 'rounded-xl', layout_estructura: 'premium' }, luxury: { tema_base: 'luxury', color_fondo: '#050505', color_primario: '#D4AF37', alineacion: 'centro', forma_botones: 'rounded-none', layout_estructura: 'clasica' }, sport: { tema_base: 'sport', color_fondo: '#000000', color_primario: '#ccff00', alineacion: 'izquierda', forma_botones: '-skew-x-12', layout_estructura: 'clasica' }, corporativo: { tema_base: 'corporativo', color_fondo: '#f8fafc', color_primario: '#0f172a', alineacion: 'izquierda', forma_botones: 'rounded-md', layout_estructura: 'clasica' }, crystal: { tema_base: 'crystal', color_fondo: 'transparent', color_primario: '#3b82f6', alineacion: 'centro', forma_botones: 'rounded-2xl', layout_estructura: 'clasica' }, minimalista: { tema_base: 'minimalista', color_fondo: '#ffffff', color_primario: '#000000', alineacion: 'centro', forma_botones: 'rounded-full', layout_estructura: 'clasica' }, matte: { tema_base: 'matte', color_fondo: '#09090b', color_primario: '#ff3b30', alineacion: 'centro', forma_botones: 'rounded-xl', layout_estructura: 'feria' } },
                 disenosEditor: [ { id: 'premium', nombre: 'Premium' }, { id: 'boutique', nombre: 'Boutique' }, { id: 'clasica', nombre: 'Clásico' }, { id: 'moderna', nombre: 'Moderno' }, { id: 'feria', nombre: 'Feria' }, { id: 'enlaces', nombre: 'Enlaces' }, { id: 'ejecutiva', nombre: 'Deportivo' } ],
                 estilosEditor: [ { id: 'onyx', nombre: 'Ónix' }, { id: 'medianoche', nombre: 'Medianoche' }, { id: 'rose', nombre: 'Rosé' }, { id: 'esmeralda', nombre: 'Esmeralda' }, { id: 'crystal', nombre: 'Crystal' }, { id: 'matte', nombre: 'Mate' }, { id: 'luxury', nombre: 'Luxury' }, { id: 'sport', nombre: 'Sport' }, { id: 'corporativo', nombre: 'Corporativo' }, { id: 'minimalista', nombre: 'Minimal' } ],
                 // Temas listos (config/combos.php): diseño, estilo, color y botones de una vez
@@ -442,7 +442,7 @@
                 // Cambia colores y botones del estilo sin tocar el diseño elegido
                 aplicarTema(id) {
                     const diseno = this.config.layout_estructura || 'clasica';
-                    this.aplicarPreset(id === 'matte' ? 'feria' : id);
+                    this.aplicarPreset(id);
                     this.config.layout_estructura = diseno;
                 },
 
@@ -528,16 +528,11 @@
                     // Perfil nuevo: el país sale de la zona horaria (o del idioma) del navegador
                     if (!this.porPais[this.pais]) this.pais = dtPaisDetectado(Object.keys(this.porPais));
 
-                    if (urlParams.has('step')) {
-                        this.paso = parseInt(urlParams.get('step'));
-                        this.modoActual = 'editar';
-                    } else if (urlParams.has('id') || urlParams.has('editar') || urlParams.has('modo')) {
-                        this.modoActual = 'editar';
-                    }
-
-                    // Magia: Si es edición, el usuario no pasa por el Paso 1
-                    if (this.modoActual === 'editar' && !urlParams.has('step')) {
-                        this.paso = 2;
+                    // Solo se edita un perfil que llegó cargado; sin él siempre se crea (empezando por el usuario, paso 1)
+                    if (this.modoActual === 'editar') {
+                        const pasoUrl = parseInt(urlParams.get('step'));
+                        // Magia: Si es edición, el usuario no pasa por el Paso 1
+                        this.paso = pasoUrl >= 2 && pasoUrl <= this.totalPasos ? pasoUrl : 2;
                     }
                 },
 
@@ -549,13 +544,14 @@
                     this.validandoNick = true;
                     this.nickError = '';
                     try {
-                        let res = await fetch('/perfil/validar-nickname?nickname=' + this.nickname.toLowerCase().replace(/\s+/g, ''));
+                        this.nickname = this.nickname.toLowerCase().replace(/\s+/g, '');
+                        let res = await fetch('/perfil/validar-nickname?nickname=' + encodeURIComponent(this.nickname));
                         let data = await res.json();
                         if (data.disponible) {
                             this.nickValidado = true; // Desbloquea botón Continuar
                         } else {
                             this.nickValidado = false;
-                            this.nickError = "Lo sentimos, el usuario '" + this.nickname + "' ya está en uso.";
+                            this.nickError = data.mensaje || "Lo sentimos, el usuario '" + this.nickname + "' ya está en uso.";
                         }
                     } catch (e) {
                         this.nickError = "Error al validar el enlace.";
@@ -643,14 +639,17 @@
                     }
                 },
 
-                procesarImagenesGaleria(event) {
-                    const archivos = event.target.files;
-                    if (!archivos) return;
-                    let disp = 4 - this.galeriaPreviews.length;
-                    for (let i = 0; i < Math.min(archivos.length, disp); i++) {
-                        let reader = new FileReader();
-                        reader.onload = (e) => { this.galeriaPreviews.push(e.target.result); };
-                        reader.readAsDataURL(archivos[i]);
+                // Cada foto se reduce antes de guardarla (partials/reducir-imagen), igual que la de perfil
+                async procesarImagenesGaleria(event) {
+                    const archivos = Array.from(event.target.files || []);
+                    event.target.value = '';
+                    for (const archivo of archivos.slice(0, 4 - this.galeriaPreviews.length)) {
+                        try {
+                            const img = await dtReducirImagen(archivo);
+                            if (this.galeriaPreviews.length < 4) this.galeriaPreviews.push(img);
+                        } catch (e) {
+                            this.toastError = 'No pudimos leer una de las imágenes. Prueba con otra foto (JPG o PNG).';
+                        }
                     }
                 },
                 
@@ -704,10 +703,14 @@
                             body: formData
                         });
                         
-                        let resultado = await respuesta.json();
+                        // Un 413 del servidor web llega como página HTML, no como JSON
+                        let resultado = respuesta.status === 413
+                            ? { message: 'Las fotos pesan demasiado para guardarlas juntas. Usa imágenes más livianas o sube menos a la vez.' }
+                            : await respuesta.json();
                         
                         if(resultado.status === 'success') {
-                            forja ? forja.terminar({ ok: true, nickname: this.nickname.toLowerCase().replace(/\s+/g, '') }) : (this.modalExitoAbierto = true);
+                            // "Ver mi perfil" abre el link maestro de la cuenta (muestra el perfil activo)
+                            forja ? forja.terminar({ ok: true, nickname: resultado.nickname || this.nickname.toLowerCase().replace(/\s+/g, '') }) : (this.modalExitoAbierto = true);
                         } else {
                             this.toastError = resultado.message || "Error al procesar los datos.";
                             forja?.terminar({ ok: false, mensaje: this.toastError });
@@ -726,6 +729,7 @@
         }
     </script>
 
+    @include('partials.reducir-imagen')
     @include('partials.forja')
 </body>
 </html>

@@ -102,6 +102,11 @@ class GenerarSitio extends Command
             ? "User-agent: *\nDisallow: /pedido\nSitemap: $dominio$base/sitemap.xml\n"
             : "User-agent: *\nDisallow: /\n");
 
+        // En la raíz del dominio, dauntoque.com/keiner abre el perfil: lo que no es del sitio de ventas va al portal
+        if ($base === '') {
+            File::put($destino . '/.htaccess', self::htaccess($portal));
+        }
+
         $this->info(count($paginas) . " páginas generadas en $destino");
 
         return self::SUCCESS;
@@ -127,6 +132,16 @@ class GenerarSitio extends Command
                 'pagos' => DB::table('payment_methods')->where('market_code', $m->code)->orderBy('sort')->pluck('label')->all(),
             ]];
         })->all();
+    }
+
+    /** Reglas para dauntoque.com: toda ruta que no sea un archivo o carpeta del sitio se abre en el portal. */
+    public static function htaccess(string $portal): string
+    {
+        return "RewriteEngine On\n"
+            . "RewriteCond %{REQUEST_URI} !^/\\.well-known/\n"
+            . "RewriteCond %{REQUEST_FILENAME} !-f\n"
+            . "RewriteCond %{REQUEST_FILENAME} !-d\n"
+            . "RewriteRule ^(.+)$ $portal/$1 [R=302,L]\n";
     }
 
     /** COP 299900 -> "$299.900"; USD 119 -> "$119". */

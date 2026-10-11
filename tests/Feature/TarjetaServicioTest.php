@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Chip;
 use App\Models\Profile;
 use App\Models\Tarjeta;
 use App\Models\User;
@@ -26,6 +27,7 @@ class TarjetaServicioTest extends TestCase
         Carbon::setTestNow('2026-10-14 10:00:00');
         [$usuario, $perfil] = $this->usuarioConPerfil();
 
+        Chip::firstOrCreate(['codigo' => 'chip-abc123']);
         $this->actingAs($usuario)->get('/activar/chip-abc123')->assertRedirect('/dashboard');
 
         $tarjeta = Tarjeta::where('nfc_uid', 'chip-abc123')->firstOrFail();

@@ -22,10 +22,12 @@ class AnaliticasController extends Controller
 
         $visitante = substr(hash('sha256', $request->ip() . '|' . $request->userAgent() . '|' . now()->toDateString() . '|' . config('app.key')), 0, 32);
 
-        // Una misma visita recargada varias veces en el día cuenta una sola vez
-        if ($accion === 'vista_perfil' && ProfileEvent::where('profile_id', $perfil->id)
+        // Una misma visita recargada varias veces en el día cuenta una sola vez;
+        // un mismo clic repetido por el mismo visitante cuenta una vez cada 30 segundos
+        $desde = $accion === 'vista_perfil' ? now()->startOfDay() : now()->subSeconds(30);
+        if (ProfileEvent::where('profile_id', $perfil->id)
                 ->where('accion', $accion)->where('visitante', $visitante)
-                ->where('created_at', '>=', now()->startOfDay())->exists()) {
+                ->where('created_at', '>=', $desde)->exists()) {
             return response()->noContent();
         }
 
