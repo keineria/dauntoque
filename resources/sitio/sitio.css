@@ -500,6 +500,50 @@ button { font-family: inherit; }
 .raiz h1 { font-size: clamp(26px, 5vw, 36px); margin-top: 24px; }
 .raiz nav { display: grid; gap: 10px; margin-top: 24px; min-width: min(340px, 100%); }
 
+/* Tarjeta con IA: pasos a la izquierda y el editor de ejemplo a la derecha */
+.ia-wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 480px); gap: clamp(32px, 6vw, 72px); align-items: center; }
+.ia-pasos { list-style: none; margin: 30px 0 0; padding: 0; display: grid; gap: 18px; }
+.ia-pasos li { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 14px; align-items: start; }
+.ia-pasos h3 { font-size: 18px; margin-bottom: 4px; }
+.ia-pasos p { font-size: 15px; }
+.ia-n { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: var(--ink); color: var(--signal-2); font: 700 16px var(--f-mono); }
+.ia-pronto { margin-top: 24px; display: inline-flex; gap: 8px; align-items: center; padding: 9px 14px; border-radius: 999px; background: #e3efe7; color: #1f6b44; font-weight: 600; font-size: 14px; }
+.ia-editor { background: var(--ink); color: var(--txt-d); border-radius: 22px; box-shadow: 0 30px 70px -30px rgba(13, 15, 16, .55); overflow: hidden; }
+.ia-barra { display: flex; align-items: center; gap: 7px; padding: 14px 18px; border-bottom: 1px solid var(--line-d); font: 500 12px var(--f-mono); color: var(--mut-d); }
+.ia-barra i { width: 10px; height: 10px; border-radius: 50%; background: var(--line-d); }
+.ia-barra span { margin-left: 8px; }
+.ia-cuerpo { padding: 20px; display: grid; gap: 14px; }
+.ia-msg { padding: 12px 14px; border-radius: 16px; font-size: 14.5px; line-height: 1.5; max-width: 92%; }
+.ia-msg small { display: flex; align-items: center; gap: 5px; font: 600 11px var(--f-mono); letter-spacing: .06em; text-transform: uppercase; margin-bottom: 4px; opacity: .75; }
+.ia-msg.tu { justify-self: end; background: var(--ink-3); border-bottom-right-radius: 5px; }
+.ia-msg.bot { background: color-mix(in srgb, var(--signal) 16%, var(--ink-2)); border: 1px solid color-mix(in srgb, var(--signal) 40%, transparent); border-bottom-left-radius: 5px; }
+.ia-msg.bot small { color: var(--signal-2); opacity: 1; }
+.ia-usar { margin-top: 10px; display: flex; width: fit-content; align-items: center; gap: 6px; padding: 6px 11px; border-radius: 999px; background: var(--signal); color: #04150c; font-weight: 700; font-size: 12.5px; }
+.ia-op small { display: block; font: 500 11px var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--mut-d); margin-bottom: 8px; }
+.ia-temas { display: flex; flex-wrap: wrap; gap: 8px; }
+.ia-temas i { width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--line-d); }
+.ia-temas i.on { border-color: var(--signal-2); box-shadow: 0 0 0 3px color-mix(in srgb, var(--signal) 35%, transparent); }
+.ia-formas { display: flex; flex-wrap: wrap; gap: 8px; }
+.ia-formas span { padding: 7px 13px; border: 1px solid var(--line-d); font-size: 13px; color: var(--mut-d); }
+.ia-formas .f0 { border-radius: 999px; } .ia-formas .f1 { border-radius: 9px; } .ia-formas .f2 { border-radius: 2px; }
+.ia-formas span.on { border-color: var(--signal); color: var(--txt-d); background: color-mix(in srgb, var(--signal) 14%, transparent); }
+
+/* Apps adicionales */
+.apps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.app { background: var(--ink-2); border: 1px solid var(--line-d); border-radius: var(--r); padding: 22px; display: grid; gap: 10px; align-content: start; }
+.app.destacada { border-color: color-mix(in srgb, var(--signal) 55%, transparent); background: linear-gradient(160deg, color-mix(in srgb, var(--signal) 14%, var(--ink-2)), var(--ink-2) 70%); }
+.app-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.app-ic { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; background: var(--ink-3); color: var(--signal-2); }
+.app-pronto { font: 600 11px var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: #2a0f04; background: var(--naranja); padding: 5px 9px; border-radius: 999px; }
+.app p { font-size: 15px; }
+.apps-nota { margin-top: 22px; display: flex; gap: 8px; align-items: center; font-size: 15px; }
+.apps-nota svg { color: var(--signal); flex: none; }
+
+@media (max-width: 900px) {
+  .ia-wrap { grid-template-columns: 1fr; }
+  .apps { grid-template-columns: 1fr; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation: none !important; transition: none !important; }

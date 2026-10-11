@@ -28,13 +28,13 @@ return [
         'envio' => ['CO' => 'Envío gratis a toda Colombia', 'US' => 'Envío gratis en EE. UU.'],
 
         'inicio' => [
-            'titulo' => 'Tarjeta de presentación NFC premium | DaUnToque',
+            'titulo' => 'Tarjeta de presentación NFC con IA | DaUnToque',
             'descripcion' => 'Un toque y tu contacto queda guardado: perfil web, WhatsApp, portafolio y cobros con :pagos. Pago único de :precio, sin mensualidades.',
             'oferta' => 'Precio de lanzamiento · Ahorras :ahorro',
             'ahorroCorto' => 'Ahorras :ahorro',
             'h1a' => 'Un toque y ya',
             'h1b' => 'te guardaron.',
-            'sub' => 'Acercas tu tarjeta al celular de tu cliente y se abre tu perfil: te guarda en su agenda, te escribe por WhatsApp y te paga ahí mismo. Sin apps y sin papel.',
+            'sub' => 'Tu tarjeta de presentación con IA. Acercas tu tarjeta al celular de tu cliente y se abre tu perfil: te guarda en su agenda, te escribe por WhatsApp y te paga ahí mismo. Sin apps y sin papel.',
             'cta' => 'Quiero mi tarjeta',
             'ctaDemo' => 'Pruébalo como cliente',
             'unico' => 'Pago único · Sin mensualidades',
@@ -59,7 +59,9 @@ return [
             'indice' => [
                 ['pruebalo', 'user', 'Pruébalo como cliente'],
                 ['dos-perfiles', 'spark', '2 perfiles de regalo'],
+                ['ia', 'spark', 'Créala con IA'],
                 ['panel', 'chart', 'Tu panel'],
+                ['apps', 'cal', 'Apps adicionales'],
                 ['viaje', 'truck', 'De la compra al primer toque'],
                 ['acabados', 'spark', 'Tu tarjeta con tu nombre'],
                 ['casos', 'chat', 'Casos reales'],
@@ -115,6 +117,44 @@ return [
             ],
             'dosFinde' => 'Fin de semana',
             'dosPuntos' => ['Uno para el trabajo, otro para tu vida', 'Cambias el perfil activo desde tu panel en segundos', 'Incluido con tu tarjeta solo durante el lanzamiento'],
+
+            // Tarjeta con IA: lo que hoy hace la IA (escribe la presentación) y la personalización del editor
+            'ia' => [
+                'eyebrow' => 'Tarjeta con IA',
+                'h' => 'Tú cuentas a qué te dedicas. La IA arma tu perfil.',
+                'p' => 'Escribe tu oficio en una frase y la inteligencia artificial redacta tu presentación. Después personalizas todo a tu gusto y lo cambias cuando quieras, sin reimprimir nada.',
+                'pasos' => [
+                    ['Cuéntale a la IA', 'Escribe a qué te dedicas y en segundos te propone una presentación lista para usar.'],
+                    ['Elige tu estilo', '10 diseños, tus colores, tu foto, tu portada y la forma de tus botones.'],
+                    ['Ajusta cada detalle', 'Galería, redes, WhatsApp, dirección y cómo te pagan. Todo se edita desde tu panel.'],
+                ],
+                'pronto' => 'Próximamente: la IA también te propone el diseño completo de tu tarjeta.',
+                'aria' => 'Ejemplo: el dueño escribe su oficio, la IA redacta la presentación y él elige diseño y colores',
+                'editor' => 'Editor de tu perfil',
+                'tu' => 'Tú',
+                'pide' => 'Soy barbero en Medellín, cortes clásicos y fade.',
+                'ia' => 'IA',
+                'responde' => 'Barbero en Medellín especializado en fade y cortes clásicos. Llega, siéntate y sal como nuevo. Agenda tu turno por WhatsApp.',
+                'usar' => 'Usar este texto',
+                'diseno' => 'Diseño',
+                'colores' => 'Color',
+                'botones' => 'Botones',
+                'formas' => ['Redondos', 'Suaves', 'Rectos'],
+            ],
+
+            // Apps adicionales: se activan dentro de la misma tarjeta (todavía no existen: van como "Próximamente")
+            'apps' => [
+                'eyebrow' => 'Apps adicionales',
+                'h' => 'Suma solo lo que tu negocio necesita',
+                'p' => 'Activa apps dentro de tu misma tarjeta por un valor pequeño y deja de pagar otras plataformas por aparte.',
+                'pronto' => 'Próximamente',
+                'lista' => [
+                    ['cal', 'Agenda de citas', 'Tus clientes eligen día y hora desde tu perfil y la cita te llega al instante. Ideal para barberías, salones, consultorios y asesores.'],
+                    ['cash', 'Catálogo y precios', 'Muestra tus servicios o productos con foto y precio, y recibe el pedido por WhatsApp.'],
+                    ['spark', 'Reseñas de clientes', 'Tus clientes dejan su opinión en tu perfil y los nuevos llegan con confianza.'],
+                ],
+                'nota' => 'Tu tarjeta sigue sin mensualidades. Las apps son opcionales y activas solo las que uses.',
+            ],
 
             'panel' => [
                 'eyebrow' => 'Tu panel',
@@ -298,13 +338,13 @@ return [
         'envio' => ['CO' => 'Free shipping anywhere in Colombia', 'US' => 'Free shipping in the US'],
 
         'inicio' => [
-            'titulo' => 'Premium NFC business card | DaUnToque',
+            'titulo' => 'AI-powered NFC business card | DaUnToque',
             'descripcion' => 'One tap and your contact is saved: web profile, WhatsApp, portfolio and payments with :pagos. One-time :precio, no monthly fees.',
             'oferta' => 'Launch price · Save :ahorro',
             'ahorroCorto' => 'Save :ahorro',
             'h1a' => 'One tap and',
             'h1b' => 'you\'re saved.',
-            'sub' => 'Hold your card to your client\'s phone and your profile opens: they save you to their contacts, text you on WhatsApp and pay you right there. No apps, no paper.',
+            'sub' => 'Your AI-powered business card. Hold it to your client\'s phone and your profile opens: they save you to their contacts, text you on WhatsApp and pay you right there. No apps, no paper.',
             'cta' => 'Get my card',
             'ctaDemo' => 'Try it as a client',
             'unico' => 'One-time payment · No monthly fees',
@@ -329,7 +369,9 @@ return [
             'indice' => [
                 ['pruebalo', 'user', 'Try it as a client'],
                 ['dos-perfiles', 'spark', '2 profiles for the price of one'],
+                ['ia', 'spark', 'Build it with AI'],
                 ['panel', 'chart', 'Your dashboard'],
+                ['apps', 'cal', 'Add-on apps'],
                 ['viaje', 'truck', 'From order to first tap'],
                 ['acabados', 'spark', 'Your card with your name'],
                 ['casos', 'chat', 'Real stories'],
@@ -383,6 +425,42 @@ return [
             ],
             'dosFinde' => 'Weekend',
             'dosPuntos' => ['One for work, one for your life', 'Switch the active profile from your dashboard in seconds', 'Included with your card during launch only'],
+
+            'ia' => [
+                'eyebrow' => 'AI-powered card',
+                'h' => 'You say what you do. AI builds your profile.',
+                'p' => 'Describe your trade in one sentence and artificial intelligence writes your intro. Then you customize everything your way and change it whenever you like, with no reprinting.',
+                'pasos' => [
+                    ['Tell the AI', 'Say what you do and in seconds it suggests an intro ready to use.'],
+                    ['Pick your style', '10 designs, your colors, your photo, your cover and your button shape.'],
+                    ['Fine-tune every detail', 'Gallery, socials, WhatsApp, address and how you get paid. All editable from your dashboard.'],
+                ],
+                'pronto' => 'Coming soon: AI will also suggest your card\'s full design.',
+                'aria' => 'Example: the owner types their trade, AI writes the intro and they pick the design and colors',
+                'editor' => 'Your profile editor',
+                'tu' => 'You',
+                'pide' => 'I\'m a barber in Miami, classic cuts and fades.',
+                'ia' => 'AI',
+                'responde' => 'Miami barber specializing in fades and classic cuts. Sit down, relax and walk out brand new. Book your spot on WhatsApp.',
+                'usar' => 'Use this text',
+                'diseno' => 'Design',
+                'colores' => 'Color',
+                'botones' => 'Buttons',
+                'formas' => ['Round', 'Soft', 'Square'],
+            ],
+
+            'apps' => [
+                'eyebrow' => 'Add-on apps',
+                'h' => 'Add only what your business needs',
+                'p' => 'Turn on apps inside the same card for a small fee and stop paying for separate platforms.',
+                'pronto' => 'Coming soon',
+                'lista' => [
+                    ['cal', 'Appointments', 'Clients pick a day and time from your profile and the booking reaches you instantly. Perfect for barbers, salons, clinics and consultants.'],
+                    ['cash', 'Catalog & prices', 'Show your services or products with photo and price, and get the order on WhatsApp.'],
+                    ['spark', 'Client reviews', 'Clients leave their review on your profile so new ones arrive with confidence.'],
+                ],
+                'nota' => 'Your card still has no monthly fees. Apps are optional and you only turn on the ones you use.',
+            ],
 
             'panel' => [
                 'eyebrow' => 'Your dashboard',
