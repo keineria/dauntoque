@@ -55,10 +55,11 @@ class ChipsRegistroTest extends TestCase
         $admin = $this->usuarioConPerfil('dueno@dauntoque.com');
         Chip::create(['codigo' => 'chip-qr-1']);
 
-        $this->actingAs($admin)->get('/dashboard')->assertOk()
-            ->assertSee('Tu código QR')->assertSee('https:\/\/dauntoque.com\/cliente' . $admin->id, false);
-        $this->actingAs($admin)->get('/admin/chips')->assertOk()
-            ->assertSee('QR del chip')->assertSee('\/activar\/chip-qr-1', false);
+        $inicio = $this->actingAs($admin)->get('/dashboard')->assertOk()->assertSee('Tu código QR')->getContent();
+        $this->assertMatchesRegularExpression('#https:\\\\*/\\\\*/dauntoque\.com\\\\*/cliente' . $admin->id . '#', $inicio);
+
+        $chips = $this->actingAs($admin)->get('/admin/chips')->assertOk()->assertSee('QR del chip')->getContent();
+        $this->assertMatchesRegularExpression('#activar\\\\*/chip-qr-1#', $chips);
     }
 
     public function test_el_admin_registra_codigos_pegados_y_genera_nuevos(): void
