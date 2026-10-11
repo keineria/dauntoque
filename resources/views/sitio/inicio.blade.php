@@ -9,10 +9,14 @@
     $medio2 = $medios[1] ?? null;
     $ext = $compraExterna ? 'target="_blank" rel="noopener"' : '';
     $casos = [
+        // 'extra' = segunda foto (su trabajo) en miniatura sobre la principal
         ['foto' => 'caso-kathe', 'nombre' => 'Kathe Glam & Nails', 'url' => 'https://kathe.dauntoque.com'],
-        ['foto' => 'caso-brey', 'nombre' => 'Breynner Logistics', 'url' => 'https://brey.dauntoque.com'],
-        ['foto' => 'caso-carlos', 'nombre' => 'Carlos Constructor', 'url' => 'https://carlos.dauntoque.com'],
+        ['foto' => 'caso-brey', 'extra' => 'caso-brey-cara', 'nombre' => 'Breynner Logistics', 'url' => 'https://brey.dauntoque.com'],
+        ['foto' => 'caso-carlos', 'extra' => 'caso-carlos-obra', 'nombre' => 'Carlos Mendoza', 'url' => 'https://carlos.dauntoque.com'],
+        ['foto' => 'caso-camilo', 'extra' => 'caso-camilo-corte', 'nombre' => 'Palacio Barbershop', 'url' => 'https://camilo.dauntoque.com'],
     ];
+    // Caras de la prueba social del héroe (las de los casos y una más)
+    $caras = array_merge(array_column($casos, 'foto'), ['caso-angela']);
     // Valor por separado de cada cosa incluida: partes del precio anterior que suman exactamente ese precio
     $valores = [];
     if ($mercado['antes']) {
@@ -67,7 +71,7 @@
                 </div>
                 <div class="prueba">
                     <div class="caras">
-                        @foreach ($casos as $c)<img src="{{ $base }}/media/{{ $c['foto'] }}-sm.webp" alt="" width="40" height="40">@endforeach
+                        @foreach ($caras as $cara)<img src="{{ $base }}/media/{{ $cara }}-sm.webp" alt="" width="40" height="40">@endforeach
                     </div>
                     <div><div class="estrellas" role="img" aria-label="{{ $i['estrellas'] }}">★★★★★</div><span class="mut">{{ $i['prueba'] }}</span></div>
                 </div>
@@ -223,6 +227,41 @@
         </div>
     </section>
 
+    {{-- 3b. Tarjeta con IA: la IA escribe la presentación y el dueño personaliza todo --}}
+    @php $ia = $i['ia']; @endphp
+    <section class="sec light ia-sec" id="ia">
+        <div class="wrap ia-wrap">
+            <div class="ia-txt">
+                <div class="head" style="margin:0">
+                    <span class="eyebrow">{{ $ia['eyebrow'] }}</span>
+                    <h2>{{ $ia['h'] }}</h2>
+                    <p class="lead mut">{{ $ia['p'] }}</p>
+                </div>
+                <ol class="ia-pasos">
+                    @foreach ($ia['pasos'] as $n => [$h, $txt])
+                        <li><span class="ia-n">{{ $n + 1 }}</span><div><h3>{{ $h }}</h3><p class="mut">{{ $txt }}</p></div></li>
+                    @endforeach
+                </ol>
+                <p class="ia-pronto"><svg width="16" height="16" aria-hidden="true"><use href="#spark"/></svg>{{ $ia['pronto'] }}</p>
+            </div>
+            <div class="ia-editor" role="img" aria-label="{{ $ia['aria'] }}">
+                <div class="ia-barra" aria-hidden="true"><i></i><i></i><i></i><span>{{ $ia['editor'] }}</span></div>
+                <div class="ia-cuerpo" aria-hidden="true">
+                    <div class="ia-msg tu"><small>{{ $ia['tu'] }}</small>{{ $ia['pide'] }}</div>
+                    <div class="ia-msg bot"><small><svg width="12" height="12"><use href="#spark"/></svg>{{ $ia['ia'] }}</small>{{ $ia['responde'] }}<span class="ia-usar"><svg width="14" height="14"><use href="#ok"/></svg>{{ $ia['usar'] }}</span></div>
+                    <div class="ia-op">
+                        <small>{{ $ia['diseno'] }}</small>
+                        <div class="ia-temas">@foreach (['#0d0f10', '#f5f4ef', '#1e3a5f', '#2fae6e', '#c9a227', '#7c3aed', '#e11d48', '#0ea5e9', '#f28c66', '#334155'] as $n => $color)<i class="{{ $n === 0 ? 'on' : '' }}" style="background:{{ $color }}"></i>@endforeach</div>
+                    </div>
+                    <div class="ia-op">
+                        <small>{{ $ia['botones'] }}</small>
+                        <div class="ia-formas">@foreach ($ia['formas'] as $n => $forma)<span class="f{{ $n }} {{ $n === 0 ? 'on' : '' }}">{{ $forma }}</span>@endforeach</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     {{-- 4. Tu panel: quién te vio, te guardó y te pagó --}}
     <section class="sec panel-sec" id="panel">
         <div class="wrap">
@@ -259,6 +298,28 @@
                 </div>
             </div>
             <div class="notas-panel">@foreach ($pn['notas'] as [$b, $txt])<div><b>{{ $b }}</b><p>{{ $txt }}</p></div>@endforeach</div>
+        </div>
+    </section>
+
+    {{-- 4b. Apps adicionales que se activan dentro de la misma tarjeta (próximamente) --}}
+    @php $ap = $i['apps']; @endphp
+    <section class="sec apps-sec" id="apps">
+        <div class="wrap">
+            <div class="head">
+                <span class="eyebrow">{{ $ap['eyebrow'] }}</span>
+                <h2>{{ $ap['h'] }}</h2>
+                <p class="lead mut">{{ $ap['p'] }}</p>
+            </div>
+            <div class="apps">
+                @foreach ($ap['lista'] as $n => [$ico, $h, $txt])
+                    <article class="app {{ $n === 0 ? 'destacada' : '' }}">
+                        <div class="app-top"><span class="app-ic"><svg width="22" height="22" aria-hidden="true"><use href="#{{ $ico }}"/></svg></span><span class="app-pronto">{{ $ap['pronto'] }}</span></div>
+                        <h3>{{ $h }}</h3>
+                        <p class="mut">{{ $txt }}</p>
+                    </article>
+                @endforeach
+            </div>
+            <p class="apps-nota mut"><svg width="16" height="16" aria-hidden="true"><use href="#ok"/></svg>{{ $ap['nota'] }}</p>
         </div>
     </section>
 
@@ -336,7 +397,10 @@
                 @foreach ($casos as $n => $c)
                     @php [$dato, $cita, $rol] = $i['casos'][$n]; @endphp
                     <article class="caso">
-                        <img src="{{ $base }}/media/{{ $c['foto'] }}.webp" width="480" height="480" alt="{{ $c['nombre'] }}" loading="lazy">
+                        <div class="caso-fotos">
+                            <img src="{{ $base }}/media/{{ $c['foto'] }}.webp" width="480" height="480" alt="{{ $c['nombre'] }}" loading="lazy">
+                            @isset($c['extra'])<img class="caso-extra" src="{{ $base }}/media/{{ $c['extra'] }}.webp" width="160" height="160" alt="" loading="lazy">@endisset
+                        </div>
                         <div>
                             <span class="dato">{{ $dato }}</span>
                             <blockquote>“{{ $cita }}”</blockquote>

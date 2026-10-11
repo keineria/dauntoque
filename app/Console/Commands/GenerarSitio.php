@@ -102,9 +102,11 @@ class GenerarSitio extends Command
             ? "User-agent: *\nDisallow: /pedido\nSitemap: $dominio$base/sitemap.xml\n"
             : "User-agent: *\nDisallow: /\n");
 
-        // En la raíz del dominio, dauntoque.com/keiner abre el perfil: lo que no es del sitio de ventas va al portal
+        // En la raíz del dominio, dauntoque.com/keiner muestra el perfil: lo que no es del sitio de ventas
+        // lo sirve portal.php pidiéndolo al portal, sin cambiar la dirección
         if ($base === '') {
-            File::put($destino . '/.htaccess', self::htaccess($portal));
+            File::put($destino . '/.htaccess', self::htaccess());
+            File::put($destino . '/portal.php', strtr(File::get(resource_path('sitio/servidor/portal.php')), ['__PORTAL__' => $portal]));
         }
 
         $this->info(count($paginas) . " páginas generadas en $destino");
@@ -134,14 +136,14 @@ class GenerarSitio extends Command
         })->all();
     }
 
-    /** Reglas para dauntoque.com: toda ruta que no sea un archivo o carpeta del sitio se abre en el portal. */
-    public static function htaccess(string $portal): string
+    /** Reglas para dauntoque.com: toda ruta que no sea un archivo o carpeta del sitio la atiende portal.php. */
+    public static function htaccess(): string
     {
         return "RewriteEngine On\n"
             . "RewriteCond %{REQUEST_URI} !^/\\.well-known/\n"
             . "RewriteCond %{REQUEST_FILENAME} !-f\n"
             . "RewriteCond %{REQUEST_FILENAME} !-d\n"
-            . "RewriteRule ^(.+)$ $portal/$1 [R=302,L]\n";
+            . "RewriteRule ^ portal.php [L]\n";
     }
 
     /** COP 299900 -> "$299.900"; USD 119 -> "$119". */

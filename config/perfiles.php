@@ -3,8 +3,11 @@
 // Reglas de negocio de los perfiles, en un solo lugar.
 return [
     // Dirección pública de los perfiles: la que abre la tarjeta y la que se comparte (dauntoque.com/keiner).
-    // En dauntoque.com, el .htaccess que crea sitio:generar manda al portal toda ruta que no sea del sitio de ventas.
+    // En dauntoque.com, el portal.php que crea sitio:generar trae del portal toda ruta que no sea del sitio de ventas.
     'url_publica' => rtrim(env('PERFIL_URL_PUBLICA', env('APP_URL', 'http://localhost')), '/'),
+
+    // Quién puede reenviar la IP real del visitante (X-Forwarded-For): portal.php llega desde este mismo servidor
+    'proxies' => array_values(array_filter(array_map('trim', explode(',', env('PROXIES_CONFIABLES', '127.0.0.1,::1'))))),
 
     // Máximo de perfiles por cuenta (plan gratuito)
     'limite' => 2,
