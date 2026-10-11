@@ -53,6 +53,8 @@ class PublicProfileController extends Controller
             'galeria' => array_values(array_filter((array) $galeria, fn ($img) => ImageStore::esPropia($img))),
             'enlace' => Profile::urlPublica($linkMaestro),
             'vcf' => url('/' . $linkMaestro . '/vcf'),
+            // Botón "Agendar cita" solo cuando la agenda recibe reservas en línea
+            'agenda' => \App\Services\Agenda\Agenda::modoPublico($perfil->user_id) === 'activa' ? Profile::urlPublica($linkMaestro) . '/agenda' : null,
             'preview' => false,
         ];
 
