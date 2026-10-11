@@ -9,10 +9,14 @@
     $medio2 = $medios[1] ?? null;
     $ext = $compraExterna ? 'target="_blank" rel="noopener"' : '';
     $casos = [
+        // 'extra' = segunda foto (su trabajo) en miniatura sobre la principal
         ['foto' => 'caso-kathe', 'nombre' => 'Kathe Glam & Nails', 'url' => 'https://kathe.dauntoque.com'],
         ['foto' => 'caso-brey', 'nombre' => 'Breynner Logistics', 'url' => 'https://brey.dauntoque.com'],
-        ['foto' => 'caso-carlos', 'nombre' => 'Carlos Constructor', 'url' => 'https://carlos.dauntoque.com'],
+        ['foto' => 'caso-carlos', 'extra' => 'caso-carlos-obra', 'nombre' => 'Carlos Mendoza', 'url' => 'https://carlos.dauntoque.com'],
+        ['foto' => 'caso-camilo', 'extra' => 'caso-camilo-corte', 'nombre' => 'Palacio Barbershop', 'url' => 'https://camilo.dauntoque.com'],
     ];
+    // Caras de la prueba social del héroe (las de los casos y una más)
+    $caras = array_merge(array_column($casos, 'foto'), ['caso-quinto']);
     // Valor por separado de cada cosa incluida: partes del precio anterior que suman exactamente ese precio
     $valores = [];
     if ($mercado['antes']) {
@@ -67,7 +71,7 @@
                 </div>
                 <div class="prueba">
                     <div class="caras">
-                        @foreach ($casos as $c)<img src="{{ $base }}/media/{{ $c['foto'] }}-sm.webp" alt="" width="40" height="40">@endforeach
+                        @foreach ($caras as $cara)<img src="{{ $base }}/media/{{ $cara }}-sm.webp" alt="" width="40" height="40">@endforeach
                     </div>
                     <div><div class="estrellas" role="img" aria-label="{{ $i['estrellas'] }}">★★★★★</div><span class="mut">{{ $i['prueba'] }}</span></div>
                 </div>
@@ -393,7 +397,10 @@
                 @foreach ($casos as $n => $c)
                     @php [$dato, $cita, $rol] = $i['casos'][$n]; @endphp
                     <article class="caso">
-                        <img src="{{ $base }}/media/{{ $c['foto'] }}.webp" width="480" height="480" alt="{{ $c['nombre'] }}" loading="lazy">
+                        <div class="caso-fotos">
+                            <img src="{{ $base }}/media/{{ $c['foto'] }}.webp" width="480" height="480" alt="{{ $c['nombre'] }}" loading="lazy">
+                            @isset($c['extra'])<img class="caso-extra" src="{{ $base }}/media/{{ $c['extra'] }}.webp" width="160" height="160" alt="" loading="lazy">@endisset
+                        </div>
                         <div>
                             <span class="dato">{{ $dato }}</span>
                             <blockquote>“{{ $cita }}”</blockquote>

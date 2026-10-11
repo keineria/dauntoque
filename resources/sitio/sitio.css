@@ -370,7 +370,9 @@ button { font-family: inherit; }
 @media (max-width: 900px) { .acabados { grid-template-columns: 1fr; } .estudio { min-height: 260px; } }
 
 /* Casos reales */
-.casos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.casos { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+.caso-fotos { position: relative; }
+.caso-fotos .caso-extra { position: absolute; right: 14px; bottom: 14px; width: 34%; aspect-ratio: 1; border-radius: 14px; border: 3px solid var(--ink-2); box-shadow: 0 12px 30px -10px rgba(0, 0, 0, .6); object-position: center; height: auto; }
 .caso { background: var(--ink-2); border: 1px solid var(--line-d); border-radius: 20px; overflow: hidden; display: grid; grid-template-rows: auto 1fr; }
 .caso img { width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; object-position: center 25%; }
 .caso > div { padding: 20px; display: grid; gap: 12px; align-content: start; }
@@ -380,7 +382,7 @@ button { font-family: inherit; }
 .caso .quien b { font: 700 15px var(--f-display); }
 .caso .quien a { color: var(--signal-2); font: 600 13px var(--f-body); white-space: nowrap; }
 .dato { font: 700 13px var(--f-mono); color: var(--signal-2); background: color-mix(in srgb, var(--signal) 12%, transparent); padding: 6px 10px; border-radius: 8px; justify-self: start; }
-@media (max-width: 900px) { .casos { grid-template-columns: 1fr; } .caso { grid-template-columns: 160px 1fr; grid-template-rows: auto; } .caso img { height: 100%; aspect-ratio: auto; } }
+@media (max-width: 900px) { .casos { grid-template-columns: 1fr; } .caso { grid-template-columns: 160px 1fr; grid-template-rows: auto; } .caso img { height: 100%; aspect-ratio: auto; } .caso-fotos { height: 100%; } .caso-fotos .caso-extra { width: 46%; right: 8px; bottom: 8px; border-radius: 10px; border-width: 2px; } }
 @media (max-width: 520px) { .caso { grid-template-columns: 1fr; } .caso img { aspect-ratio: 16 / 10; height: auto; } }
 
 /* Comparación y calculadora */

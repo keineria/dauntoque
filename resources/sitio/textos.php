@@ -41,7 +41,7 @@ return [
             'sinMensualidades' => 'Sin mensualidades',
             'garantia30' => 'Garantía de 30 días',
             'regalo' => ['2º perfil de regalo', 'por lanzamiento'],
-            'prueba' => 'Salones, transporte y construcción ya cierran con un toque',
+            'prueba' => 'Salones, barberías, transporte y construcción ya cierran con un toque',
             'estrellas' => '5 de 5',
 
             'escena' => [
@@ -211,6 +211,7 @@ return [
                 ['Agenda llena desde el perfil', 'Mis clientas ven las fotos de mis uñas al instante y guardan mi contacto sin excusas. Mi agenda se llena sola.', 'Salón de uñas'],
                 ['Cobra el flete en el acto', 'En transporte no hay tiempo que perder. Toco el celular del cliente, se abre mi perfil, cobro el flete por Zelle y arrancamos.', 'Transporte · EE. UU.'],
                 ['Justifica sus precios', 'Cuando voy a cotizar una remodelación, saco la Matte Black y el cliente ve mis obras pasadas en un segundo. Me da autoridad.', 'Remodelaciones'],
+                ['Su trabajo habla por él', 'Desde 2004 corto cabello. Ahora el cliente ve mis cortes en el perfil, guarda mi número y vuelve. Me paga por Zelle sin buscar efectivo.', 'Barbería · EE. UU.'],
             ],
 
             'comparaEyebrow' => 'Papel, QR o NFC',
@@ -351,7 +352,7 @@ return [
             'sinMensualidades' => 'No monthly fees',
             'garantia30' => '30-day guarantee',
             'regalo' => ['Free 2nd profile', 'for launch'],
-            'prueba' => 'Salons, transportation and construction pros already close with a tap',
+            'prueba' => 'Salons, barbershops, transportation and construction pros already close with a tap',
             'estrellas' => '5 out of 5',
 
             'escena' => [
@@ -516,6 +517,7 @@ return [
                 ['A full calendar from the profile', 'My clients see photos of my nails instantly and save my contact, no excuses. My calendar fills itself.', 'Nail salon'],
                 ['Gets paid for the job on the spot', 'In transportation there is no time to waste. I tap the client\'s phone, my profile opens, I get paid via Zelle and we roll.', 'Transportation · USA'],
                 ['Backs up his prices', 'When I go quote a remodel, I pull out the Matte Black and the client sees my past work in a second. It gives me authority.', 'Remodeling'],
+                ['His work speaks for him', 'I\'ve been cutting hair since 2004. Now clients see my cuts on my profile, save my number and come back. They pay me via Zelle, no cash needed.', 'Barbershop · USA'],
             ],
 
             'comparaEyebrow' => 'Paper, QR or NFC',
