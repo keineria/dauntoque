@@ -49,6 +49,18 @@ class ChipsRegistroTest extends TestCase
         $this->actingAs($this->usuarioConPerfil('dueno@dauntoque.com'))->get('/admin/chips')->assertOk()->assertSee('Chips');
     }
 
+    public function test_el_panel_muestra_el_qr_del_perfil_y_de_cada_chip(): void
+    {
+        config(['chips.admins' => ['dueno@dauntoque.com'], 'perfiles.url_publica' => 'https://dauntoque.com']);
+        $admin = $this->usuarioConPerfil('dueno@dauntoque.com');
+        Chip::create(['codigo' => 'chip-qr-1']);
+
+        $this->actingAs($admin)->get('/dashboard')->assertOk()
+            ->assertSee('Tu código QR')->assertSee('https:\/\/dauntoque.com\/cliente' . $admin->id, false);
+        $this->actingAs($admin)->get('/admin/chips')->assertOk()
+            ->assertSee('QR del chip')->assertSee('\/activar\/chip-qr-1', false);
+    }
+
     public function test_el_admin_registra_codigos_pegados_y_genera_nuevos(): void
     {
         config(['chips.admins' => ['dueno@dauntoque.com']]);

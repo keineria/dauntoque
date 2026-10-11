@@ -128,6 +128,19 @@
             </div>
         </section>
         <style>@media (max-width:640px){ .dt-inicio { grid-template-columns:1fr !important; } }</style>
+
+        {{-- QR al mismo enlace que abre la tarjeta: sirve a quien no tiene NFC activo en el celular --}}
+        @php($enlaceQr = \App\Models\Profile::urlPublica($publico['nickname']))
+        <section class="dt-panel" style="margin-top:18px">
+            <div class="dt-panel-h"><h2>Tu código QR</h2></div>
+            <div style="display:flex;flex-wrap:wrap;gap:24px;align-items:center">
+                <x-qr :url="$enlaceQr" :nombre="'qr-' . $publico['nickname']" />
+                <div style="flex:1;min-width:220px">
+                    <p style="margin:0 0 8px">Abre <b style="overflow-wrap:anywhere">{{ \App\Models\Profile::prefijoPublico() }}{{ $publico['nickname'] }}</b>, el mismo perfil que abre tu tarjeta.</p>
+                    <p class="dt-sub" style="margin:0">Úsalo para quien no tenga el NFC activo en su celular: en el respaldo de tu tarjeta, en tu local, en tus redes o en una presentación. Si cambias de perfil activo, el QR sigue funcionando.</p>
+                </div>
+            </div>
+        </section>
     @endif
 
     {{-- Celebración al vincular una tarjeta NFC por primera vez --}}
