@@ -16,6 +16,8 @@ return Application::configure(basePath: dirname(__DIR__))
         // Bold no envía token CSRF: el webhook se valida con su firma
         $middleware->validateCsrfTokens(except: ['webhooks/bold']);
         $middleware->alias(['admin' => \App\Http\Middleware\SoloAdmin::class]);
+        // Contraseña temporal (cuentas creadas con admin:crear): se cambia antes de usar el panel
+        $middleware->web(append: [\App\Http\Middleware\CambiarClaveTemporal::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

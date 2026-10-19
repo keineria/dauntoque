@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Market;
 use App\Models\Pedido;
 use App\Services\Bold;
+use App\Services\Carritos;
 use App\Support\Precios;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -19,10 +20,15 @@ class CompraController extends Controller
     {
         $precio = Precios::tarjeta(self::PAIS);
         abort_unless($precio, 404);
+        $moneda = Market::where('code', self::PAIS)->value('currency') ?? 'COP';
+        // Enlace de la última promoción (carrito abandonado): precio con descuento y datos ya escritos
+        $promo = Carritos::promoVigente($request->query('promo'));
 
         return view('compra.formulario', [
-            'precio' => $precio,
-            'moneda' => Market::where('code', self::PAIS)->value('currency') ?? 'COP',
+            'precio' => $promo ? Carritos::conDescuento($precio, $moneda) : $precio,
+            'promo' => $promo,
+            'descuento' => $promo ? Carritos::descuento() : 0,
+            'moneda' => $moneda,
             'acabado' => array_key_exists($request->query('acabado'), Pedido::ACABADOS) ? $request->query('acabado') : 'matte-black',
             'departamentos' => config('pedidos.departamentos'),
             'enLinea' => Bold::configurado(),
@@ -42,6 +48,7 @@ class CompraController extends Controller
             'direccion' => ['required', 'string', 'max:200'],
             'acabado' => ['required', Rule::in(array_keys(Pedido::ACABADOS))],
             'nombre_tarjeta' => ['nullable', 'string', 'max:40'],
+            'promo' => ['nullable', 'string', 'size:40'],
         ], [
             'celular.regex' => 'Escribe un número de celular válido.',
         ]);
@@ -51,11 +58,18 @@ class CompraController extends Controller
         }
 
         $precio = Precios::tarjeta(self::PAIS);
+        $moneda = Market::where('code', self::PAIS)->value('currency') ?? 'COP';
+        $promo = Carritos::promoVigente($datos['promo'] ?? null);
+        if ($promo) {
+            $precio = Carritos::conDescuento($precio, $moneda);
+        }
+        unset($datos['promo']);
         $pedido = Pedido::create(array_merge($datos, [
             'correo' => mb_strtolower($datos['correo']),
             'pais' => self::PAIS,
-            'moneda' => Market::where('code', self::PAIS)->value('currency') ?? 'COP',
+            'moneda' => $moneda,
             'monto' => $precio->amount,
+            'promo_de_pedido_id' => $promo?->id,
         ]));
 
         try {

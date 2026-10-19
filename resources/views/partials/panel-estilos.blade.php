@@ -90,6 +90,29 @@
         .dt-styles .dt-thumb { aspect-ratio:16/11; }
         .dt-sw { width:28px; height:28px; border-radius:50%; border:2px solid #0b0b10; box-shadow:0 0 0 1px rgba(255,255,255,.15); cursor:pointer; padding:0; }
         .dt-sw.on { box-shadow:0 0 0 2px #fff; }
+        /* Administrador: tarjetas de números y tablas */
+        .ad-tabs { margin-bottom:20px; flex-wrap:wrap; }
+        .ad-tabs a { border-radius:9px; padding:6px 14px; font-size:12.5px; font-weight:600; color:var(--muted); text-decoration:none; }
+        .ad-tabs a.on { background:rgba(255,255,255,.1); color:#fff; }
+        .ad-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(210px, 1fr)); gap:14px; }
+        .ad-grid .dt-stat small { display:block; color:var(--muted); font-size:12px; margin-top:4px; }
+        .ad-link { color:inherit; text-decoration:none; }
+        .ad-tabla { display:flex; flex-direction:column; }
+        .ad-fila { display:grid; grid-template-columns:minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1.2fr); gap:12px; align-items:center; padding:11px 0; border-top:1px solid var(--border); font-size:13.5px; }
+        .ad-fila:first-child { border-top:0; }
+        .ad-fila small { display:block; color:var(--muted); font-size:12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        .ad-fila > span { min-width:0; }
+        @media (max-width: 640px) { .ad-fila { grid-template-columns:1fr; gap:4px; } .ad-fila > span[style] { text-align:left !important; } }
+        /* Chat de ayuda */
+        .sp-chat { display:flex; flex-direction:column; gap:12px; }
+        .sp-aviso { display:flex; flex-direction:column; gap:2px; padding:12px 14px; border-radius:14px; background:rgba(59,130,246,.1); border:1px solid rgba(59,130,246,.25); font-size:13.5px; }
+        .sp-mensajes { display:flex; flex-direction:column; gap:10px; min-height:220px; max-height:55vh; overflow-y:auto; padding:4px; }
+        .sp-msj { max-width:78%; align-self:flex-start; background:rgba(255,255,255,.06); border:1px solid var(--border); border-radius:16px 16px 16px 4px; padding:10px 12px; }
+        .sp-msj.mio { align-self:flex-end; background:rgba(37,99,235,.22); border-color:rgba(59,130,246,.35); border-radius:16px 16px 4px 16px; }
+        .sp-msj p { margin:0; white-space:pre-wrap; overflow-wrap:anywhere; font-size:14px; }
+        .sp-msj small { display:block; margin-top:4px; color:var(--muted); font-size:11px; }
+        .sp-escribir { display:flex; gap:8px; align-items:flex-end; }
+        .sp-escribir textarea { resize:none; }
         /* Tipografías del perfil */
         .dt-fuentes { display:grid; grid-template-columns:repeat(auto-fill, minmax(112px, 1fr)); gap:10px; }
         .dt-fuente { display:flex; flex-direction:column; align-items:flex-start; gap:2px; padding:10px 12px; border:1px solid var(--border); border-radius:14px; background:rgba(0,0,0,.3); color:var(--text); cursor:pointer; text-align:left; transition:border-color .15s, box-shadow .15s; }

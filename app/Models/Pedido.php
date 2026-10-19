@@ -13,13 +13,14 @@ class Pedido extends Model
     protected $fillable = [
         'user_id', 'nombre', 'correo', 'celular', 'documento', 'departamento', 'ciudad', 'direccion',
         'acabado', 'nombre_tarjeta', 'pais', 'moneda', 'monto', 'estado', 'link_id', 'pago_proveedor_id',
-        'pagado_en', 'correo_enviado_en',
+        'pagado_en', 'correo_enviado_en', 'promo_de_pedido_id',
     ];
 
     protected $casts = [
         'monto' => 'decimal:2',
         'pagado_en' => 'datetime',
         'correo_enviado_en' => 'datetime',
+        'promo_enviada_en' => 'datetime',
     ];
 
     protected static function booted(): void
