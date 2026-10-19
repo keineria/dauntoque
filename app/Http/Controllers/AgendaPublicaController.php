@@ -149,6 +149,7 @@ class AgendaPublicaController extends Controller
             'puedeCambiar' => $cita->clientePuedeCambiar($ajustes->limite_cancelar_horas),
             'limiteHoras' => $ajustes->limite_cancelar_horas,
             'politica' => $ajustes->politica_cancelacion,
+            'calendarios' => self::calendarios($cita, $perfil),
             'listo' => $request->query('listo'),
             'urlReservar' => $maestro && Agenda::modoPublico($cita->user_id) === 'activa' ? Profile::urlPublica($maestro) . '/agenda' : null,
         ]);
@@ -196,6 +197,26 @@ class AgendaPublicaController extends Controller
         Citas::cancelar($cita, 'cliente');
 
         return redirect()->to($u = '/cita/' . $cita->token . '?listo=cancelada')->setTargetUrl($u);
+    }
+
+    /** Enlaces para guardar la cita en Google Calendar y Outlook (el iPhone usa el archivo .ics). */
+    private static function calendarios(Cita $cita, Profile $perfil): array
+    {
+        $titulo = $cita->servicio_nombre . ' · ' . ($perfil->nombre ?: 'DaUnToque');
+        $utc = fn ($d) => $d->copy()->utc();
+
+        return [
+            'google' => 'https://calendar.google.com/calendar/render?' . http_build_query([
+                'action' => 'TEMPLATE', 'text' => $titulo,
+                'dates' => $utc($cita->inicia_en)->format('Ymd\THis\Z') . '/' . $utc($cita->termina_en)->format('Ymd\THis\Z'),
+                'details' => $cita->enlace(), 'location' => (string) $perfil->direccion,
+            ]),
+            'outlook' => 'https://outlook.live.com/calendar/0/action/compose?' . http_build_query([
+                'subject' => $titulo, 'startdt' => $utc($cita->inicia_en)->format('Y-m-d\TH:i:s\Z'),
+                'enddt' => $utc($cita->termina_en)->format('Y-m-d\TH:i:s\Z'), 'body' => $cita->enlace(), 'location' => (string) $perfil->direccion,
+            ]),
+            'ics' => '/cita/' . $cita->token . '/ics',
+        ];
     }
 
     public function ics(string $token)

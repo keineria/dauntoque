@@ -42,6 +42,7 @@ return [
     'con' => 'with :nombre',
     'donde' => 'Where',
     'anadir_calendario' => 'Add to my calendar',
+    'cal_apple' => 'iPhone or Mac Calendar',
     'mover' => 'Request another time',
     'mover_ayuda' => 'Your appointment keeps its current time until :nombre accepts the new one.',
     'enviar_cambio' => 'Request this change',
