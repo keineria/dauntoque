@@ -48,6 +48,7 @@
         </div>
 
         <p class="bq-bio" x-show="p.bio || p.preview" x-text="p.bio || t('tuBio')"></p>
+        @include('partials.perfil._agenda', ['lugar' => 'prioridad'])
 
         <section x-show="p.galeria && p.galeria.length">
             <h2 class="bq-h" x-text="t('trabajos')">Mis trabajos</h2>

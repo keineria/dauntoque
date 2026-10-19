@@ -33,6 +33,7 @@
     <h1 class="pe-nombre pp-nombre" x-text="p.nombre || t('tuNombre')"></h1>
     <p class="pe-prof" x-show="p.tipo !== 'empresa' && (p.profesion || p.preview)" x-text="p.profesion || t('tuProfesion')"></p>
     <p class="pe-bio" x-show="p.bio || p.preview" x-text="p.bio || t('tuBio')"></p>
+    @include('partials.perfil._agenda', ['lugar' => 'prioridad'])
 
     <div class="pe-lista">
         <div x-ref="acciones" style="display:flex;flex-direction:column;gap:12px">

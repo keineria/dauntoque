@@ -33,6 +33,8 @@ class PublicProfileController extends Controller
         $diseno = is_array($perfil->design_config) ? $perfil->design_config : (json_decode($perfil->design_config ?? '', true) ?: []);
         $color = $diseno['color_primario'] ?? '#3b82f6';
 
+        $boton = \App\Services\Agenda\Agenda::botonDe($perfil);
+
         // Datos que pinta la plantilla compartida (partials/perfil-publico), la misma de la vista previa del editor
         $datos = [
             'nombre' => $perfil->nombre ?: $perfil->nickname,
@@ -55,8 +57,9 @@ class PublicProfileController extends Controller
             'galeria' => array_values(array_filter((array) $galeria, fn ($img) => ImageStore::esPropia($img))),
             'enlace' => Profile::urlPublica($linkMaestro),
             'vcf' => url('/' . $linkMaestro . '/vcf'),
-            // Botón "Agendar cita" solo cuando la agenda recibe reservas en línea
-            'agenda' => \App\Services\Agenda\Agenda::modoPublico($perfil->user_id) === 'activa' ? Profile::urlPublica($linkMaestro) . '/agenda' : null,
+            // Botón "Agendar cita" solo cuando la agenda recibe reservas en línea y el dueño no lo ocultó en este perfil
+            'agenda' => \App\Services\Agenda\Agenda::modoPublico($perfil->user_id) === 'activa' && $boton['visible'] ? Profile::urlPublica($linkMaestro) . '/agenda' : null,
+            'agenda_prioridad' => $boton['prioridad'],
             'preview' => false,
         ];
 

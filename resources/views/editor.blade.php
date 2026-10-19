@@ -172,6 +172,28 @@
                                     <span x-show="!generandoIA">Mejorar con IA</span><span x-show="generandoIA">Redactando…</span>
                                 </button>
                             </div>
+
+                            {{-- Botón "Agendar cita" de la app Agenda --}}
+                            <div class="dt-panel" style="margin-top:20px;padding:16px">
+                                <b style="font-size:14px">📅 Botón "Agendar cita"</b>
+                                @if($agendaEstado === 'activa')
+                                    <label style="display:flex;gap:10px;align-items:center;margin-top:12px;cursor:pointer">
+                                        <input type="checkbox" :checked="config.agenda_boton !== false" @change="config.agenda_boton = $event.target.checked"> Mostrar el botón en este perfil
+                                    </label>
+                                    <label style="display:flex;gap:10px;align-items:center;margin-top:8px;cursor:pointer" x-show="config.agenda_boton !== false">
+                                        <input type="checkbox" :checked="config.agenda_prioridad === true" @change="config.agenda_prioridad = $event.target.checked"> Darle prioridad: ponerlo justo después de la descripción
+                                    </label>
+                                @elseif($agendaEstado === 'pendiente')
+                                    <p class="dt-sub">Tu agenda está activa, pero falta crear un servicio y tu horario para que el botón aparezca.</p>
+                                    <a class="dt-btn" href="/dashboard/agenda/ajustes" target="_blank" style="margin-top:10px">Completar la agenda</a>
+                                @elseif($agendaEstado === 'basica')
+                                    <p class="dt-sub">Tu agenda venció. Renuévala para volver a mostrar el botón.</p>
+                                    <a class="dt-btn" href="/dashboard/agenda" target="_blank" style="margin-top:10px">Ver mi agenda</a>
+                                @else
+                                    <p class="dt-sub">Tus clientes reservan desde tu tarjeta. Gratis el primer año.</p>
+                                    <a class="dt-btn pri" href="/dashboard/apps" target="_blank" style="margin-top:10px">Activar la agenda</a>
+                                @endif
+                            </div>
                         </div>
 
                         {{-- PASO 5: galería --}}
@@ -462,7 +484,7 @@
                 },
 
                 aplicarPreset(nombre) { 
-                    this.config = { ...this.presets[nombre], tipografia: this.config.tipografia || '' }; 
+                    this.config = { ...this.presets[nombre], tipografia: this.config.tipografia || '', agenda_boton: this.config.agenda_boton, agenda_prioridad: this.config.agenda_prioridad }; 
                     this.plantilla = this.config.tema_base; 
                     this.alineacion = this.config.alineacion; 
                 },
@@ -501,6 +523,8 @@
                         pagos: this.listaPagos,
                         redes: this.redesSeleccionadas, galeria: this.galeriaPreviews,
                         enlace: '#', vcf: '#', preview: true,
+                        agenda: @js($agendaEstado === 'activa') && this.config.agenda_boton !== false ? '#' : null,
+                        agenda_prioridad: this.config.agenda_prioridad === true,
                     };
                 },
 

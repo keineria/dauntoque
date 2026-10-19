@@ -50,6 +50,36 @@ class Agenda
         return $lista ? 'activa' : null;
     }
 
+    /**
+     * Estado de la agenda para mostrarlo en el editor: null (sin activar), 'pendiente' (activa, falta servicio u horario),
+     * 'activa' (recibe reservas) o 'basica' (venció).
+     */
+    public static function estado(int $userId): ?string
+    {
+        return self::app($userId) ? (self::modoPublico($userId) ?? 'pendiente') : null;
+    }
+
+    /** El dueño decide en cada perfil si se ve el botón (por defecto sí) y si va justo después de la descripción. */
+    public static function botonDe(Profile $perfil): array
+    {
+        $diseno = is_array($perfil->design_config) ? $perfil->design_config : (json_decode($perfil->design_config ?? '', true) ?: []);
+
+        return [
+            'visible' => ($diseno['agenda_boton'] ?? true) !== false,
+            'prioridad' => ($diseno['agenda_prioridad'] ?? false) === true,
+        ];
+    }
+
+    /** Guarda las dos opciones del botón dentro del diseño del perfil, sin tocar lo demás. */
+    public static function guardarBoton(Profile $perfil, bool $visible, bool $prioridad): void
+    {
+        $diseno = is_array($perfil->design_config) ? $perfil->design_config : (json_decode($perfil->design_config ?? '', true) ?: []);
+        $diseno['agenda_boton'] = $visible;
+        $diseno['agenda_prioridad'] = $prioridad;
+        $perfil->design_config = json_encode($diseno);
+        $perfil->save();
+    }
+
     /** Precio de renovación de la agenda en la moneda del país: "$99.000 COP" o "$39 USD". */
     public static function precioRenovacion(?string $pais): string
     {

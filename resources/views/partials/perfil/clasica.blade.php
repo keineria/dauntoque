@@ -64,10 +64,14 @@
         </div>
 
         <template x-if="p.estructura === 'feria'">
-            <a class="pc-btn pri" :class="p.forma" :href="p.vcf" @click="accion('descarga_vcf', $event)"><span class="ajusta" x-text="t('guardar')">Guardar contacto</span></a>
+            <div>
+                @include('partials.perfil._agenda')
+                <a class="pc-btn pri" :class="p.forma" :href="p.vcf" @click="accion('descarga_vcf', $event)"><span class="ajusta" x-text="t('guardar')">Guardar contacto</span></a>
+            </div>
         </template>
 
         <p class="pc-bio" :class="p.estructura !== 'feria' && p.alineacion === 'izquierda' ? 'izq' : ''" x-show="p.bio || p.preview" x-text="p.bio || t('tuBio')"></p>
+        @include('partials.perfil._agenda', ['lugar' => 'prioridad'])
 
         <div class="pc-grid" x-show="p.redes && p.redes.length">
             <template x-for="red in (p.redes || [])" :key="red.id">

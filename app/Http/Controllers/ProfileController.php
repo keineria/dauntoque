@@ -26,8 +26,10 @@ class ProfileController extends Controller
             $perfil = Profile::where('id', $request->id)->where('user_id', Auth::id())->first();
         }
         $mercados = Market::opciones();
+        // Estado de la agenda para el bloque "Botón Agendar cita" del editor
+        $agendaEstado = \App\Services\Agenda\Agenda::estado(Auth::id());
 
-        return view('editor', compact('perfil', 'mercados'));
+        return view('editor', compact('perfil', 'mercados', 'agendaEstado'));
     }
 
     public function validarNickname(Request $request)
