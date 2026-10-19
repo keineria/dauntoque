@@ -32,7 +32,18 @@ class User extends Authenticatable
             'dos_pasos_secreto' => 'encrypted',
             'dos_pasos_respaldo' => 'encrypted:array',
             'dos_pasos_activo_en' => 'datetime',
+            'recordatorio_uso_en' => 'datetime',
         ];
+    }
+
+    public function perfiles()
+    {
+        return $this->hasMany(Profile::class);
+    }
+
+    public function tarjetas()
+    {
+        return $this->hasMany(Tarjeta::class);
     }
 
     /** Dueño del negocio: entra al panel de administración (rol es_admin o config/chips.php, ADMIN_CORREOS). */

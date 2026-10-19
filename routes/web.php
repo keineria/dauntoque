@@ -98,6 +98,12 @@ Route::middleware(['auth'])->group(function () {
     });
     Route::middleware('admin')->prefix('admin')->group(function () {
         Route::get('/', [App\Http\Controllers\AdminController::class, 'inicio']);
+        Route::post('/clientes/{usuario}/reenviar-codigo', [App\Http\Controllers\AdminController::class, 'reenviarCodigo'])->whereNumber('usuario')->middleware('throttle:10,1');
+        Route::controller(App\Http\Controllers\AdminSinUsoController::class)->prefix('sin-uso')->group(function () {
+            Route::get('/', 'index');
+            Route::post('/enviar-todos', 'enviarTodos');
+            Route::post('/{usuario}/enviar', 'enviar')->whereNumber('usuario');
+        });
         Route::get('/carritos', [App\Http\Controllers\AdminController::class, 'carritos']);
         Route::post('/carritos/promo', [App\Http\Controllers\AdminController::class, 'guardarPromo']);
         Route::post('/carritos/enviar-todos', [App\Http\Controllers\AdminController::class, 'enviarPromoTodos']);
@@ -105,6 +111,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/correos', [App\Http\Controllers\AdminController::class, 'correos']);
         Route::post('/correos', [App\Http\Controllers\AdminController::class, 'guardarCorreos']);
         Route::post('/correos/prueba', [App\Http\Controllers\AdminController::class, 'probarCorreo'])->middleware('throttle:5,1');
+        Route::post('/correos/smtp', [App\Http\Controllers\AdminController::class, 'guardarSmtp']);
+        Route::get('/correos/plantilla/{id}', [App\Http\Controllers\AdminController::class, 'plantilla']);
+        Route::post('/correos/plantilla/{id}', [App\Http\Controllers\AdminController::class, 'guardarPlantilla'])->middleware('throttle:20,1');
+        Route::post('/correos/plantilla/{id}/restaurar', [App\Http\Controllers\AdminController::class, 'restaurarPlantilla']);
         Route::controller(App\Http\Controllers\AdminSoporteController::class)->prefix('soporte')->group(function () {
             Route::get('/', 'index');
             Route::get('/resumen', 'resumen');
@@ -117,6 +127,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/chips', [App\Http\Controllers\AdminChipsController::class, 'index']);
         Route::post('/chips', [App\Http\Controllers\AdminChipsController::class, 'guardar']);
         Route::post('/chips/generar', [App\Http\Controllers\AdminChipsController::class, 'generar']);
+        Route::get('/chips/exportar', [App\Http\Controllers\AdminChipsController::class, 'exportar']);
+        Route::post('/chips/{chip}/reenviar', [App\Http\Controllers\AdminChipsController::class, 'reenviar'])->middleware('throttle:10,1');
         Route::delete('/chips/{chip}', [App\Http\Controllers\AdminChipsController::class, 'eliminar']);
     });
     Route::post('/renovar/{tarjeta}', [App\Http\Controllers\RenovacionController::class, 'crear']);

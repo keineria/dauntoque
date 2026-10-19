@@ -26,14 +26,14 @@ class ActivarTarjetaController extends Controller
         $perfil = Profile::activoDe(Auth::id());
         if (! $perfil) {
             // Se enlaza solo al crear el perfil (ProfileController) o al volver al panel
-            session(['nfc_pendiente' => $chip->codigo]);
+            session(['nfc_pendiente' => $chip->codigo, 'nfc_medio' => 'codigo']);
 
             return redirect('/dashboard')->with('status', 'Código correcto. Crea tu perfil y tu tarjeta quedará enlazada.');
         }
         if (Profile::where('user_id', Auth::id())->where('nfc_uid', $chip->codigo)->exists()) {
             return back()->with('status', 'Esa tarjeta ya está enlazada a tu cuenta.');
         }
-        if (! Tarjeta::vincular($perfil, $chip->codigo)) {
+        if (! Tarjeta::vincular($perfil, $chip->codigo, 'codigo')) {
             return back()->withErrors(['codigo' => 'Esa tarjeta ya está activada en otra cuenta. Escríbenos desde Ayuda y lo revisamos.'])->withInput();
         }
 
@@ -51,9 +51,10 @@ class ActivarTarjetaController extends Controller
         if (! $perfil) {
             return false;
         }
+        $medio = session()->pull('nfc_medio', 'tarjeta');
         session()->forget('nfc_pendiente');
 
         return Profile::where('nfc_uid', $codigo)->where('user_id', $userId)->doesntExist()
-            && Tarjeta::vincular($perfil, $codigo);
+            && Tarjeta::vincular($perfil, $codigo, $medio);
     }
 }

@@ -68,7 +68,7 @@ class CorreosAdminTest extends TestCase
         $admin = $this->admin();
 
         $this->actingAs($admin)->get('/admin/correos')->assertOk()
-            ->assertDontSee('SuperSecreta99')->assertDontSee('pedidos@dauntoque.com')->assertSee('configurada ✓');
+            ->assertDontSee('SuperSecreta99')->assertSee('Usando el del servidor (.env)');
 
         Mail::fake();
         $this->actingAs($admin)->post('/admin/correos/prueba', ['para' => 'yo@correo.com'])->assertSessionHas('status');

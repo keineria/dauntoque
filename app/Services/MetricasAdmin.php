@@ -3,14 +3,10 @@
 namespace App\Services;
 
 use App\Models\Pedido;
-use App\Models\Profile;
-use App\Models\ProfileEvent;
 use App\Models\SoporteConversacion;
 use App\Models\Tarjeta;
 use App\Models\User;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 
 /** Números del administrador: compras, clientes, uso de las tarjetas, carritos y soporte. */
 class MetricasAdmin
@@ -51,7 +47,7 @@ class MetricasAdmin
             'activos' => $estados->filter()->count(),
             'inactivos' => $estados->reject(fn ($activo) => $activo)->count(),
             'sinTarjeta' => $total - $estados->count(),
-            'sinUso' => $this->sinUsoConsulta()->count(),
+            'sinUso' => ClientesAdmin::sinUso()->count(),
         ];
     }
 
@@ -62,40 +58,5 @@ class MetricasAdmin
             'chatsEnAtencion' => SoporteConversacion::where('tipo', 'chat')->where('estado', 'abierta')->count(),
             'ticketsAbiertos' => SoporteConversacion::where('tipo', 'ticket')->where('estado', '!=', 'cerrada')->count(),
         ];
-    }
-
-    /** Usuarios con perfil y cuenta de más de MESES_SIN_USO meses, sin ningún evento en sus perfiles en ese tiempo. */
-    private function sinUsoConsulta()
-    {
-        $desde = now()->subMonths(self::MESES_SIN_USO);
-
-        return User::where('created_at', '<', $desde)
-            ->whereIn('id', Profile::select('user_id'))
-            ->whereNotIn('id', ProfileEvent::query()
-                ->join('profiles', 'profiles.id', '=', 'profile_events.profile_id')
-                ->where('profile_events.created_at', '>=', $desde)
-                ->select('profiles.user_id'));
-    }
-
-    /**
-     * Lista de clientes sin uso, con la fecha de la última visita o clic (null si nunca tuvo).
-     *
-     * @return Collection<int, array{nombre: string, correo: string, ultimoUso: ?string, desde: string}>
-     */
-    public function sinUso(int $limite = 50): Collection
-    {
-        $usuarios = $this->sinUsoConsulta()->orderBy('created_at')->limit($limite)->get(['id', 'name', 'email', 'created_at']);
-        $ultimos = ProfileEvent::query()
-            ->join('profiles', 'profiles.id', '=', 'profile_events.profile_id')
-            ->whereIn('profiles.user_id', $usuarios->pluck('id'))
-            ->groupBy('profiles.user_id')
-            ->pluck(DB::raw('MAX(profile_events.created_at)'), 'profiles.user_id');
-
-        return $usuarios->map(fn (User $u) => [
-            'nombre' => $u->name,
-            'correo' => $u->email,
-            'ultimoUso' => isset($ultimos[$u->id]) ? Carbon::parse($ultimos[$u->id])->format('d/m/Y') : null,
-            'desde' => $u->created_at->format('d/m/Y'),
-        ]);
     }
 }

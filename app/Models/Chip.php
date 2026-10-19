@@ -12,7 +12,9 @@ class Chip extends Model
     /** Letras y números que no se confunden al escribirlos a mano (sin i, l, o, 0 ni 1). */
     private const LEGIBLES = 'abcdefghjkmnpqrstuvwxyz23456789';
 
-    protected $fillable = ['codigo', 'nota', 'pedido_id'];
+    public const ORIGENES = ['sistema' => 'Del sistema', 'propio' => 'Propios'];
+
+    protected $fillable = ['codigo', 'nota', 'pedido_id', 'origen'];
 
     public function pedido()
     {
@@ -25,6 +27,7 @@ class Chip extends Model
         return static::firstOrCreate(['pedido_id' => $pedido->id], [
             'codigo' => static::nuevoCodigo(),
             'nota' => "Pedido {$pedido->codigo} · {$pedido->nombre}",
+            'origen' => 'sistema',
         ]);
     }
 
@@ -69,6 +72,12 @@ class Chip extends Model
         } while (static::where('codigo', $codigo)->exists());
 
         return $codigo;
+    }
+
+    /** Activación del chip (si alguien ya lo activó). */
+    public function tarjeta()
+    {
+        return $this->hasOne(Tarjeta::class, 'nfc_uid', 'codigo');
     }
 
     public function url(): string
