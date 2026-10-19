@@ -23,7 +23,7 @@ class AdminController extends Controller
             'm' => $metricas->resumen(),
             'sinUso' => $metricas->sinUso(20),
             'mesesSinUso' => MetricasAdmin::MESES_SIN_USO,
-            'ultimasCompras' => Pedido::where('estado', 'pagado')->latest('pagado_en')->limit(8)->get(),
+            'ultimasCompras' => Pedido::with('chip')->where('estado', 'pagado')->latest('pagado_en')->limit(8)->get(),
         ]);
     }
 

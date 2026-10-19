@@ -9,6 +9,10 @@
         @if($pedido->documento)<tr><td><b>Documento</b></td><td>{{ $pedido->documento }}</td></tr>@endif
         <tr><td><b>Dirección</b></td><td>{{ $pedido->direccion }}, {{ $pedido->ciudad }} ({{ $pedido->departamento }})</td></tr>
         <tr><td><b>Tarjeta</b></td><td>{{ $pedido->acabadoNombre() }}@if($pedido->nombre_tarjeta) · nombre: {{ $pedido->nombre_tarjeta }}@endif</td></tr>
+        @if($pedido->chip)
+            <tr><td><b>Código</b></td><td><b style="font-family:monospace;font-size:16px">{{ $pedido->chip->codigo }}</b></td></tr>
+            <tr><td><b>Grabar en el chip</b></td><td><a href="{{ $pedido->chip->url() }}">{{ $pedido->chip->url() }}</a></td></tr>
+        @endif
         <tr><td><b>Total</b></td><td>{{ $pedido->totalTexto() }} · Bold {{ $pedido->pago_proveedor_id }}</td></tr>
     </table>
 </body></html>

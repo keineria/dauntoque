@@ -12,7 +12,7 @@ class AdminChipsController extends Controller
     public function index(Request $request)
     {
         $buscar = trim((string) $request->query('buscar'));
-        $chips = Chip::query()
+        $chips = Chip::with('pedido')
             ->when($buscar !== '', fn ($q) => $q->where(fn ($q) => $q->where('codigo', 'like', "%$buscar%")->orWhere('nota', 'like', "%$buscar%")))
             ->latest('id')->paginate(50)->withQueryString();
         // Activación de cada chip de la página: correo del dueño y fecha

@@ -108,6 +108,10 @@ class DashboardController extends Controller
 
     public function index()
     {
+        if (ActivarTarjetaController::enlazarPendiente(Auth::id())) {
+            session()->now('nfc_success', true);
+        }
+
         return view('dashboard.index', $this->cargarDatos() + [
             'stats' => AnaliticasController::resumen(Auth::id()),
             'fichas' => $this->fichasPerfiles(Auth::id()),

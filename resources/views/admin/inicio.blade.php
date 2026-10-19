@@ -35,7 +35,7 @@
                 @foreach ($ultimasCompras as $p)
                     <div class="ad-fila" role="row">
                         <span><b>{{ $p->nombre }}</b><small>{{ $p->correo }} · {{ $p->ciudad }}</small></span>
-                        <span>{{ $p->codigo }}<small>{{ $p->acabadoNombre() }}</small></span>
+                        <span>{{ $p->codigo }}<small>{{ $p->acabadoNombre() }}@if ($p->chip) · código <a href="/admin/chips?buscar={{ $p->chip->codigo }}" style="font-family:ui-monospace,Consolas,monospace">{{ $p->chip->codigo }}</a>@endif</small></span>
                         <span style="text-align:right"><b>{{ $p->totalTexto() }}</b><small>{{ $p->pagado_en?->format('d/m/Y H:i') }}</small></span>
                     </div>
                 @endforeach

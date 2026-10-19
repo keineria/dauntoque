@@ -34,6 +34,12 @@ class Pedido extends Model
         return 'token';
     }
 
+    /** Código de activación de la tarjeta, creado al confirmarse el pago. */
+    public function chip()
+    {
+        return $this->hasOne(Chip::class);
+    }
+
     public function acabadoNombre(): string
     {
         return self::ACABADOS[$this->acabado] ?? $this->acabado;

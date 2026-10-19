@@ -75,7 +75,7 @@ class ChipsRegistroTest extends TestCase
 
         $this->actingAs($admin)->post('/admin/chips/generar', ['cantidad' => 3])->assertSessionHas('generados');
         $this->assertSame(5, Chip::count());
-        $this->assertSame(3, Chip::where('codigo', 'not like', 'chip-%')->whereRaw('length(codigo) = 12')->count());
+        $this->assertSame(3, Chip::where('codigo', 'not like', 'chip-%')->whereRaw('length(codigo) = 9')->count());
     }
 
     public function test_no_se_borra_un_chip_activado(): void

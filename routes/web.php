@@ -43,6 +43,7 @@ Route::middleware(['auth'])->group(function () {
 
    Route::get('/perfil/validar-nickname', [App\Http\Controllers\ProfileController::class, 'validarNickname']);
     Route::post('/perfil/{id}/duplicar', [ProfileController::class, 'duplicar']);
+    Route::post('/tarjeta/activar', App\Http\Controllers\ActivarTarjetaController::class)->middleware('throttle:10,1');
     Route::post('/perfil/{id}/activar', [App\Http\Controllers\ProfileController::class, 'activar']);
     Route::delete('/perfil/{id}/eliminar', [App\Http\Controllers\ProfileController::class, 'eliminar']);
     // Editor
