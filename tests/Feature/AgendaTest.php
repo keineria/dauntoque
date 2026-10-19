@@ -293,6 +293,16 @@ class AgendaTest extends TestCase
         $r->assertSessionHasErrors('nombre');
     }
 
+    public function test_la_cita_ofrece_google_iphone_y_outlook(): void
+    {
+        $this->reservar('2026-10-13', '09:00');
+        $this->get('/cita/' . Cita::first()->token)->assertOk()
+            ->assertSee('calendar.google.com/calendar/render?action=TEMPLATE', false)
+            ->assertSee('dates=20261013T140000Z%2F20261013T144000Z', false)
+            ->assertSee('outlook.live.com', false)
+            ->assertSee('Calendario del iPhone o Mac');
+    }
+
     public function test_la_agenda_vencida_solo_muestra_whatsapp(): void
     {
         Agenda::app($this->dueno->id)->update(['vence_en' => now()->subDay()]);

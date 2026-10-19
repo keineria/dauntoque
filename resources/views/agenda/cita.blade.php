@@ -48,7 +48,15 @@
     @endif
 
     @if($cita->activa() && !$cita->realizada())
-        <a class="ag-btn sec" href="/cita/{{ $cita->token }}/ics">{{ __('agenda.anadir_calendario') }}</a>
+        {{-- Guardar en el calendario: la opción del dispositivo va primero (iPhone/Mac → Apple; los demás → Google) --}}
+        <div x-data="{ abierto: false, apple: /iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent) }">
+            <button type="button" class="ag-btn sec" @click="abierto = !abierto" :aria-expanded="abierto">{{ __('agenda.anadir_calendario') }}</button>
+            <div x-show="abierto" x-cloak style="display:flex;flex-direction:column">
+                <a class="ag-btn sec" :style="apple ? 'order:2' : 'order:1'" href="{{ $calendarios['google'] }}" target="_blank" rel="noopener">Google Calendar</a>
+                <a class="ag-btn sec" :style="apple ? 'order:1' : 'order:2'" href="{{ $calendarios['ics'] }}">{{ __('agenda.cal_apple') }}</a>
+                <a class="ag-btn sec" style="order:3" href="{{ $calendarios['outlook'] }}" target="_blank" rel="noopener">Outlook</a>
+            </div>
+        </div>
 
         @if($puedeCambiar)
             <div x-data="mover()" x-cloak>

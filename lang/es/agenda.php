@@ -44,6 +44,7 @@ return [
     'con' => 'con :nombre',
     'donde' => 'Dónde',
     'anadir_calendario' => 'Añadir a mi calendario',
+    'cal_apple' => 'Calendario del iPhone o Mac',
     'mover' => 'Pedir otra hora',
     'mover_ayuda' => 'Tu cita sigue a la hora actual hasta que :nombre acepte la nueva.',
     'enviar_cambio' => 'Pedir este cambio',
