@@ -26,6 +26,16 @@ class AuthenticatedSessionController extends Controller
     {
         $request->authenticate();
 
+        // Con verificación en dos pasos: la sesión no se abre hasta escribir el código de la app
+        $usuario = Auth::user();
+        if ($usuario->tieneDosPasos()) {
+            Auth::guard('web')->logout();
+            $request->session()->regenerate();
+            $request->session()->put('dos_pasos', ['id' => $usuario->id, 'recordar' => $request->boolean('remember'), 'hasta' => now()->addMinutes(10)->timestamp]);
+
+            return redirect('/dos-pasos');
+        }
+
         $request->session()->regenerate();
 
         return redirect()->intended(route('dashboard', absolute: false));

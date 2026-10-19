@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Mail\PedidoConfirmado;
 use App\Mail\PedidoNuevo;
+use App\Models\Chip;
 use App\Models\Pago;
 use App\Models\Pedido;
 use App\Services\Bold;
@@ -48,6 +49,7 @@ class WebhookBoldController extends Controller
             }
             if ($tipo === 'SALE_APPROVED') {
                 $pedido->update(['estado' => 'pagado', 'pagado_en' => now(), 'pago_proveedor_id' => $pagoId]);
+                Chip::deCompra($pedido);
 
                 return true;
             }
@@ -63,7 +65,7 @@ class WebhookBoldController extends Controller
         }
     }
 
-    /** Correo al cliente (compra y enlace para crear su perfil) y aviso interno para despachar. */
+    /** Correo al cliente (compra, enlace para crear su perfil y código de activación) y aviso interno para despachar. */
     private function avisarCompra(Pedido $pedido): void
     {
         try {

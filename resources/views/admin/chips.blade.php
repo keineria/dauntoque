@@ -4,9 +4,10 @@
     <div class="dt-head">
         <div>
             <h1 class="dt-h1">Chips</h1>
-            <p class="dt-sub">Solo los chips registrados aquí se pueden activar. {{ $total }} registrados · {{ $activados }} activados.</p>
+            <p class="dt-sub">Solo los chips registrados aquí se pueden activar. Cada compra pagada crea su código y se lo enviamos al cliente en el correo. {{ $total }} registrados · {{ $activados }} activados.</p>
         </div>
     </div>
+    @include('admin._tabs')
 
     @if ($generados)
         <section class="dt-panel" style="margin-bottom:18px" x-data="{ copiado: false }">
@@ -14,7 +15,7 @@
                 <h2>Códigos nuevos para grabar</h2>
                 <button type="button" class="dt-btn" @click="navigator.clipboard.writeText($refs.lista.value); copiado = true" x-text="copiado ? 'Copiado' : 'Copiar todos'">Copiar todos</button>
             </div>
-            <p class="dt-sub" style="margin:0 0 10px">Graba cada enlace en un chip con la app NFC Tools (Escribir → Añadir registro → URL).</p>
+            <p class="dt-sub" style="margin:0 0 10px">Graba cada enlace en un chip con la app NFC Tools (Escribir → Añadir registro → URL). El cliente también puede escribir el código (lo que va después de /activar/) en su panel.</p>
             <textarea x-ref="lista" class="dt-input" rows="{{ min(count($generados), 10) }}" readonly style="font-family:ui-monospace,Consolas,monospace;font-size:13px">{{ implode("\n", $generados) }}</textarea>
         </section>
     @endif
@@ -47,13 +48,18 @@
         </div>
         <div style="overflow-x:auto">
             <table style="width:100%;border-collapse:collapse;font-size:14px">
-                <thead><tr style="text-align:left" class="dt-sub"><th style="padding:8px">Código</th><th style="padding:8px">Nota</th><th style="padding:8px">Estado</th><th></th></tr></thead>
+                <thead><tr style="text-align:left" class="dt-sub"><th style="padding:8px">Código</th><th style="padding:8px">Nota o pedido</th><th style="padding:8px">Estado</th><th></th></tr></thead>
                 <tbody>
                 @forelse ($chips as $chip)
                     @php $t = $tarjetas[$chip->codigo] ?? null; @endphp
                     <tr style="border-top:1px solid rgba(127,127,127,.18)">
                         <td style="padding:8px;font-family:ui-monospace,Consolas,monospace;word-break:break-all">{{ $chip->codigo }}</td>
-                        <td style="padding:8px">{{ $chip->nota }}</td>
+                        <td style="padding:8px">
+                            {{ $chip->nota }}
+                            @if ($chip->pedido)
+                                <span class="dt-sub" style="display:block;font-size:12px">{{ $chip->pedido->correo }} · {{ $chip->pedido->acabadoNombre() }}@if($chip->pedido->nombre_tarjeta) · {{ $chip->pedido->nombre_tarjeta }}@endif</span>
+                            @endif
+                        </td>
                         <td style="padding:8px">
                             @if ($t)
                                 <span class="dt-chip up">Activado</span>

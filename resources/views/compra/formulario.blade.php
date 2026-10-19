@@ -50,6 +50,7 @@
 
 <main class="w grid">
     <form class="form" method="POST" action="/comprar" novalidate>
+        @if ($promo)<input type="hidden" name="promo" value="{{ $promo->promo_token }}">@endif
         @csrf
         <div style="display:grid;gap:6px">
             <h1 style="font-size:clamp(30px,4.5vw,42px)">Tu tarjeta, a un paso</h1>
@@ -68,14 +69,14 @@
                     <label style="display:block">
                         <input type="radio" name="acabado" value="{{ $clave }}" @checked(old('acabado', $acabado) === $clave)>
                         <span class="acab">
-                            <span class="mini {{ $clave }}"><span>dauntoque</span><b data-nombre>{{ old('nombre_tarjeta') ?: 'Tu nombre' }}</b></span>
+                            <span class="mini {{ $clave }}"><span>dauntoque</span><b data-nombre>{{ old('nombre_tarjeta', $promo?->nombre_tarjeta) ?: 'Tu nombre' }}</b></span>
                             <span><b>{{ $nombre }}</b><br><small class="mut">{{ $clave === 'crystal' ? 'Transparente, el rompehielos.' : 'Negro mate, sobria y con autoridad.' }}</small></span>
                         </span>
                     </label>
                 @endforeach
             </div>
             <label>Nombre en la tarjeta <small>(opcional, máx. 40)</small>
-                <input id="nombre_tarjeta" name="nombre_tarjeta" maxlength="40" value="{{ old('nombre_tarjeta') }}" placeholder="Ej.: Carlos Constructor">
+                <input id="nombre_tarjeta" name="nombre_tarjeta" maxlength="40" value="{{ old('nombre_tarjeta', $promo?->nombre_tarjeta) }}" placeholder="Ej.: Carlos Constructor">
             </label>
             @error('acabado')<span class="err">{{ $message }}</span>@enderror
         </fieldset>
@@ -83,21 +84,21 @@
         <fieldset>
             <legend>2. Tus datos</legend>
             <label>Nombre completo
-                <input id="nombre" name="nombre" required maxlength="120" autocomplete="name" value="{{ old('nombre') }}">
+                <input id="nombre" name="nombre" required maxlength="120" autocomplete="name" value="{{ old('nombre', $promo?->nombre) }}">
                 @error('nombre')<span class="err">{{ $message }}</span>@enderror
             </label>
             <div class="dos">
                 <label>Correo <small>(aquí te llega el enlace)</small>
-                    <input id="correo" name="correo" type="email" required autocomplete="email" value="{{ old('correo') }}">
+                    <input id="correo" name="correo" type="email" required autocomplete="email" value="{{ old('correo', $promo?->correo) }}">
                     @error('correo')<span class="err">{{ $message }}</span>@enderror
                 </label>
                 <label>Celular / WhatsApp
-                    <input id="celular" name="celular" type="tel" required autocomplete="tel" inputmode="tel" value="{{ old('celular') }}" placeholder="300 123 4567">
+                    <input id="celular" name="celular" type="tel" required autocomplete="tel" inputmode="tel" value="{{ old('celular', $promo?->celular) }}" placeholder="300 123 4567">
                     @error('celular')<span class="err">{{ $message }}</span>@enderror
                 </label>
             </div>
             <label>Cédula <small>(opcional, para la guía de envío)</small>
-                <input id="documento" name="documento" maxlength="30" inputmode="numeric" value="{{ old('documento') }}">
+                <input id="documento" name="documento" maxlength="30" inputmode="numeric" value="{{ old('documento', $promo?->documento) }}">
             </label>
         </fieldset>
 
@@ -107,17 +108,17 @@
                 <label>Departamento
                     <select id="departamento" name="departamento" required>
                         <option value="">Elige…</option>
-                        @foreach ($departamentos as $d)<option @selected(old('departamento') === $d)>{{ $d }}</option>@endforeach
+                        @foreach ($departamentos as $d)<option @selected(old('departamento', $promo?->departamento) === $d)>{{ $d }}</option>@endforeach
                     </select>
                     @error('departamento')<span class="err">{{ $message }}</span>@enderror
                 </label>
                 <label>Ciudad o municipio
-                    <input id="ciudad" name="ciudad" required maxlength="80" autocomplete="address-level2" value="{{ old('ciudad') }}">
+                    <input id="ciudad" name="ciudad" required maxlength="80" autocomplete="address-level2" value="{{ old('ciudad', $promo?->ciudad) }}">
                     @error('ciudad')<span class="err">{{ $message }}</span>@enderror
                 </label>
             </div>
             <label>Dirección <small>(con barrio, apto o referencia)</small>
-                <input id="direccion" name="direccion" required maxlength="200" autocomplete="street-address" value="{{ old('direccion') }}">
+                <input id="direccion" name="direccion" required maxlength="200" autocomplete="street-address" value="{{ old('direccion', $promo?->direccion) }}">
                 @error('direccion')<span class="err">{{ $message }}</span>@enderror
             </label>
         </fieldset>
@@ -132,6 +133,7 @@
             @if ($precio->compare_at)<span class="chip">Ahorras {{ $fmt($precio->compare_at - $precio->amount) }}</span>@endif
         </div>
         <div class="precio"><strong>{{ $fmt($precio->amount) }}</strong><span class="mut">{{ $moneda }}</span>@if ($precio->compare_at)<span class="antes">{{ $fmt($precio->compare_at) }}</span>@endif</div>
+        @if ($promo)<p class="chip" style="display:inline-block;margin:10px 0 0">Promoción aplicada: {{ $descuento }} % de descuento</p>@endif
         <ul>
             <li>Tarjeta física con chip NFC</li>
             <li>Perfil web con WhatsApp, redes, portafolio y cobros</li>

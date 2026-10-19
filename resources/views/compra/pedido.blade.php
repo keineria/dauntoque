@@ -42,11 +42,18 @@
             <dt>Total</dt><dd>{{ $pedido->totalTexto() }}</dd>
             <dt>Envío a</dt><dd>{{ $pedido->ciudad }}, {{ $pedido->departamento }}</dd>
         </dl>
+        @if ($pedido->estado === 'pagado' && $pedido->chip)
+            <div style="background:#e3f5ea;border-radius:14px;padding:14px 16px">
+                <div style="font-size:13px;color:#14633b;font-weight:700">Tu código de activación</div>
+                <div style="margin:4px 0;font-family:ui-monospace,Consolas,monospace;font-size:24px;font-weight:800;letter-spacing:.08em">{{ $pedido->chip->codigo }}</div>
+                <div style="font-size:14px;color:#2d4a39">También llegó a tu correo. Sirve para activar la tarjeta desde tu panel si el celular no la lee.</div>
+            </div>
+        @endif
         @if ($pedido->estado === 'pagado')
             <ol>
                 <li>Crea tu perfil con este mismo correo.</li>
                 <li>Te escribimos al {{ $pedido->celular }} con la guía de envío.</li>
-                <li>Cuando llegue, acércala a tu celular y queda activa.</li>
+                <li>Cuando llegue, acércala a tu celular o escribe tu código en el panel y queda activa.</li>
             </ol>
         @endif
     </div>

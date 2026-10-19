@@ -20,6 +20,29 @@
         <div class="dt-panel" role="status" style="margin-bottom:18px">Recibimos tu pago. Cuando Bold lo confirme, tu nuevo año aparece aquí (puede tardar unos minutos).</div>
     @endif
 
+    {{-- Activar la tarjeta con el código del correo de compra (sirve desde un computador) --}}
+    @if(!$publico || !$publico['tieneChip'])
+        <section class="dt-panel" style="margin-bottom:18px">
+            <div class="dt-panel-h"><h2>Activa tu tarjeta</h2></div>
+            @if(!$publico && session('nfc_pendiente'))
+                <p style="margin:0 0 12px">Tu tarjeta está lista para enlazarse. Crea tu perfil y queda activa.</p>
+                <a href="/editor" class="dt-btn pri" style="justify-self:start">Crear mi perfil</a>
+            @else
+                <p class="dt-sub" style="margin:0 0 12px">Acerca la tarjeta a tu celular o escribe el código de activación que te llegó en el correo de tu compra.</p>
+                <form method="POST" action="/tarjeta/activar" style="display:flex;flex-wrap:wrap;gap:10px;align-items:flex-start">
+                    @csrf
+                    <div style="flex:1;min-width:200px;max-width:320px">
+                        <label class="dt-label" for="activar-codigo" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Código de activación</label>
+                        <input id="activar-codigo" name="codigo" type="text" value="{{ old('codigo') }}" maxlength="200" required autocomplete="off" autocapitalize="none" spellcheck="false"
+                               placeholder="Ej.: k7mq-2xpa" class="dt-input" style="font-family:ui-monospace,Consolas,monospace" @error('codigo') aria-invalid="true" aria-describedby="activar-error" @enderror>
+                        @error('codigo')<p id="activar-error" style="margin:6px 0 0;color:#f87171;font-size:13px">{{ $message }}</p>@enderror
+                    </div>
+                    <button type="submit" class="dt-btn pri">Activar</button>
+                </form>
+            @endif
+        </section>
+    @endif
+
     {{-- Servicio de cada tarjeta: 365 días desde que se activó el chip (config/servicio.php) --}}
     @foreach($tarjetas as $t)
         @php

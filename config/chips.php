@@ -8,6 +8,6 @@ return [
     // Correos con acceso a /admin (separados por coma), por ejemplo: ADMIN_CORREOS=keiner@dauntoque.com
     'admins' => array_values(array_filter(array_map(fn ($c) => strtolower(trim($c)), explode(',', (string) env('ADMIN_CORREOS', ''))))),
 
-    // Largo de los códigos que genera el panel (letras minúsculas y números: imposibles de adivinar)
-    'largo_codigo' => 12,
+    // Largo de los códigos que generan el panel y las compras (sin contar los guiones cada 4 caracteres)
+    'largo_codigo' => 8,
 ];
