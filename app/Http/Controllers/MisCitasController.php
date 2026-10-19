@@ -71,7 +71,7 @@ class MisCitasController extends Controller
             }
         }
 
-        return redirect('/mis-citas')->with('aviso', __('agenda.codigo_enviado'));
+        return redirect('/mis-citas')->setTargetUrl('/mis-citas')->with('aviso', __('agenda.codigo_enviado'));
     }
 
     public function verificar(Request $request)
@@ -86,7 +86,7 @@ class MisCitasController extends Controller
                 Cache::put($this->clave($correo), ['hash' => $guardado['hash'], 'intentos' => $guardado['intentos'] + 1], now()->addMinutes(config('agenda.codigo_minutos')));
             }
 
-            return redirect('/mis-citas')->withErrors(['codigo' => __('agenda.codigo_invalido')]);
+            return redirect('/mis-citas')->setTargetUrl('/mis-citas')->withErrors(['codigo' => __('agenda.codigo_invalido')]);
         }
 
         Cache::forget($this->clave($correo));
@@ -95,13 +95,13 @@ class MisCitasController extends Controller
         $request->session()->put('agenda_correo_hasta', now()->addMinutes(config('agenda.sesion_minutos'))->timestamp);
         $request->session()->forget('agenda_correo_pendiente');
 
-        return redirect('/mis-citas');
+        return redirect('/mis-citas')->setTargetUrl('/mis-citas');
     }
 
     public function salir(Request $request)
     {
         $request->session()->forget(['agenda_correo', 'agenda_correo_hasta', 'agenda_correo_pendiente']);
 
-        return redirect('/mis-citas');
+        return redirect('/mis-citas')->setTargetUrl('/mis-citas');
     }
 }

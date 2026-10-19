@@ -11,6 +11,7 @@ use App\Services\Agenda\Citas;
 use App\Services\Agenda\Disponibilidad;
 use App\Support\ImageStore;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Carbon;
 
 /**
@@ -74,8 +75,10 @@ class AgendaPublicaController extends Controller
             'zona' => config('agenda.zonas.' . $ajustes->zona_horaria, $ajustes->zona_horaria),
             'limiteHoras' => $ajustes->limite_cancelar_horas,
             'politica' => $ajustes->politica_cancelacion,
-            'urlHoras' => url('/' . $maestro . '/agenda/horas'),
-            'urlReservar' => url('/' . $maestro . '/agenda'),
+            // Rutas relativas: la página se abre en dauntoque.com/usuario/agenda (por portal.php) o en el portal,
+            // y las horas y la reserva deben pedirse al mismo dominio (si no, el navegador las bloquea y la sesión no coincide)
+            'urlHoras' => '/' . $maestro . '/agenda/horas',
+            'urlReservar' => '/' . $maestro . '/agenda',
             'urlPerfil' => Profile::urlPublica($maestro),
         ]);
     }
@@ -102,6 +105,17 @@ class AgendaPublicaController extends Controller
             abort(422);
         }
 
+        try {
+            return $this->guardarReserva($request, $perfil, $idioma);
+        } catch (ValidationException $e) {
+            // Vuelve a la misma dirección en la que estaba el cliente (relativa, para no saltar de dominio)
+            return redirect()->back()->setTargetUrl('/' . $nickname . '/agenda?lang=' . $idioma)
+                ->withErrors($e->errors())->withInput($request->except('sitio_web'));
+        }
+    }
+
+    private function guardarReserva(Request $request, Profile $perfil, string $idioma)
+    {
         $datos = $request->validate([
             'servicio_id' => 'required|integer',
             'fecha' => 'required|date_format:Y-m-d',
@@ -116,7 +130,7 @@ class AgendaPublicaController extends Controller
 
         $cita = Citas::reservar($servicio, $inicio, $datos, $idioma);
 
-        return redirect('/cita/' . $cita->token . '?listo=' . ($cita->estado === 'confirmada' ? 'reservada' : 'pendiente'));
+        return redirect()->to($u = '/cita/' . $cita->token . '?listo=' . ($cita->estado === 'confirmada' ? 'reservada' : 'pendiente'))->setTargetUrl($u);
     }
 
     public function cita(Request $request, string $token)
@@ -160,7 +174,7 @@ class AgendaPublicaController extends Controller
 
         Citas::proponerCambio($cita, Carbon::createFromFormat('Y-m-d H:i', $datos['fecha'] . ' ' . $datos['hora'], $ajustes->zona_horaria), 'cliente');
 
-        return redirect('/cita/' . $cita->token . '?listo=cambio');
+        return redirect()->to($u = '/cita/' . $cita->token . '?listo=cambio')->setTargetUrl($u);
     }
 
     public function responder(Request $request, string $token)
@@ -171,7 +185,7 @@ class AgendaPublicaController extends Controller
 
         Citas::responderCambio($cita, $acepta, 'cliente');
 
-        return redirect('/cita/' . $cita->token . '?listo=' . ($acepta ? 'aceptada' : 'rechazada'));
+        return redirect()->to($u = '/cita/' . $cita->token . '?listo=' . ($acepta ? 'aceptada' : 'rechazada'))->setTargetUrl($u);
     }
 
     public function cancelar(string $token)
@@ -181,7 +195,7 @@ class AgendaPublicaController extends Controller
 
         Citas::cancelar($cita, 'cliente');
 
-        return redirect('/cita/' . $cita->token . '?listo=cancelada');
+        return redirect()->to($u = '/cita/' . $cita->token . '?listo=cancelada')->setTargetUrl($u);
     }
 
     public function ics(string $token)

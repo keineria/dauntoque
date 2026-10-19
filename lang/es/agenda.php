@@ -11,6 +11,8 @@ return [
     'min' => 'min',
     'requiere_aprobacion' => 'Se confirma cuando :nombre la apruebe',
     'sin_horas' => 'No hay horas libres en los próximos días. Escríbele por WhatsApp.',
+    'error_horas' => 'No pudimos cargar las horas. Revisa tu conexión e inténtalo otra vez.',
+    'reintentar' => 'Intentar otra vez',
     'sin_horas_dia' => 'Ese día ya no tiene horas libres.',
     'cargando' => 'Buscando horas libres...',
     'hora_zona' => 'Horas en :zona',

@@ -281,6 +281,18 @@ class AgendaTest extends TestCase
         $this->actingAs($sinPerfil)->get('/dashboard/agenda')->assertOk()->assertSee('Esta cuenta todavía no tiene perfil');
     }
 
+    public function test_la_reserva_pide_horas_al_mismo_dominio_de_la_pagina(): void
+    {
+        // En dauntoque.com/usuario/agenda (por portal.php) las horas y la reserva no pueden ir a portal.dauntoque.com
+        $this->get('/barberia/agenda')->assertOk()
+            ->assertSee("fetch('\\/barberia\\/agenda\\/horas'", false)
+            ->assertSee('action="/barberia/agenda"', false);
+
+        $r = $this->post('/barberia/agenda', ['servicio_id' => $this->corte->id]);
+        $this->assertSame('/barberia/agenda?lang=es', $r->headers->get('Location'));
+        $r->assertSessionHasErrors('nombre');
+    }
+
     public function test_la_agenda_vencida_solo_muestra_whatsapp(): void
     {
         Agenda::app($this->dueno->id)->update(['vence_en' => now()->subDay()]);

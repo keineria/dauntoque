@@ -11,6 +11,8 @@ return [
     'min' => 'min',
     'requiere_aprobacion' => 'Confirmed once :nombre approves it',
     'sin_horas' => 'No open times in the coming days. Send a WhatsApp message instead.',
+    'error_horas' => 'We couldn\'t load the times. Check your connection and try again.',
+    'reintentar' => 'Try again',
     'sin_horas_dia' => 'That day has no open times left.',
     'cargando' => 'Looking for open times...',
     'hora_zona' => 'Times in :zona',
