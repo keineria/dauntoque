@@ -252,6 +252,35 @@ class AgendaTest extends TestCase
         $this->get('/barberia/agenda')->assertNotFound();
     }
 
+    public function test_el_dueno_publica_oculta_y_da_prioridad_al_boton(): void
+    {
+        $perfil = Profile::where('user_id', $this->dueno->id)->first();
+        $this->actingAs($this->dueno)->get('/dashboard/agenda')->assertOk()->assertSee('Botón "Agendar cita" en tu perfil', false)->assertSee('Darle prioridad');
+
+        $this->actingAs($this->dueno)->post('/dashboard/agenda/boton', ['perfil_id' => $perfil->id, 'visible' => 0])->assertRedirect();
+        $this->get('/barberia')->assertOk()->assertSee('\u0022agenda\u0022:null', false);
+        $this->actingAs($this->dueno)->get('/dashboard/agenda')->assertSee('Publicar botón en el perfil');
+
+        $this->actingAs($this->dueno)->post('/dashboard/agenda/boton', ['perfil_id' => $perfil->id, 'visible' => 1, 'prioridad' => 1]);
+        $this->get('/barberia')->assertOk()->assertDontSee('\u0022agenda\u0022:null', false)->assertSee('\u0022agenda_prioridad\u0022:true', false);
+    }
+
+    public function test_el_editor_ofrece_el_boton_de_la_agenda(): void
+    {
+        $perfil = Profile::where('user_id', $this->dueno->id)->first();
+        $this->actingAs($this->dueno)->get('/editor?id=' . $perfil->id)->assertOk()->assertSee('Mostrar el botón en este perfil')->assertSee('Darle prioridad');
+
+        $otro = User::factory()->create();
+        $this->actingAs($otro)->get('/editor')->assertOk()->assertSee('Activar la agenda');
+    }
+
+    public function test_la_agenda_avisa_si_la_cuenta_no_tiene_perfil(): void
+    {
+        $sinPerfil = User::factory()->create();
+        Agenda::activar($sinPerfil->id);
+        $this->actingAs($sinPerfil)->get('/dashboard/agenda')->assertOk()->assertSee('Esta cuenta todavía no tiene perfil');
+    }
+
     public function test_la_agenda_vencida_solo_muestra_whatsapp(): void
     {
         Agenda::app($this->dueno->id)->update(['vence_en' => now()->subDay()]);

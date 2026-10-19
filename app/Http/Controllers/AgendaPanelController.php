@@ -76,6 +76,11 @@ class AgendaPanelController extends Controller
             'precio' => Agenda::precioRenovacion($perfil?->pais),
             'whatsappVentas' => Market::where('code', MediosPago::pais($perfil?->pais))->value('whatsapp'),
             'proximas' => Cita::where('user_id', $userId)->where('estado', 'confirmada')->where('inicia_en', '>', now())->count(),
+            'lista' => Agenda::modoPublico($userId) === 'activa',
+            'perfiles' => Profile::where('user_id', $userId)->orderBy('id')->get()->map(fn (Profile $p) => [
+                'id' => $p->id, 'nombre' => $p->nombre_perfil ?: ($p->nombre ?: $p->nickname),
+                'activo' => $p->id === $perfil?->id,
+            ] + Agenda::botonDe($p)),
         ]);
     }
 
@@ -84,6 +89,17 @@ class AgendaPanelController extends Controller
         Agenda::activar(Auth::id());
 
         return redirect('/dashboard/agenda/ajustes')->with('status', 'Tu agenda está activa y gratis por un año. Ahora crea tus servicios y tu horario.');
+    }
+
+    /** Publica u oculta el botón "Agendar cita" en un perfil y decide si va justo después de la descripción. */
+    public function boton(Request $request)
+    {
+        $datos = $request->validate(['perfil_id' => 'required|integer', 'visible' => 'required|boolean', 'prioridad' => 'nullable|boolean']);
+        $perfil = Profile::where('user_id', Auth::id())->findOrFail($datos['perfil_id']);
+        $actual = Agenda::botonDe($perfil);
+        Agenda::guardarBoton($perfil, (bool) $datos['visible'], (bool) ($datos['prioridad'] ?? $actual['prioridad']));
+
+        return back()->with('status', $datos['visible'] ? 'Listo: el botón "Agendar cita" ya se ve en tu perfil.' : 'Ocultaste el botón "Agendar cita" de ese perfil.');
     }
 
     public function aprobar(int $id)

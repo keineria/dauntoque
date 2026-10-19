@@ -82,6 +82,7 @@
         <h2 class="px-h"><span x-text="t('perfil')">Perfil</span></h2>
         <p class="px-texto" x-text="p.bio || t('tuBio')"></p>
     </section>
+    @include('partials.perfil._agenda', ['lugar' => 'prioridad'])
 
     <section class="px-bloque" x-show="p.galeria && p.galeria.length">
         <h2 class="px-h"><span x-text="t('portafolio')">Portafolio</span></h2>

@@ -41,6 +41,7 @@
             <h2 class="pp-h"><span x-text="t('sobreMi')">Sobre mí</span></h2>
             <p class="pp-bio" x-text="p.bio || t('tuBio')"></p>
         </section>
+        @include('partials.perfil._agenda', ['lugar' => 'prioridad'])
 
         <section class="pp-card" x-show="p.redes && p.redes.length">
             <h2 class="pp-h"><span x-text="t('redes')">Redes sociales</span></h2>

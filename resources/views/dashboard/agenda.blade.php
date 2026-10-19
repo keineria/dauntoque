@@ -49,6 +49,35 @@
             </section>
         @endif
 
+        @if($perfiles->isEmpty())
+            <section class="dt-panel" style="border-color:rgba(245,158,11,.45);margin-bottom:18px">
+                <b>Esta cuenta todavía no tiene perfil.</b>
+                <p class="dt-sub">El botón "Agendar cita" aparece en el perfil de esta misma cuenta. Crea tu perfil para que tus clientes puedan reservar.</p>
+                <a class="dt-btn pri" href="/editor" style="margin-top:12px">Crear mi perfil</a>
+            </section>
+        @elseif($lista)
+            <section class="dt-panel" style="margin-bottom:18px">
+                <div class="dt-panel-h"><h2>Botón "Agendar cita" en tu perfil</h2></div>
+                @foreach($perfiles as $pf)
+                    <div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;align-items:center;padding:12px 0;border-top:1px solid var(--border)">
+                        <div>
+                            <b>{{ $pf['nombre'] }}</b>@if($pf['activo']) <span class="dt-chip">El que abre tu tarjeta</span>@endif<br>
+                            <span class="dt-sub" style="margin:0">{{ $pf['visible'] ? ($pf['prioridad'] ? 'Publicado, justo después de la descripción' : 'Publicado') : 'Sin publicar' }}</span>
+                        </div>
+                        <div style="display:flex;gap:8px;flex-wrap:wrap">
+                            @if($pf['visible'])
+                                <form method="POST" action="/dashboard/agenda/boton">@csrf<input type="hidden" name="perfil_id" value="{{ $pf['id'] }}"><input type="hidden" name="visible" value="1"><input type="hidden" name="prioridad" value="{{ $pf['prioridad'] ? 0 : 1 }}"><button class="dt-btn" type="submit">{{ $pf['prioridad'] ? 'Quitar prioridad' : 'Darle prioridad' }}</button></form>
+                                <form method="POST" action="/dashboard/agenda/boton">@csrf<input type="hidden" name="perfil_id" value="{{ $pf['id'] }}"><input type="hidden" name="visible" value="0"><button class="dt-btn danger" type="submit">Ocultar</button></form>
+                            @else
+                                <form method="POST" action="/dashboard/agenda/boton">@csrf<input type="hidden" name="perfil_id" value="{{ $pf['id'] }}"><input type="hidden" name="visible" value="1"><button class="dt-btn pri" type="submit">Publicar botón en el perfil</button></form>
+                            @endif
+                        </div>
+                    </div>
+                @endforeach
+                <p class="dt-sub" style="font-size:12px">Con prioridad, el botón queda justo después de la descripción del perfil. También lo cambias al editar el perfil.</p>
+            </section>
+        @endif
+
         @if($app->diasRestantes() <= 30)
             <section class="dt-panel" style="border-color:{{ $app->vigente() ? 'rgba(245,158,11,.45)' : 'rgba(239,68,68,.5)' }};margin-bottom:18px">
                 <b>{{ $app->vigente() ? 'Tu agenda vence en ' . $app->diasRestantes() . ' ' . ($app->diasRestantes() === 1 ? 'día' : 'días') . '.' : 'Tu agenda venció.' }}</b>

@@ -58,6 +58,7 @@
         </div>
 
         <p class="pr-bio" x-show="p.bio || p.preview" x-text="p.bio || t('tuBio')"></p>
+        @include('partials.perfil._agenda', ['lugar' => 'prioridad'])
 
         <div style="display:flex;flex-direction:column;gap:10px" x-ref="acciones">
             @include('partials.perfil._agenda')

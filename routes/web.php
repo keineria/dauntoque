@@ -61,6 +61,7 @@ Route::middleware(['auth'])->group(function () {
     Route::controller(App\Http\Controllers\AgendaPanelController::class)->prefix('dashboard/agenda')->group(function () {
         Route::get('/', 'index');
         Route::post('/activar', 'activar');
+        Route::post('/boton', 'boton');
         Route::post('/citas', 'crear');
         Route::post('/citas/{id}/aprobar', 'aprobar');
         Route::post('/citas/{id}/rechazar', 'rechazar');
