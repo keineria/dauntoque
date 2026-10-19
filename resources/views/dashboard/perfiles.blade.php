@@ -1,6 +1,8 @@
 @extends('layouts.app')
 
 @section('contenido')
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="{{ \App\Support\Tipografias::urlGoogle() }}">
 <div x-data="gestorPerfiles()" x-init="iniciar()">
 
     <div class="dt-head">
@@ -61,7 +63,7 @@
                                 <button class="dt-ico" @click="abierto = !abierto" @click.away="abierto = false" title="Más opciones" aria-label="Más opciones">
                                     <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg>
                                 </button>
-                                <div x-show="abierto" x-cloak class="dt-panel" style="position:absolute;right:0;top:36px;padding:6px;min-width:170px;z-index:30;box-shadow:0 12px 32px rgba(0,0,0,.12)">
+                                <div x-show="abierto" x-cloak class="dt-pop" @keydown.escape.window="abierto = false">
                                     <button class="dt-btn" style="width:100%;justify-content:flex-start;border:0" @click="abierto = false; duplicar(p)">Duplicar</button>
                                     <button class="dt-btn danger" style="width:100%;justify-content:flex-start;border:0" @click="abierto = false; pedirEliminar(p)">Eliminar</button>
                                 </div>
@@ -151,6 +153,18 @@
             </div>
             <a class="dt-btn" :href="'/editor?id=' + actual.id + '&step=8'">Más opciones de diseño</a>
         </div>
+
+        <span class="dt-label" style="margin-top:24px">Tipografía</span>
+        <div class="dt-fuentes">
+            <button type="button" class="dt-fuente" :class="!actual.tipografia ? 'on' : ''" @click="cambiar({ tipografia: '' }, 'tipografia', '')">
+                <b>Aa</b><span>Según el estilo</span>
+            </button>
+            <template x-for="f in tipografias" :key="f.id">
+                <button type="button" class="dt-fuente" :class="actual.tipografia === f.id ? 'on' : ''" @click="cambiar({ tipografia: f.id }, 'tipografia', f.id)" :aria-label="'Tipografía ' + f.nombre">
+                    <b :style="'font-family:' + f.titulo">Aa</b><span :style="'font-family:' + f.texto" x-text="f.nombre"></span>
+                </button>
+            </template>
+        </div>
         <p class="dt-sub" style="margin-top:14px;font-size:12.5px">Los cambios se guardan solos y se aplican a la página pública de este perfil.</p>
     </section>
     </template>
@@ -200,6 +214,8 @@
             ],
             colores: ['#3b82f6', '#c8a96a', '#d4af37', '#e8a3b8', '#2eaa6e', '#38bdf8', '#7a3fd6', '#f5f5f4'],
             combos: @json(config('combos')),
+            // Tipografías del perfil (config/tipografias.php); '' deja la letra del estilo
+            tipografias: @json(\App\Support\Tipografias::paraVista()),
             // ¿El perfil tiene exactamente este tema listo?
             esCombo(c) {
                 const p = this.actual;

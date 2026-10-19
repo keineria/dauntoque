@@ -8,7 +8,7 @@
         .bq-aro { width:138px; height:138px; border-radius:50%; padding:3px; background:linear-gradient(140deg, var(--acc), #f3d9a4 45%, var(--acc)); box-shadow:0 0 0 8px color-mix(in srgb, var(--acc) 10%, transparent), 0 24px 50px -20px var(--acc); }
         .bq-aro > div { width:100%; height:100%; border-radius:50%; overflow:hidden; border:4px solid var(--card); background:var(--chip); display:grid; place-items:center; font:700 44px var(--titulo); color:var(--muted); }
         .bq-aro img { width:100%; height:100%; object-fit:cover; }
-        .bq-nombre { margin:0; font:700 28px/1.12 Georgia, "Times New Roman", serif; letter-spacing:-.01em; }
+        .bq-nombre { margin:0; font:700 28px/1.12 var(--titulo-bq, Georgia), "Times New Roman", serif; letter-spacing:-.01em; }
         .bq-prof { margin:10px auto 0; font-size:11px; font-weight:800; letter-spacing:.2em; text-transform:uppercase; color:var(--acc); line-height:1.6; max-width:30ch; }
         .pp-corporativo .bq-prof, .pp-minimalista .bq-prof { color:color-mix(in srgb, var(--acc) 85%, var(--text)); }
         .bq-bio { position:relative; margin:0; text-align:center; font-size:14.5px; line-height:1.7; color:var(--muted); }

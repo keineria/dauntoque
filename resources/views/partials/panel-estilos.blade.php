@@ -38,6 +38,10 @@
         .dt-head { display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:16px; margin-bottom:24px; }
         .dt-panel { border:1px solid var(--border); border-radius:24px; background:var(--card); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); padding:22px; }
         .dt-panel + .dt-panel { margin-top:18px; }
+        /* Cada panel es una capa propia (por el desenfoque): el que tiene un menú abierto o el foco pasa encima de los
+           de abajo, para que los desplegables no queden tapados por la caja siguiente */
+        .dt-panel:focus-within, .dt-panel:has(.dt-pop:not([style*="display: none"])) { position:relative; z-index:40; }
+        .dt-pop { position:absolute; right:0; top:calc(100% + 6px); z-index:30; min-width:170px; padding:6px; border:1px solid var(--border); border-radius:14px; background:var(--card-solid); box-shadow:0 16px 40px rgba(0,0,0,.45); }
         .dt-panel-h { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:12px; margin-bottom:18px; }
         .dt-panel-h h2 { font-size:15px; font-weight:800; margin:0; letter-spacing:-.01em; }
         .dt-btn { height:38px; border-radius:12px; border:1px solid var(--border); background:rgba(255,255,255,.05); color:var(--text); padding:0 16px; font-weight:700; font-size:13px; display:inline-flex; align-items:center; justify-content:center; gap:6px; text-decoration:none; cursor:pointer; white-space:nowrap; transition:background .15s, box-shadow .15s, transform .15s; }
@@ -86,6 +90,13 @@
         .dt-styles .dt-thumb { aspect-ratio:16/11; }
         .dt-sw { width:28px; height:28px; border-radius:50%; border:2px solid #0b0b10; box-shadow:0 0 0 1px rgba(255,255,255,.15); cursor:pointer; padding:0; }
         .dt-sw.on { box-shadow:0 0 0 2px #fff; }
+        /* Tipografías del perfil */
+        .dt-fuentes { display:grid; grid-template-columns:repeat(auto-fill, minmax(112px, 1fr)); gap:10px; }
+        .dt-fuente { display:flex; flex-direction:column; align-items:flex-start; gap:2px; padding:10px 12px; border:1px solid var(--border); border-radius:14px; background:rgba(0,0,0,.3); color:var(--text); cursor:pointer; text-align:left; transition:border-color .15s, box-shadow .15s; }
+        .dt-fuente b { font-size:26px; line-height:1.1; font-weight:700; }
+        .dt-fuente span { font-size:12px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
+        .dt-fuente:hover { border-color:rgba(59,130,246,.45); }
+        .dt-fuente.on { border-color:#3b82f6; box-shadow:0 0 0 1px #3b82f6, 0 0 20px rgba(59,130,246,.25); }
 
         /* Miniaturas del perfil público (mismos estilos y diseños que la página pública) */
         .mini { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; padding:12px; }

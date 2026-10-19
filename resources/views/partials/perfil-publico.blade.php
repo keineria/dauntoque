@@ -10,7 +10,7 @@
 <style>
     .pp { --acc:#3b82f6; --sobre:#fff; --bg:#0a0a0b; --card:#131316; --text:#f4f4f5; --muted:#a1a1aa; --line:rgba(255,255,255,.08); --chip:rgba(255,255,255,.06);
           --titulo:"Inter", ui-sans-serif, system-ui, sans-serif;
-          min-height:100vh; min-height:100dvh; background:var(--bg); color:var(--text); font-family:"Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; position:relative; }
+          min-height:100vh; min-height:100dvh; background:var(--bg); color:var(--text); font-family:var(--texto, "Inter"), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; position:relative; }
     .pp-crystal { --bg:#0b0d12; --card:rgba(22,24,32,.62); --line:rgba(255,255,255,.09);
                   background:linear-gradient(180deg, rgba(9,10,14,.82), rgba(9,10,14,.97)), url('https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=1000&auto=format&fit=crop') center/cover fixed; }
     .pp-crystal .pp-card, .pp-medianoche .pp-card { backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); }
@@ -152,6 +152,12 @@
         const [r, g, b] = [0, 2, 4].map(i => parseInt(n.substr(i, 2), 16) / 255).map(c => c <= .03928 ? c / 12.92 : ((c + .055) / 1.055) ** 2.4);
         return (0.2126 * r + 0.7152 * g + 0.0722 * b) > 0.36 ? '#0b0b0c' : '#ffffff';
     }
+    // Tipografía elegida (config/tipografias.php): cambia la letra de títulos y textos; sin elegir, queda la del estilo
+    window.DT_FUENTES = @json(collect(config('tipografias'))->map(fn ($t) => ['titulo' => $t['titulo'], 'texto' => $t['texto']]));
+    function dtFuente(id) {
+        const f = window.DT_FUENTES[id];
+        return f ? `; --titulo:${f.titulo}; --titulo-bq:${f.titulo}; --texto:${f.texto}; font-synthesis-weight:none` : '';
+    }
     function dtSoloDigitos(t) { return String(t || '').replace(/[^0-9]/g, ''); }
     // Medios de pago (config/pagos.php). Cada medio del perfil llega como { type, value }
     window.DT_PAGOS = @json(config('pagos.medios'));
@@ -169,7 +175,7 @@
 
 {{-- Diseños disponibles (design_config.layout_estructura): clasica (y feria), premium, boutique, moderna, enlaces, ejecutiva (Deportivo) --}}
 <div class="pp" :class="['pp-' + (p.tema || 'crystal'), p.preview ? 'pp-preview' : '']"
-     :style="`--acc:${p.color || '#3b82f6'}; --sobre:${dtSobre(p.color || '#3b82f6')}`"
+     :style="`--acc:${p.color || '#3b82f6'}; --sobre:${dtSobre(p.color || '#3b82f6')}` + dtFuente(p.tipografia)"
      x-data="{ pagoAbierto: null, fotoGrande: null, copiado: false, barraVisible: false, idioma: dtIdiomaInicial(p.preview), bienvenida: !p.preview,
                t(clave) { return (window.DT_TXT[this.idioma] || window.DT_TXT.es)[clave] || clave; },
                cambiarIdioma() { this.idioma = this.idioma === 'es' ? 'en' : 'es'; try { localStorage.setItem('dt-idioma', this.idioma); } catch (e) {} this.$nextTick(() => dtAjustar(this.$el)); },

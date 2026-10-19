@@ -19,6 +19,10 @@
     @if($datos['foto'])<meta property="og:image" content="{{ url($datos['foto']) }}">@endif
     <meta name="twitter:card" content="summary">
 
+    @if($fuente = \App\Support\Tipografias::urlGoogle(array_filter([$datos['tipografia']])))
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="{{ $fuente }}">
+    @endif
     @vite('resources/css/panel.css')
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
     <style>html, body { margin:0; min-height:100%; } [x-cloak] { display:none !important; }</style>
