@@ -43,7 +43,11 @@
             <div x-show="servicio">
                 <h2>2 · {{ __('agenda.paso_dia') }}</h2>
                 <p class="ag-muted" x-show="cargando">{{ __('agenda.cargando') }}</p>
-                <div x-show="!cargando && !Object.keys(dias).length">
+                <div x-show="!cargando && fallo">
+                    <p class="ag-muted">{{ __('agenda.error_horas') }}</p>
+                    <button type="button" class="ag-btn" @click="elegirServicio(servicio)">{{ __('agenda.reintentar') }}</button>
+                </div>
+                <div x-show="!cargando && !fallo && !Object.keys(dias).length">
                     <p class="ag-muted">{{ __('agenda.sin_horas') }}</p>
                     @if($negocio['whatsapp'])
                         <a class="ag-btn wa" href="https://wa.me/{{ $negocio['whatsapp'] }}?text={{ rawurlencode(__('agenda.whatsapp_basico_texto')) }}">{{ __('agenda.whatsapp_basico') }}</a>
@@ -106,7 +110,7 @@
             function reserva() {
                 return {
                     servicios: @json($servicios),
-                    servicio: null, dias: {}, fecha: null, hora: null, cargando: false, enviando: false,
+                    servicio: null, dias: {}, fallo: false, fecha: null, hora: null, cargando: false, enviando: false,
                     init() {
                         // Con un solo servicio se salta el primer paso
                         if (this.servicios.length === 1) this.elegirServicio(this.servicios[0]);
@@ -115,8 +119,9 @@
                         this.servicio = s; this.fecha = null; this.hora = null; this.cargando = true; this.dias = {};
                         try {
                             const r = await fetch(@js($urlHoras) + '?servicio=' + s.id, { headers: { Accept: 'application/json' } });
+                            this.fallo = !r.ok;
                             this.dias = r.ok ? await r.json() : {};
-                        } catch (e) { this.dias = {}; }
+                        } catch (e) { this.fallo = true; this.dias = {}; }
                         this.cargando = false;
                         const primero = Object.keys(this.dias)[0];
                         if (primero) this.fecha = primero;
