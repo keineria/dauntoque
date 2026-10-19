@@ -7,6 +7,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     @include('partials.panel-estilos')
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="{{ \App\Support\Tipografias::urlGoogle() }}">
 
     @vite('resources/css/panel.css')
     <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" rel="stylesheet">
@@ -301,6 +303,17 @@
                                     </label>
                                 </div>
                             </div>
+                            <span class="dt-label" style="margin-top:22px">Tipografía</span>
+                            <div class="dt-fuentes" style="margin-bottom:6px">
+                                <button type="button" class="dt-fuente" :class="!config.tipografia ? 'on' : ''" @click="config.tipografia = ''">
+                                    <b>Aa</b><span>Según el estilo</span>
+                                </button>
+                                <template x-for="f in tipografias" :key="f.id">
+                                    <button type="button" class="dt-fuente" :class="config.tipografia === f.id ? 'on' : ''" @click="config.tipografia = f.id" :aria-label="'Tipografía ' + f.nombre">
+                                        <b :style="'font-family:' + f.titulo">Aa</b><span :style="'font-family:' + f.texto" x-text="f.nombre"></span>
+                                    </button>
+                                </template>
+                            </div>
                         </div>
 
                         {{-- PASO 9: nombre del perfil --}}
@@ -430,6 +443,8 @@
                 estilosEditor: [ { id: 'onyx', nombre: 'Ónix' }, { id: 'medianoche', nombre: 'Medianoche' }, { id: 'rose', nombre: 'Rosé' }, { id: 'esmeralda', nombre: 'Esmeralda' }, { id: 'crystal', nombre: 'Crystal' }, { id: 'matte', nombre: 'Mate' }, { id: 'luxury', nombre: 'Luxury' }, { id: 'sport', nombre: 'Sport' }, { id: 'corporativo', nombre: 'Corporativo' }, { id: 'minimalista', nombre: 'Minimal' } ],
                 // Temas listos (config/combos.php): diseño, estilo, color y botones de una vez
                 combos: @json(config('combos')),
+                // Tipografías del perfil (config/tipografias.php); '' deja la letra del estilo
+                tipografias: @json(\App\Support\Tipografias::paraVista()),
                 esCombo(c) {
                     return (this.config.layout_estructura || 'clasica') === c.diseno && this.config.tema_base === c.tema
                         && String(this.config.color_primario || '').toLowerCase() === c.color && this.config.forma_botones === c.forma;
@@ -447,7 +462,7 @@
                 },
 
                 aplicarPreset(nombre) { 
-                    this.config = { ...this.presets[nombre] }; 
+                    this.config = { ...this.presets[nombre], tipografia: this.config.tipografia || '' }; 
                     this.plantilla = this.config.tema_base; 
                     this.alineacion = this.config.alineacion; 
                 },
@@ -481,7 +496,7 @@
                     return {
                         nombre: this.nombre, profesion: this.profesion, bio: this.bio, foto: this.fotoPreview,
                         tipo: this.tipoPerfil, alineacion: this.config.alineacion, estructura: this.config.layout_estructura,
-                        tema: this.config.tema_base || this.plantilla, color: this.config.color_primario, forma: this.config.forma_botones,
+                        tema: this.config.tema_base || this.plantilla, color: this.config.color_primario, forma: this.config.forma_botones, tipografia: this.config.tipografia || '',
                         telefono: this.telefono, correo: this.correo, direccion: this.direccion,
                         pagos: this.listaPagos,
                         redes: this.redesSeleccionadas, galeria: this.galeriaPreviews,

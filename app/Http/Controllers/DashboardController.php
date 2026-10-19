@@ -9,6 +9,7 @@ use App\Support\ImageStore;
 use App\Support\MediosPago;
 use App\Support\Precios;
 use App\Support\RedesSociales;
+use App\Support\Tipografias;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -81,6 +82,7 @@ class DashboardController extends Controller
                     'color' => preg_match('/^#[0-9a-fA-F]{3,8}$/', $color) ? $color : '#3b82f6',
                     'forma' => $diseno['forma_botones'] ?? 'rounded-2xl',
                     'estructura' => $diseno['layout_estructura'] ?? 'clasica',
+                    'tipografia' => Tipografias::valida($diseno['tipografia'] ?? null),
                 ];
             })->all();
     }

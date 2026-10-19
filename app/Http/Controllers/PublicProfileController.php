@@ -6,6 +6,7 @@ use App\Models\Profile;
 use App\Support\ImageStore;
 use App\Support\MediosPago;
 use App\Support\RedesSociales;
+use App\Support\Tipografias;
 use Illuminate\Support\Str;
 
 class PublicProfileController extends Controller
@@ -43,6 +44,7 @@ class PublicProfileController extends Controller
             'estructura' => $diseno['layout_estructura'] ?? 'clasica',
             'tema' => in_array($diseno['tema_base'] ?? '', ['crystal', 'matte', 'luxury', 'corporativo', 'sport', 'minimalista', 'onyx', 'medianoche', 'rose', 'esmeralda'], true) ? $diseno['tema_base'] : 'crystal',
             'color' => preg_match('/^#[0-9a-fA-F]{3,8}$/', $color) ? $color : '#3b82f6',
+            'tipografia' => Tipografias::valida($diseno['tipografia'] ?? null),
             'forma' => in_array($diseno['forma_botones'] ?? '', ['rounded-none', 'rounded-md', 'rounded-xl', 'rounded-2xl', 'rounded-full', '-skew-x-12'], true) ? $diseno['forma_botones'] : 'rounded-2xl',
             'telefono' => $perfil->telefono,
             'correo' => $perfil->correo_contacto,
