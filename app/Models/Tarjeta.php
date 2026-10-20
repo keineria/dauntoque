@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\Visitante;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -12,7 +13,7 @@ class Tarjeta extends Model
     /** Avisos de renovación por correo, en orden; cada uno se manda una sola vez por año de servicio. */
     public const ETAPAS_AVISO = ['mes', 'semana', 'vencido', 'pausa'];
 
-    protected $fillable = ['user_id', 'nfc_uid', 'activada_en', 'vence_en', 'aviso_etapa'];
+    protected $fillable = ['user_id', 'nfc_uid', 'activada_en', 'vence_en', 'aviso_etapa', 'activacion_medio', 'activacion_lugar', 'activacion_dispositivo'];
 
     protected $casts = [
         'activada_en' => 'datetime',
@@ -28,13 +29,18 @@ class Tarjeta extends Model
      * Registra la primera activación del chip y arranca su año de servicio.
      * Si el chip ya estaba registrado (se mudó de perfil o de cuenta), conserva sus fechas;
      * si lo vincula otra cuenta, la tarjeta pasa a esa cuenta.
+     * Guarda cómo, dónde y con qué dispositivo se activó (para el administrador).
      */
-    public static function registrarActivacion(int $userId, string $nfcUid): self
+    public static function registrarActivacion(int $userId, string $nfcUid, string $medio = 'tarjeta'): self
     {
+        $request = request();
         $tarjeta = static::firstOrCreate(['nfc_uid' => $nfcUid], [
             'user_id' => $userId,
             'activada_en' => now(),
             'vence_en' => now()->addDays(config('servicio.dias')),
+            'activacion_medio' => $medio,
+            'activacion_lugar' => Visitante::lugar($request),
+            'activacion_dispositivo' => Visitante::dispositivo($request->userAgent()),
         ]);
         if ($tarjeta->user_id !== $userId) {
             $tarjeta->user_id = $userId;
@@ -50,7 +56,7 @@ class Tarjeta extends Model
      * El usuario lleva un solo chip a la vez: el que tenía antes queda libre para otra cuenta.
      * Devuelve false si el chip ya está en el perfil de otra cuenta.
      */
-    public static function vincular(Profile $perfil, string $nfcUid): bool
+    public static function vincular(Profile $perfil, string $nfcUid, string $medio = 'tarjeta'): bool
     {
         if (Profile::where('nfc_uid', $nfcUid)->where('user_id', '!=', $perfil->user_id)->exists()) {
             return false;
@@ -59,7 +65,7 @@ class Tarjeta extends Model
             ->whereNotNull('nfc_uid')->update(['nfc_uid' => null]);
         $perfil->nfc_uid = $nfcUid;
         $perfil->save();
-        static::registrarActivacion($perfil->user_id, $nfcUid);
+        static::registrarActivacion($perfil->user_id, $nfcUid, $medio);
 
         return true;
     }

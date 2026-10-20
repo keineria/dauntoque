@@ -1,16 +1,6 @@
 @php
     $nombre = \Illuminate\Support\Str::before($tarjeta->user->name ?? '', ' ');
-    $titulo = match ($etapa) {
-        'mes', 'semana' => 'Te quedan ' . $servicio['diasRestantes'] . ' ' . ($servicio['diasRestantes'] === 1 ? 'día' : 'días') . ' de servicio.',
-        'vencido' => 'Tu año de servicio terminó.',
-        default => 'Tu tarjeta quedó en pausa.',
-    };
-    $texto = match ($etapa) {
-        'mes' => 'Renueva cuando quieras: el nuevo año se suma al final del actual, así que no pierdes ningún día.',
-        'semana' => 'Renueva esta semana para que tu perfil siga abriendo sin pausas cuando entregues tu tarjeta.',
-        'vencido' => 'Tu perfil sigue funcionando ' . $servicio['diasGracia'] . ' ' . ($servicio['diasGracia'] === 1 ? 'día' : 'días') . ' más. Renueva y todo sigue igual: tu perfil, tus contactos y tus estadísticas.',
-        default => 'Renueva y tu tarjeta vuelve a abrir tu perfil al instante, con todo lo que ya tenías.',
-    };
+    ['titulo' => $titulo, 'texto' => $texto] = \App\Mail\ServicioPorVencer::textos($etapa, $servicio);
 @endphp
 <!doctype html>
 <html lang="es">

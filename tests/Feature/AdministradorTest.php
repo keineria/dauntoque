@@ -87,8 +87,12 @@ class AdministradorTest extends TestCase
         $this->assertSame(1, $m['activos']);
         $this->assertSame(1, $m['inactivos']);
         $this->assertSame(1, $m['sinUso']);
-        $respuesta->assertSee($pausado->email)->assertDontSee($activo->email);
-        $this->assertSame([$pausado->email], $respuesta->viewData('sinUso')->pluck('correo')->all());
+        $correos = fn (string $lista) => collect($this->actingAs($admin)->get('/admin?lista='.$lista)->assertOk()->viewData('filas'))->pluck('correo')->all();
+        $this->assertSame([$pausado->email], $correos('sin_uso'));
+        $this->assertSame([$activo->email], $correos('activos'));
+        $this->assertSame([$pausado->email], $correos('inactivos'));
+        $this->assertSame([$admin->email], $correos('sin_activar'));
+        $this->actingAs($admin)->get('/admin/sin-uso')->assertOk()->assertSee($pausado->email)->assertDontSee($activo->email);
     }
 
     public function test_la_promocion_se_envia_una_sola_vez_por_correo(): void

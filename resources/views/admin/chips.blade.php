@@ -22,7 +22,8 @@
 
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;margin-bottom:18px">
         <section class="dt-panel">
-            <div class="dt-panel-h"><h2>Generar códigos nuevos</h2></div>
+            <div class="dt-panel-h"><h2>Generar códigos del sistema</h2></div>
+            <p class="dt-sub" style="margin:0 0 10px;font-size:12.5px">Códigos fáciles de escribir (k7mq-2xpa). Cada compra pagada ya crea el suyo sola.</p>
             <form method="POST" action="/admin/chips/generar" style="display:grid;gap:12px">
                 @csrf
                 <div><label class="dt-label" for="g-cantidad">Cantidad</label><input id="g-cantidad" name="cantidad" type="number" min="1" max="200" value="10" class="dt-input" required></div>
@@ -31,47 +32,67 @@
             </form>
         </section>
         <section class="dt-panel">
-            <div class="dt-panel-h"><h2>Registrar chips que ya tienes</h2></div>
+            <div class="dt-panel-h"><h2>Registrar códigos propios</h2></div>
+            <p class="dt-sub" style="margin:0 0 10px;font-size:12.5px">Para chips que grabaste tú con tu propio código. Escribe solo el código (lo que va después de /activar/).</p>
             <form method="POST" action="/admin/chips" style="display:grid;gap:12px">
                 @csrf
-                <div><label class="dt-label" for="r-codigos">Códigos o enlaces, uno por línea</label><textarea id="r-codigos" name="codigos" rows="4" class="dt-input" placeholder="https://portal.dauntoque.com/activar/abc123" required></textarea></div>
+                <div><label class="dt-label" for="r-codigos">Códigos, uno por línea</label><textarea id="r-codigos" name="codigos" rows="4" class="dt-input" placeholder="abc123&#10;tienda-001" required style="font-family:ui-monospace,Consolas,monospace"></textarea></div>
                 <div><label class="dt-label" for="r-nota">Nota (opcional)</label><input id="r-nota" name="nota" type="text" maxlength="120" class="dt-input"></div>
                 <button type="submit" class="dt-btn pri" style="justify-self:start">Registrar</button>
             </form>
         </section>
     </div>
 
-    <section class="dt-panel" x-data="{ qr: null }">
+    <section class="dt-panel" x-data="{ qr: null, copiado: null }">
         <div class="dt-panel-h">
-            <h2>Chips registrados</h2>
-            <form method="GET" action="/admin/chips"><input name="buscar" value="{{ $buscar }}" type="search" placeholder="Buscar código o nota" class="dt-input" style="height:36px"></form>
+            <h2>Códigos <span class="dt-chip">{{ $chips->total() }}</span></h2>
+            <a class="dt-btn" href="/admin/chips/exportar?{{ http_build_query(request()->only('buscar', 'origen', 'estado')) }}">Descargar en Excel (CSV)</a>
         </div>
-        <div style="overflow-x:auto">
-            <table style="width:100%;border-collapse:collapse;font-size:14px">
-                <thead><tr style="text-align:left" class="dt-sub"><th style="padding:8px">Código</th><th style="padding:8px">Nota o pedido</th><th style="padding:8px">Estado</th><th></th></tr></thead>
+        <form method="GET" action="/admin/chips" class="ad-filtros">
+            <select class="dt-input" name="estado" aria-label="Estado" style="width:auto;height:38px" onchange="this.form.submit()">
+                @foreach (\App\Http\Controllers\AdminChipsController::ESTADOS as $id => $nombre)<option value="{{ $id }}" @selected($estado === $id)>{{ $nombre }}</option>@endforeach
+            </select>
+            <select class="dt-input" name="origen" aria-label="Origen" style="width:auto;height:38px" onchange="this.form.submit()">
+                <option value="todos" @selected($origen === 'todos')>Sistema y propios</option>
+                @foreach (\App\Models\Chip::ORIGENES as $id => $nombre)<option value="{{ $id }}" @selected($origen === $id)>{{ $nombre }} ({{ $porOrigen[$id] ?? 0 }})</option>@endforeach
+            </select>
+            <input name="buscar" value="{{ $buscar }}" type="search" placeholder="Código, nota, pedido, cliente o correo" aria-label="Buscar" class="dt-input" style="flex:1;min-width:200px;height:38px">
+            <select class="dt-input" name="por" aria-label="Por página" style="width:auto;height:38px" onchange="this.form.submit()">
+                @foreach ([20, 50, 100] as $n)<option value="{{ $n }}" @selected($por === $n)>{{ $n }} por página</option>@endforeach
+            </select>
+            <button class="dt-btn" type="submit" style="height:38px">Buscar</button>
+        </form>
+        <div class="ad-scroll">
+            <table class="ad-t" style="min-width:760px">
+                <thead><tr><th>Código</th><th>Origen</th><th>Nota o pedido</th><th>Estado</th><th></th></tr></thead>
                 <tbody>
                 @forelse ($chips as $chip)
-                    @php $t = $tarjetas[$chip->codigo] ?? null; @endphp
-                    <tr style="border-top:1px solid rgba(127,127,127,.18)">
-                        <td style="padding:8px;font-family:ui-monospace,Consolas,monospace;word-break:break-all">{{ $chip->codigo }}</td>
-                        <td style="padding:8px">
-                            {{ $chip->nota }}
-                            @if ($chip->pedido)
-                                <span class="dt-sub" style="display:block;font-size:12px">{{ $chip->pedido->correo }} · {{ $chip->pedido->acabadoNombre() }}@if($chip->pedido->nombre_tarjeta) · {{ $chip->pedido->nombre_tarjeta }}@endif</span>
-                            @endif
+                    @php($t = $chip->tarjeta)
+                    <tr>
+                        <td><code style="font-size:14px">{{ $chip->codigo }}</code><small>Creado {{ $chip->created_at?->format('d/m/Y') }}</small></td>
+                        <td><span class="dt-chip" style="font-size:11px;white-space:nowrap">{{ \App\Models\Chip::ORIGENES[$chip->origen] ?? $chip->origen }}</span></td>
+                        <td>
+                            {{ $chip->nota ?: '—' }}
+                            @if ($chip->pedido)<small>{{ $chip->pedido->correo }} · {{ $chip->pedido->acabadoNombre() }}@if($chip->pedido->nombre_tarjeta) · {{ $chip->pedido->nombre_tarjeta }}@endif</small>@endif
                         </td>
-                        <td style="padding:8px">
+                        <td>
                             @if ($t)
                                 <span class="dt-chip up">Activado</span>
-                                <span class="dt-sub" style="display:block;font-size:12px">{{ $t->user?->email }} · {{ $t->activada_en?->format('d/m/Y') }}</span>
+                                <small>{{ $t->user?->name }} · {{ $t->user?->email }}</small>
+                                <small>{{ $t->activada_en?->format('d/m/Y H:i') }} · {{ $t->activacion_medio === 'codigo' ? 'escribió el código' : ($t->activacion_medio ? 'acercó la tarjeta' : 'sin dato del medio') }}</small>
+                                <small>{{ $t->activacion_lugar ?: 'Lugar sin dato' }} · {{ $t->activacion_dispositivo ?: 'dispositivo sin dato' }}</small>
                             @else
                                 <span class="dt-chip">Sin activar</span>
                             @endif
                         </td>
-                        <td style="padding:8px;text-align:right;white-space:nowrap">
+                        <td style="text-align:right;white-space:nowrap">
+                            <button type="button" class="dt-btn" @click="navigator.clipboard.writeText(@js($chip->url())); copiado = {{ $chip->id }}" x-text="copiado === {{ $chip->id }} ? 'Copiado' : 'Copiar enlace'">Copiar enlace</button>
                             <button type="button" class="dt-btn" @click="qr = {{ Js::from(['url' => $chip->url(), 'codigo' => $chip->codigo]) }}">QR</button>
+                            @if (! $t && $chip->pedido)
+                                <form method="POST" action="/admin/chips/{{ $chip->id }}/reenviar" style="display:inline">@csrf<button type="submit" class="dt-btn" title="Le vuelve a llegar el correo de su compra con este código">Reenviar al cliente</button></form>
+                            @endif
                             @unless ($t)
-                                <form method="POST" action="/admin/chips/{{ $chip->id }}" style="display:inline" onsubmit="return confirm('¿Borrar este chip del registro?')">
+                                <form method="POST" action="/admin/chips/{{ $chip->id }}" style="display:inline" onsubmit="return confirm('¿Borrar este código del registro?')">
                                     @csrf @method('DELETE')
                                     <button type="submit" class="dt-btn">Borrar</button>
                                 </form>
@@ -79,7 +100,7 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="4" style="padding:16px" class="dt-sub">Todavía no hay chips registrados.</td></tr>
+                    <tr><td colspan="5" class="dt-sub">{{ $buscar !== '' ? 'Ningún código coincide con «'.$buscar.'».' : 'No hay códigos con este filtro.' }}</td></tr>
                 @endforelse
                 </tbody>
             </table>

@@ -174,7 +174,7 @@ class ProfileController extends Controller
 
             // Chip escaneado antes de tener perfil: va al perfil activo, igual que en NfcController
             if (session()->has('nfc_pendiente')) {
-                Tarjeta::vincular(Profile::activoDe($usuario->id), session('nfc_pendiente'));
+                Tarjeta::vincular(Profile::activoDe($usuario->id), session('nfc_pendiente'), session()->pull('nfc_medio', 'tarjeta'));
                 session()->forget('nfc_pendiente');
             }
 

@@ -103,6 +103,16 @@
         .ad-fila small { display:block; color:var(--muted); font-size:12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
         .ad-fila > span { min-width:0; }
         @media (max-width: 640px) { .ad-fila { grid-template-columns:1fr; gap:4px; } .ad-fila > span[style] { text-align:left !important; } }
+        .ad-link.ad-on { border-color:rgba(59,130,246,.55); box-shadow:0 0 0 1px rgba(59,130,246,.35); }
+        .ad-filtros { display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:6px; }
+        .ad-scroll { overflow-x:auto; margin-top:10px; }
+        .ad-t { width:100%; border-collapse:collapse; font-size:13.5px; min-width:860px; }
+        .ad-t th { text-align:left; font-size:12px; font-weight:600; color:var(--muted); padding:8px 10px; white-space:nowrap; }
+        .ad-t td { padding:11px 10px; border-top:1px solid var(--border); vertical-align:top; }
+        .ad-t small { display:block; color:var(--muted); font-size:12px; margin-top:2px; }
+        .ad-t code { font-family:ui-monospace,Consolas,monospace; font-size:12.5px; }
+        .ad-t a { color:#60a5fa; text-decoration:none; }
+        .ad-t a.dt-btn { color:inherit; }
         /* Chat de ayuda */
         .sp-chat { display:flex; flex-direction:column; gap:12px; }
         .sp-aviso { display:flex; flex-direction:column; gap:2px; padding:12px 14px; border-radius:14px; background:rgba(59,130,246,.1); border:1px solid rgba(59,130,246,.25); font-size:13.5px; }

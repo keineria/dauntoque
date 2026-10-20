@@ -30,7 +30,7 @@ class NfcController extends Controller
         }
 
         // 3. Si la tarjeta es virgen (nueva), guardamos su código temporalmente
-        session(['nfc_pendiente' => $hash]);
+        session(['nfc_pendiente' => $hash, 'nfc_medio' => 'tarjeta']);
 
         // Si la persona que escanea no tiene cuenta, lo mandamos al registro
         if (!Auth::check()) {

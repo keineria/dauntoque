@@ -51,6 +51,30 @@ class Pedido extends Model
         return '$' . number_format((float) $this->monto, $this->moneda === 'COP' ? 0 : 2, ',', '.') . ' ' . $this->moneda;
     }
 
+    /** Campos para las plantillas de correo editables ({{nombre}}, {{pedido}}, …). */
+    public function valoresCorreo(): array
+    {
+        return [
+            'nombre' => Str::before($this->nombre, ' '),
+            'nombre_completo' => $this->nombre,
+            'correo' => $this->correo,
+            'celular' => $this->celular,
+            'documento' => $this->documento,
+            'pedido' => $this->codigo,
+            'fecha' => ($this->pagado_en ?? $this->created_at ?? now())->format('d/m/Y'),
+            'tarjeta' => $this->acabadoNombre(),
+            'nombre_tarjeta' => $this->nombre_tarjeta,
+            'total' => $this->totalTexto(),
+            'direccion' => $this->direccion,
+            'ciudad' => $this->ciudad,
+            'departamento' => $this->departamento,
+            'enlace_registro' => $this->enlaceRegistro(),
+            'codigo_activacion' => $this->chip?->codigo,
+            'enlace_grabar' => $this->chip?->url(),
+            'enlace_panel' => url('/dashboard'),
+        ];
+    }
+
     /** Enlace para crear la cuenta en el portal con el correo ya escrito. */
     public function enlaceRegistro(): string
     {
