@@ -38,7 +38,7 @@ class AvisarServicio extends Command
                 continue;
             }
             try {
-                Mail::to($correo)->send(new ServicioPorVencer($tarjeta, $etapa, Precios::renovacion(Profile::activoDe($tarjeta->user_id)?->pais)));
+                Mail::to($correo)->send(new ServicioPorVencer($tarjeta, $etapa, Precios::renovacion(Profile::activoDe($tarjeta->user_id)?->pais, $tarjeta->user)));
                 $tarjeta->forceFill(['aviso_etapa' => $etapa])->save();
                 $enviados++;
                 $this->line($linea);

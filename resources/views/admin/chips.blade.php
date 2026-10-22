@@ -78,7 +78,7 @@
                         <td>
                             @if ($t)
                                 <span class="dt-chip up">Activado</span>
-                                <small>{{ $t->user?->name }} · {{ $t->user?->email }}</small>
+                                <small>@if ($t->user)<a href="/admin/clientes/{{ $t->user->id }}" style="color:#60a5fa">{{ $t->user->name }}</a> · {{ $t->user->email }}@endif</small>
                                 <small>{{ $t->activada_en?->format('d/m/Y H:i') }} · {{ $t->activacion_medio === 'codigo' ? 'escribió el código' : ($t->activacion_medio ? 'acercó la tarjeta' : 'sin dato del medio') }}</small>
                                 <small>{{ $t->activacion_lugar ?: 'Lugar sin dato' }} · {{ $t->activacion_dispositivo ?: 'dispositivo sin dato' }}</small>
                             @else

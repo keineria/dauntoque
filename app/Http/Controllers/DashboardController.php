@@ -118,7 +118,7 @@ class DashboardController extends Controller
             'tarjetas' => $this->tarjetas(Auth::id()),
             'whatsappRenovar' => $this->whatsappVentas(Profile::activoDe(Auth::id())?->pais),
             'pagosEnLinea' => \App\Services\Bold::configurado(),
-            'precioRenovacion' => Precios::renovacion(Profile::activoDe(Auth::id())?->pais),
+            'precioRenovacion' => Precios::renovacion(Profile::activoDe(Auth::id())?->pais, Auth::user()),
         ]);
     }
 

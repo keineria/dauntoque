@@ -46,7 +46,7 @@
                     @foreach ($filas as $c)
                         @php($puede = ! $c['recordatorioEn'] || $c['recordatorioEn']->lt(now()->subDays($dias)))
                         <tr>
-                            <td><b>{{ $c['nombre'] }}</b><small>{{ $c['correo'] }}</small><small>{{ $c['celular'] ?: 'Sin celular' }} · desde {{ $c['registro']->format('d/m/Y') }}</small></td>
+                            <td><a class="ad-nombre" href="/admin/clientes/{{ $c['id'] }}?desde={{ urlencode('/admin/sin-uso') }}">{{ $c['nombre'] }}</a><small>{{ $c['correo'] }}</small><small>{{ $c['celular'] ?: 'Sin celular' }} · desde {{ $c['registro']->format('d/m/Y') }}</small></td>
                             <td>@foreach ($c['perfiles'] as $p)<a href="{{ $p['url'] }}" target="_blank" rel="noopener" style="display:block">/{{ $p['nickname'] }}</a>@endforeach</td>
                             <td>{{ $c['ultimoUso']?->format('d/m/Y') ?? 'Nunca' }}<small>{{ $c['vistas'] }} vistas en total</small></td>
                             <td>@if ($c['codigo'])<code>{{ $c['codigo'] }}</code><small>Activada {{ $c['activadaEn']?->format('d/m/Y') }}</small>@else<small>Sin activar</small>@endif</td>

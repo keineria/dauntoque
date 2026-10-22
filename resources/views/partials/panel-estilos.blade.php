@@ -113,6 +113,26 @@
         .ad-t code { font-family:ui-monospace,Consolas,monospace; font-size:12.5px; }
         .ad-t a { color:#60a5fa; text-decoration:none; }
         .ad-t a.dt-btn { color:inherit; }
+        .ad-t tbody tr.ad-clic { cursor:pointer; transition:background .15s; }
+        .ad-t tbody tr.ad-clic:hover { background:rgba(255,255,255,.03); }
+        .ad-t td a.ad-nombre { color:var(--text); font-weight:700; }
+        .ad-t td a.ad-nombre:hover { color:#60a5fa; }
+        .ad-volver { display:inline-block; margin-bottom:10px; color:var(--muted); font-size:13px; text-decoration:none; }
+        .ad-volver:hover { color:var(--text); }
+        .ad-avatar { width:52px; height:52px; flex:none; border-radius:50%; display:grid; place-items:center; font-size:22px; font-weight:800; color:#fff; background:linear-gradient(135deg,#3b82f6,#8b5cf6); box-shadow:0 0 18px rgba(59,130,246,.35); }
+        .ad-ficha { display:grid; grid-template-columns:minmax(0, 1.1fr) minmax(0, 1fr); gap:18px; align-items:start; }
+        .ad-ficha-col { display:flex; flex-direction:column; gap:18px; min-width:0; }
+        .ad-tarjeta { padding:14px; border:1px solid var(--border); border-radius:14px; display:grid; gap:12px; }
+        .ad-tarjeta + .ad-tarjeta { margin-top:12px; }
+        .ad-datos { display:grid; grid-template-columns:auto 1fr; gap:4px 14px; margin:0; font-size:13px; }
+        .ad-datos dt { color:var(--muted); }
+        .ad-datos dd { margin:0; overflow-wrap:anywhere; }
+        .ad-vence { display:flex; flex-wrap:wrap; gap:10px; align-items:flex-end; }
+        .ad-mini { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:10px; }
+        .ad-mini div { padding:12px; border:1px solid var(--border); border-radius:12px; display:flex; flex-direction:column; gap:2px; }
+        .ad-mini b { font-size:22px; }
+        .ad-mini span { color:var(--muted); font-size:12px; }
+        @media (max-width: 900px) { .ad-ficha { grid-template-columns:1fr; } }
         /* Chat de ayuda */
         .sp-chat { display:flex; flex-direction:column; gap:12px; }
         .sp-aviso { display:flex; flex-direction:column; gap:2px; padding:12px 14px; border-radius:14px; background:rgba(59,130,246,.1); border:1px solid rgba(59,130,246,.25); font-size:13.5px; }

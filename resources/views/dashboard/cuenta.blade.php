@@ -74,4 +74,9 @@
             <form method="POST" action="/dashboard/cuenta/dos-pasos">@csrf<button class="dt-btn pri" type="submit">Configurar verificación en dos pasos</button></form>
         @endif
     </section>
+
+    <a class="dt-panel ad-link" href="/dashboard/ayuda" style="display:flex;justify-content:space-between;align-items:center;gap:12px;text-decoration:none;color:inherit">
+        <span><b>Ayuda y preguntas frecuentes</b><br><span class="dt-sub">Respuestas paso a paso y, si las necesitas, un asesor.</span></span>
+        <span class="dt-btn">Abrir</span>
+    </a>
 @endsection

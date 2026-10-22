@@ -30,10 +30,12 @@
             <table class="ad-t">
                 <thead><tr><th>Cliente</th><th>Perfil</th><th>Tarjeta</th><th>Activación</th><th>Compra</th><th>Uso</th><th></th></tr></thead>
                 <tbody>
+                @php($desde = '/admin?'.http_build_query(array_filter(['lista' => $lista, 'buscar' => $buscar, 'por' => $por === 20 ? null : $por, 'page' => $clientes->currentPage() > 1 ? $clientes->currentPage() : null])))
                 @foreach ($filas as $c)
-                    <tr>
+                    @php($ficha = '/admin/clientes/'.$c['id'].'?desde='.urlencode($desde))
+                    <tr class="ad-clic" onclick="if (!event.target.closest('a,button,form')) location.href = @js($ficha)">
                         <td>
-                            <b>{{ $c['nombre'] }}</b>@if ($c['admin']) <span class="dt-chip" style="font-size:10px">Admin</span>@endif
+                            <a class="ad-nombre" href="{{ $ficha }}">{{ $c['nombre'] }}</a>@if ($c['admin']) <span class="dt-chip" style="font-size:10px">Admin</span>@endif
                             <small>{{ $c['correo'] }}</small>
                             <small>{{ $c['celular'] ?: 'Sin celular' }} · desde {{ $f($c['registro']) }}</small>
                         </td>
@@ -76,6 +78,7 @@
                             <small>Último: {{ $c['ultimoUso']?->diffForHumans() ?? 'nunca' }}</small>
                         </td>
                         <td style="text-align:right;white-space:nowrap">
+                            <a class="dt-btn pri" href="{{ $ficha }}">Ver y editar</a>
                             @if (! $c['codigo'] && $c['codigoCompra'])
                                 <form method="POST" action="/admin/clientes/{{ $c['id'] }}/reenviar-codigo" style="display:inline">@csrf<button class="dt-btn" type="submit" title="Le vuelve a llegar el correo de su compra con el código">Reenviar código</button></form>
                             @endif
