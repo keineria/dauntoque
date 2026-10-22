@@ -38,9 +38,6 @@
             <a href="/dashboard/configuracion" class="dt-nav {{ request()->is('dashboard/configuracion') ? 'on' : '' }}">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>Datos del perfil
             </a>
-            <a href="/dashboard/ayuda" class="dt-nav {{ request()->is('dashboard/ayuda*') ? 'on' : '' }}">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.4A8 8 0 1 1 21 12z"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5M12 16h.01"/></svg>Ayuda
-            </a>
             @if ($usuarioPanel?->esAdmin())
                 <a href="/admin" class="dt-nav {{ request()->is('admin') || request()->is('admin/*') ? 'on' : '' }}">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg>Administrador
@@ -87,12 +84,12 @@
                         <span x-text="nombreUsuario"></span>
                     </button>
                     <div x-show="menuCuenta" x-cloak @click.away="menuCuenta = false" class="dt-panel" style="position:absolute;right:0;top:44px;width:280px;z-index:60;box-shadow:0 12px 32px rgba(0,0,0,.12)">
-                        <p class="dt-label" style="margin:0">Cuenta</p>
+                        <p class="dt-label" style="margin:0">Configuración</p>
                         <p style="margin:4px 0 0;font-weight:600" x-text="nombreUsuario"></p>
                         <p class="dt-sub" style="margin:0" x-text="correoUsuario"></p>
                         <div class="dt-sep" style="margin:12px 0 8px"></div>
                         <a href="/dashboard/cuenta" class="dt-nav" style="padding:8px 10px">Mi cuenta y seguridad</a>
-                        <a href="/dashboard/ayuda" class="dt-nav" style="padding:8px 10px">Ayuda</a>
+                        <a href="/dashboard/ayuda" class="dt-nav" style="padding:8px 10px">Ayuda y preguntas frecuentes</a>
                         @if ($usuarioPanel?->esAdmin())<a href="/admin" class="dt-nav" style="padding:8px 10px">Administrador</a>@endif
                     </div>
                 </div>

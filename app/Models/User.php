@@ -33,6 +33,7 @@ class User extends Authenticatable
             'dos_pasos_respaldo' => 'encrypted:array',
             'dos_pasos_activo_en' => 'datetime',
             'recordatorio_uso_en' => 'datetime',
+            'precio_renovacion' => 'integer',
         ];
     }
 

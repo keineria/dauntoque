@@ -99,6 +99,11 @@ Route::middleware(['auth'])->group(function () {
     });
     Route::middleware('admin')->prefix('admin')->group(function () {
         Route::get('/', [App\Http\Controllers\AdminController::class, 'inicio']);
+        Route::controller(App\Http\Controllers\AdminClientesController::class)->prefix('clientes/{usuario}')->whereNumber('usuario')->group(function () {
+            Route::get('/', 'ver');
+            Route::put('/', 'guardar');
+            Route::put('/tarjetas/{tarjeta}', 'tarjeta')->whereNumber('tarjeta');
+        });
         Route::post('/clientes/{usuario}/reenviar-codigo', [App\Http\Controllers\AdminController::class, 'reenviarCodigo'])->whereNumber('usuario')->middleware('throttle:10,1');
         Route::controller(App\Http\Controllers\AdminSinUsoController::class)->prefix('sin-uso')->group(function () {
             Route::get('/', 'index');

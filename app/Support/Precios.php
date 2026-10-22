@@ -3,6 +3,7 @@
 namespace App\Support;
 
 use App\Models\Market;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
 /** Precio vigente de la tarjeta por país (tabla prices). Lo usan el sitio de ventas y el checkout. */
@@ -20,16 +21,36 @@ class Precios
             ->orderByDesc('id')->first();
     }
 
-    /** Precio de la renovación anual en la moneda del país: "$120.000 COP" o "$55 USD" (config/servicio.php). */
-    public static function renovacion(?string $pais): ?string
+    /**
+     * Monto de la renovación anual en la moneda del país (config/servicio.php),
+     * o el precio especial que el administrador le puso a ese cliente.
+     */
+    public static function montoRenovacion(?string $pais, ?User $usuario = null): ?int
+    {
+        $especial = $usuario?->precio_renovacion;
+
+        return $especial !== null ? (int) $especial : config('servicio.precio_renovacion.' . MediosPago::pais($pais));
+    }
+
+    public static function moneda(?string $pais): string
     {
         $pais = MediosPago::pais($pais);
-        $monto = config("servicio.precio_renovacion.$pais");
-        if ($monto === null) {
-            return null;
-        }
-        $moneda = Market::where('code', $pais)->value('currency') ?? ($pais === 'US' ? 'USD' : 'COP');
 
-        return '$' . number_format($monto, 0, ',', $pais === 'US' ? ',' : '.') . ' ' . $moneda;
+        return Market::where('code', $pais)->value('currency') ?? ($pais === 'US' ? 'USD' : 'COP');
+    }
+
+    /** Precio de la renovación anual con su moneda: "$120.000 COP" o "$55 USD". */
+    public static function renovacion(?string $pais, ?User $usuario = null): ?string
+    {
+        $monto = static::montoRenovacion($pais, $usuario);
+
+        return $monto === null ? null : static::texto($monto, $pais);
+    }
+
+    public static function texto(int $monto, ?string $pais): string
+    {
+        $pais = MediosPago::pais($pais);
+
+        return '$' . number_format($monto, 0, ',', $pais === 'US' ? ',' : '.') . ' ' . static::moneda($pais);
     }
 }

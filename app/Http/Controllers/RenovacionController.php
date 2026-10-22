@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Market;
 use App\Models\Pago;
 use App\Models\Profile;
 use App\Models\Tarjeta;
 use App\Services\Bold;
 use App\Support\MediosPago;
+use App\Support\Precios;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
@@ -24,8 +24,8 @@ class RenovacionController extends Controller
         }
 
         $pais = MediosPago::pais(Profile::activoDe(Auth::id())?->pais);
-        $monto = config("servicio.precio_renovacion.$pais");
-        $moneda = Market::where('code', $pais)->value('currency') ?? ($pais === 'US' ? 'USD' : 'COP');
+        $monto = Precios::montoRenovacion($pais, Auth::user());
+        $moneda = Precios::moneda($pais);
 
         try {
             $link = Bold::crearLink(
