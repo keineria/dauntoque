@@ -72,6 +72,8 @@
         </div>
     </template>
 
+    @include('partials.perfil._musica')
+
     @include('partials.perfil._calificame')
 
     <footer class="pe-pie">

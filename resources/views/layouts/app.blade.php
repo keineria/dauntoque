@@ -56,7 +56,7 @@
                 @endforeach
             @endif
 
-            @if($appsMenu->intersect(['agenda', 'calificame'])->isNotEmpty())
+            @if($appsMenu->intersect(['agenda', 'calificame', 'musica'])->isNotEmpty())
                 <div class="dt-sep"></div>
                 <div class="dt-small">Apps activas</div>
                 @if($appsMenu->contains('agenda'))
@@ -67,6 +67,11 @@
                 @if($appsMenu->contains('calificame'))
                     <a href="/dashboard/calificame" class="dt-nav {{ request()->is('dashboard/calificame*') ? 'on' : '' }}">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z"/></svg>Califícame
+                    </a>
+                @endif
+                @if($appsMenu->contains('musica'))
+                    <a href="/dashboard/musica" class="dt-nav {{ request()->is('dashboard/musica*') ? 'on' : '' }}">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>Música
                     </a>
                 @endif
             @endif
@@ -115,7 +120,7 @@
             <a href="/dashboard" class="{{ request()->is('dashboard') ? 'on' : '' }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Inicio</a>
             <a href="/dashboard/perfiles" class="{{ request()->is('dashboard/perfiles') ? 'on' : '' }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="11" r="2.5"/><path d="M14 9h4M14 13h4M6 17h12"/></svg>Perfiles</a>
             <a href="/dashboard/analiticas" class="{{ request()->is('dashboard/analiticas') ? 'on' : '' }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Analíticas</a>
-            <a href="/dashboard/apps" class="{{ request()->is('dashboard/apps') || request()->is('dashboard/agenda*') || request()->is('dashboard/calificame*') ? 'on' : '' }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M17.5 14v7M14 17.5h7"/></svg>Apps</a>
+            <a href="/dashboard/apps" class="{{ request()->is('dashboard/apps') || request()->is('dashboard/agenda*') || request()->is('dashboard/calificame*') || request()->is('dashboard/musica*') ? 'on' : '' }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M17.5 14v7M14 17.5h7"/></svg>Apps</a>
             <a href="/dashboard/configuracion" class="{{ request()->is('dashboard/configuracion') ? 'on' : '' }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>Datos</a>
         </nav>
     </div>

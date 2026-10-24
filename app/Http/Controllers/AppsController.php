@@ -14,7 +14,8 @@ class AppsController extends Controller
     {
         $userId = Auth::id();
         $activas = AppAdicional::where('user_id', $userId)->get()->keyBy('app');
-        $precio = Agenda::precioRenovacion(Profile::activoDe($userId)?->pais);
+        $pais = Profile::activoDe($userId)?->pais;
+        $precio = Agenda::precioRenovacion($pais);
 
         $apps = [
             [
@@ -36,6 +37,16 @@ class AppsController extends Controller
                 'abrir' => '/dashboard/calificame',
                 'activar' => '/dashboard/calificame/activar',
                 'app' => $activas->get('calificame'),
+            ],
+            [
+                'clave' => 'musica',
+                'icono' => '🎧',
+                'nombre' => 'Música',
+                'resumen' => 'Para DJs y artistas: tu canción destacada y tu lista de Spotify suenan en tu perfil con un toque en play.',
+                'precio' => 'Gratis el primer año, luego ' . Agenda::precioRenovacion($pais, 'musica') . ' al año.',
+                'abrir' => '/dashboard/musica',
+                'activar' => '/dashboard/musica/activar',
+                'app' => $activas->get('musica'),
             ],
             [
                 'clave' => 'asistente',

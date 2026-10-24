@@ -62,6 +62,8 @@ class PublicProfileController extends Controller
             'agenda_prioridad' => $boton['prioridad'],
             // Califícame: sello de estrellas, los comentarios que eligió el dueño y el botón para calificar
             'calificame' => \App\Services\Calificame\Calificame::publico($perfil->user_id, $linkMaestro),
+            // Música: canción destacada y lista de Spotify (reproductor oficial, el visitante toca play)
+            'musica' => \App\Services\Musica\Musica::publico($perfil->user_id),
             'preview' => false,
         ];
 
