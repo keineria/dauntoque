@@ -17,10 +17,10 @@
         </div>
         @php($enLista = fn ($l) => '/admin?lista='.$l.'#clientes')
         <a class="dt-stat ad-link {{ $lista === 'todos' ? 'ad-on' : '' }}" href="{{ $enLista('todos') }}"><span>Clientes</span><b>{{ $fmt($m['clientes']) }}</b><small>Ver la lista con buscador</small></a>
-        <a class="dt-stat ad-link {{ $lista === 'activos' ? 'ad-on' : '' }}" href="{{ $enLista('activos') }}"><span>Clientes activos</span><b style="color:#4ade80">{{ $fmt($m['activos']) }}</b><small>Servicio vigente o en gracia</small></a>
-        <a class="dt-stat ad-link {{ $lista === 'inactivos' ? 'ad-on' : '' }}" href="{{ $enLista('inactivos') }}"><span>Clientes inactivos</span><b style="color:#f87171">{{ $fmt($m['inactivos']) }}</b><small>Servicio en pausa (sin renovar)</small></a>
+        <a class="dt-stat ad-link {{ $lista === 'activos' ? 'ad-on' : '' }}" href="{{ $enLista('activos') }}"><span>Clientes activos</span><b style="color:var(--ok-t)">{{ $fmt($m['activos']) }}</b><small>Servicio vigente o en gracia</small></a>
+        <a class="dt-stat ad-link {{ $lista === 'inactivos' ? 'ad-on' : '' }}" href="{{ $enLista('inactivos') }}"><span>Clientes inactivos</span><b style="color:var(--bad-t)">{{ $fmt($m['inactivos']) }}</b><small>Servicio en pausa (sin renovar)</small></a>
         <a class="dt-stat ad-link {{ $lista === 'sin_activar' ? 'ad-on' : '' }}" href="{{ $enLista('sin_activar') }}"><span>Sin activar su tarjeta</span><b>{{ $fmt($m['sinTarjeta']) }}</b><small>Cuentas sin tarjeta enlazada</small></a>
-        <a class="dt-stat ad-link" href="/admin/sin-uso"><span>Sin usar tarjeta o enlace</span><b style="color:#fbbf24">{{ $fmt($m['sinUso']) }}</b><small>{{ $mesesSinUso }}+ meses sin visitas · enviar recordatorio</small></a>
+        <a class="dt-stat ad-link" href="/admin/sin-uso"><span>Sin usar tarjeta o enlace</span><b style="color:var(--warn-t)">{{ $fmt($m['sinUso']) }}</b><small>{{ $mesesSinUso }}+ meses sin visitas · enviar recordatorio</small></a>
         <a class="dt-stat ad-link" href="/admin/carritos#en-proceso"><span>En proceso de compra</span><b>{{ $fmt($m['enProceso']) }}</b><small>Pedidos de las últimas horas</small></a>
         <a class="dt-stat ad-link" href="/admin/carritos"><span>Carritos abandonados</span><b>{{ $fmt($m['abandonados']) }}</b><small>{{ $fmt($m['promosEnviadas']) }} promos enviadas · {{ $fmt($m['comprasConPromo']) }} compraron · enviar promoción</small></a>
         <a class="dt-stat ad-link" href="/admin/carritos#declinados"><span>Declinan el pago</span><b>{{ $fmt($m['declinados']) }}</b><small>Bold rechazó y no volvieron a pagar</small></a>

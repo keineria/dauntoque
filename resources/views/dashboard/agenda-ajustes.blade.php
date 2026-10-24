@@ -21,7 +21,7 @@
     </div>
 
     @if($errors->any())
-        <div class="dt-panel" style="border-color:rgba(239,68,68,.5);margin-bottom:18px;color:#f87171">{{ $errors->first() }}</div>
+        <div class="dt-panel" style="border-color:rgba(239,68,68,.5);margin-bottom:18px;color:var(--bad-t)">{{ $errors->first() }}</div>
     @endif
 
     {{-- Servicios --}}

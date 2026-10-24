@@ -31,7 +31,7 @@
             <div>
                 <h1 class="dt-h1">Agenda</h1>
                 <p class="dt-sub">
-                    @if($enlace)Tus clientes reservan en <a href="{{ $enlace }}" target="_blank" rel="noopener" style="color:#60a5fa">{{ preg_replace('#^https?://#', '', $enlace) }}</a>.@endif
+                    @if($enlace)Tus clientes reservan en <a href="{{ $enlace }}" target="_blank" rel="noopener" style="color:var(--link)">{{ preg_replace('#^https?://#', '', $enlace) }}</a>.@endif
                     {{ $proximas }} {{ $proximas === 1 ? 'cita confirmada' : 'citas confirmadas' }} por venir.
                 </p>
             </div>
@@ -133,11 +133,11 @@
             @foreach($dias as $dia)
                 @php $lista = $porDia[$dia->format('Y-m-d')] ?? collect(); @endphp
                 @if($vista === 'semana')
-                    <div style="margin:16px 0 6px;font-weight:800;font-size:13px;text-transform:capitalize;{{ $dia->isSameDay(now($zona)) ? 'color:#60a5fa' : '' }}">{{ $dia->locale('es')->translatedFormat('l j') }}</div>
+                    <div style="margin:16px 0 6px;font-weight:800;font-size:13px;text-transform:capitalize;{{ $dia->isSameDay(now($zona)) ? 'color:var(--link)' : '' }}">{{ $dia->locale('es')->translatedFormat('l j') }}</div>
                 @endif
                 @forelse($lista as $c)
                     @php $estado = $c->estadoVisible(); $wa = \App\Services\Agenda\Citas::enlaceWhatsapp($c, $ajustes); @endphp
-                    <div x-data="{ abierto: null }" style="border:1px solid var(--border);border-radius:16px;padding:12px 14px;margin-bottom:8px;background:rgba(0,0,0,.2)">
+                    <div x-data="{ abierto: null }" style="border:1px solid var(--border);border-radius:16px;padding:12px 14px;margin-bottom:8px;background:var(--sunken)">
                         <div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;align-items:center">
                             <div style="display:flex;gap:14px;align-items:center;min-width:0">
                                 <div style="font-weight:800;font-variant-numeric:tabular-nums;min-width:74px">{{ $h($c) }}<br><span class="dt-sub" style="margin:0;font-size:12px;font-weight:500">{{ $c->duracionMin() }} min</span></div>
@@ -145,12 +145,12 @@
                                     <b>{{ $c->cliente_nombre }}</b> <span class="dt-chip {{ $chip[$estado][1] }}">{{ $chip[$estado][0] }}</span><br>
                                     <span class="dt-sub" style="margin:0">{{ $c->servicio_nombre }} · {{ $c->cliente_correo }}@if($c->cliente_whatsapp) · {{ $c->cliente_whatsapp }}@endif</span>
                                     @if($c->nota)<br><span class="dt-sub" style="margin:0;font-style:italic">“{{ $c->nota }}”</span>@endif
-                                    @if($c->estado === 'cambio')<br><span class="dt-sub" style="margin:0;color:#fbbf24">{{ $c->propuesta_por === 'duenio' ? 'Propusiste' : 'Pide' }} pasarla al {{ $c->fechaLocal($zona, $c->propuesta_inicia_en) }} {{ $h($c, $c->propuesta_inicia_en) }}</span>@endif
+                                    @if($c->estado === 'cambio')<br><span class="dt-sub" style="margin:0;color:var(--warn-t)">{{ $c->propuesta_por === 'duenio' ? 'Propusiste' : 'Pide' }} pasarla al {{ $c->fechaLocal($zona, $c->propuesta_inicia_en) }} {{ $h($c, $c->propuesta_inicia_en) }}</span>@endif
                                 </div>
                             </div>
                             @if($c->activa() && !$c->realizada())
                                 <div style="display:flex;gap:6px;flex-wrap:wrap">
-                                    @if($wa)<a class="dt-btn" href="{{ $wa }}" target="_blank" rel="noopener" style="color:#4ade80">WhatsApp</a>@endif
+                                    @if($wa)<a class="dt-btn" href="{{ $wa }}" target="_blank" rel="noopener" style="color:var(--ok-t)">WhatsApp</a>@endif
                                     @if($c->estado === 'confirmada')<button class="dt-btn" type="button" @click="abierto = abierto === 'mover' ? null : 'mover'">Mover</button>@endif
                                     <button class="dt-btn danger" type="button" @click="abierto = abierto === 'cancelar' ? null : 'cancelar'">Cancelar</button>
                                 </div>
@@ -185,7 +185,7 @@
             <form method="POST" action="/dashboard/agenda/citas" class="dt-panel" style="width:100%;max-width:520px;max-height:90vh;overflow:auto;background:var(--card-solid)">
                 @csrf
                 <div class="dt-panel-h"><h2>Nueva cita</h2><button type="button" class="dt-ico" @click="abierta = false" aria-label="Cerrar">✕</button></div>
-                @if($errors->any())<p style="color:#f87171;margin:0 0 12px">{{ $errors->first() }}</p>@endif
+                @if($errors->any())<p style="color:var(--bad-t);margin:0 0 12px">{{ $errors->first() }}</p>@endif
                 <div style="display:grid;gap:12px">
                     <div><span class="dt-label">Servicio</span>
                         <select class="dt-input" name="servicio_id" required>
