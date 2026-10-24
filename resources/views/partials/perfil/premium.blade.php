@@ -108,9 +108,9 @@
             <h2 class="pr-h centro" x-text="t('portafolio')">Portafolio</h2>
             <div class="pr-linea"></div>
             <div class="pr-gal">
-                <template x-for="(img, i) in (p.galeria || [])" :key="i">
-                    <button type="button" @click="if (!p.preview) fotoGrande = img" :aria-label="t('verImagen') + ' ' + (i + 1)">
-                        <img :src="img" alt="" loading="lazy">
+                <template x-for="(img, i) in dtGal(p.galeria)" :key="i">
+                    <button type="button" class="pp-gal-item" @click="if (!p.preview) fotoGrande = img" :aria-label="img.titulo || (t('verImagen') + ' ' + (i + 1))">
+                        <img :src="img.url" :alt="img.titulo || ''" loading="lazy"><span class="pp-gal-tit" x-show="img.titulo" x-text="img.titulo"></span>
                         <span class="lupa"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></span>
                     </button>
                 </template>

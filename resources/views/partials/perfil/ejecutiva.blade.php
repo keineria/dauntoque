@@ -87,8 +87,8 @@
     <section class="px-bloque" x-show="p.galeria && p.galeria.length">
         <h2 class="px-h"><span x-text="t('portafolio')">Portafolio</span></h2>
         <div class="px-gal">
-            <template x-for="(img, i) in (p.galeria || [])" :key="i">
-                <button type="button" @click="if (!p.preview) fotoGrande = img" :aria-label="t('verImagen') + ' ' + (i + 1)"><img :src="img" alt="" loading="lazy"></button>
+            <template x-for="(img, i) in dtGal(p.galeria)" :key="i">
+                <button type="button" class="pp-gal-item" @click="if (!p.preview) fotoGrande = img" :aria-label="img.titulo || (t('verImagen') + ' ' + (i + 1))"><img :src="img.url" :alt="img.titulo || ''" loading="lazy"><span class="pp-gal-tit" x-show="img.titulo" x-text="img.titulo"></span></button>
             </template>
         </div>
     </section>

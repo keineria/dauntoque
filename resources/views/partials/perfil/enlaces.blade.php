@@ -65,8 +65,8 @@
         <div style="width:100%">
             <p class="pe-sep"><span x-text="t('portafolio')">Portafolio</span></p>
             <div class="pe-gal" style="margin-top:10px">
-                <template x-for="(img, i) in p.galeria" :key="i">
-                    <button type="button" style="border-radius:14px" @click="if (!p.preview) fotoGrande = img" :aria-label="t('verImagen') + ' ' + (i + 1)"><img :src="img" alt="" loading="lazy"></button>
+                <template x-for="(img, i) in dtGal(p.galeria)" :key="i">
+                    <button type="button" class="pp-gal-item" style="border-radius:14px" @click="if (!p.preview) fotoGrande = img" :aria-label="img.titulo || (t('verImagen') + ' ' + (i + 1))"><img :src="img.url" :alt="img.titulo || ''" loading="lazy"><span class="pp-gal-tit" x-show="img.titulo" x-text="img.titulo"></span></button>
                 </template>
             </div>
         </div>

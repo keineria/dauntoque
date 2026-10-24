@@ -39,9 +39,20 @@
         .ed-opt.on { border-color:var(--primary); background:var(--primary-soft); color:var(--primary); }
         .ed-drop { border:1.5px dashed var(--border); border-radius:10px; background:var(--surface); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; padding:18px; color:var(--muted); font-size:13px; cursor:pointer; position:relative; text-align:center; }
         .ed-drop:hover { border-color:var(--primary); color:var(--text); }
-        .ed-red { border:1px solid var(--border); border-radius:8px; background:var(--card); padding:8px 4px; display:flex; flex-direction:column; align-items:center; gap:4px; font-size:10px; font-weight:600; color:var(--muted); cursor:pointer; text-transform:uppercase; letter-spacing:.04em; }
+        /* Redes: cuadrícula de botones del mismo tamaño (3 columnas) */
+        .ed-redes { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:8px; margin-bottom:12px; }
+        .ed-redes.lleno { opacity:.5; pointer-events:none; }
+        .ed-red { width:100%; min-height:64px; justify-content:center; border:1px solid var(--border); border-radius:8px; background:var(--card); padding:8px 4px; display:flex; flex-direction:column; align-items:center; gap:4px; font-size:10px; font-weight:600; color:var(--muted); cursor:pointer; text-transform:uppercase; letter-spacing:.04em; }
         .ed-red:hover { border-color:var(--primary); color:var(--text); }
         .ed-red svg, .ed-ico-red svg { width:18px; height:18px; }
+        /* Portafolio: miniaturas de tamaño fijo, cada una con el nombre del producto o servicio */
+        .ed-gal { display:grid; grid-template-columns:repeat(auto-fill, minmax(140px, 1fr)); gap:12px; }
+        .ed-gal-item { display:flex; flex-direction:column; gap:6px; min-width:0; }
+        .ed-gal-foto { position:relative; aspect-ratio:1; border-radius:8px; overflow:hidden; border:1px solid var(--border); background:var(--surface); }
+        .ed-gal-foto img { display:block; width:100%; height:100%; object-fit:cover; }
+        .ed-gal-foto .dt-ico { position:absolute; top:6px; right:6px; width:26px; height:26px; border-radius:50%; }
+        .ed-gal-item input { width:100%; height:34px; padding:0 10px; border:1px solid var(--border); border-radius:7px; background:var(--card); color:var(--text); font:inherit; font-size:12.5px; }
+        .ed-gal-item input:focus { outline:none; border-color:var(--primary); }
         .ed-paises { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:20px; }
         .ed-pais { display:flex; align-items:center; gap:10px; padding:12px; border:1px solid var(--border); border-radius:10px; background:var(--card); color:var(--muted); font-size:13.5px; font-weight:600; cursor:pointer; text-align:left; }
         .ed-pais b { width:30px; height:30px; flex:none; border-radius:8px; display:grid; place-items:center; background:var(--surface); font-size:11px; letter-spacing:.04em; color:var(--text); }
@@ -204,11 +215,15 @@
                                 <span>Cargar imágenes</span>
                                 <small><span x-text="4 - galeriaPreviews.length"></span> disponibles</small>
                             </div>
-                            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px" x-show="galeriaPreviews.length > 0">
+                            <p class="dt-sub" style="font-size:12px;margin:0 0 10px" x-show="galeriaPreviews.length > 0">Escribe debajo de cada foto el nombre del producto o servicio; se verá en tu tarjeta.</p>
+                            <div class="ed-gal" x-show="galeriaPreviews.length > 0">
                                 <template x-for="(img, index) in galeriaPreviews" :key="index">
-                                    <div style="position:relative">
-                                        <img :src="img" alt="" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;border:1px solid var(--border)">
-                                        <button @click="eliminarImagenGaleria(index)" class="dt-ico" style="position:absolute;top:-8px;right:-8px;width:24px;height:24px;border-radius:50%" aria-label="Quitar imagen">&times;</button>
+                                    <div class="ed-gal-item">
+                                        <div class="ed-gal-foto">
+                                            <img :src="img.url" alt="">
+                                            <button @click="eliminarImagenGaleria(index)" class="dt-ico" aria-label="Quitar imagen">&times;</button>
+                                        </div>
+                                        <input type="text" x-model="img.titulo" maxlength="60" placeholder="Producto o servicio" :aria-label="'Producto o servicio de la foto ' + (index + 1)">
                                     </div>
                                 </template>
                             </div>
@@ -222,7 +237,7 @@
                                 <div class="dt-inline"><span>Dirección</span><input type="text" x-model="direccion" placeholder="Opcional" aria-label="Dirección"></div>
                             </div>
                             <div style="display:flex;justify-content:space-between;align-items:center"><span class="dt-label">Redes sociales</span><span class="dt-chip" x-text="`${redesSeleccionadas.length}/4`"></span></div>
-                            <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-bottom:12px" :style="redesSeleccionadas.length >= 4 ? 'opacity:.5;pointer-events:none' : ''">
+                            <div class="ed-redes" :class="redesSeleccionadas.length >= 4 ? 'lleno' : ''">
                                 <template x-for="red in opcionesRedes" :key="red.id">
                                     <button @click="agregarRed(red)" x-show="!redesSeleccionadas.find(r => r.id === red.id)" class="ed-red">
                                         <span x-html="red.svg"></span><span x-text="red.id === 'x' ? 'X' : red.nombre"></span>
@@ -550,8 +565,7 @@
                         let r = @json($perfil->redes_sociales);
                         this.redesSeleccionadas = typeof r === 'string' ? JSON.parse(r||'[]') : (r||[]);
 
-                        let g = @json($perfil->galeria);
-                        this.galeriaPreviews = typeof g === 'string' ? JSON.parse(g||'[]') : (g||[]);
+                        this.galeriaPreviews = @json(\App\Support\Galeria::normalizar($perfil->galeria));
 
                         let c = @json($perfil->design_config);
                         let pConf = typeof c === 'string' ? JSON.parse(c||'null') : c;
@@ -685,7 +699,7 @@
                     for (const archivo of archivos.slice(0, 4 - this.galeriaPreviews.length)) {
                         try {
                             const img = await dtReducirImagen(archivo);
-                            if (this.galeriaPreviews.length < 4) this.galeriaPreviews.push(img);
+                            if (this.galeriaPreviews.length < 4) this.galeriaPreviews.push({ url: img, titulo: '' });
                         } catch (e) {
                             this.toastError = 'No pudimos leer una de las imágenes. Prueba con otra foto (JPG o PNG).';
                         }

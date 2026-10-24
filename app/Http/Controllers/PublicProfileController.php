@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Profile;
+use App\Support\Galeria;
 use App\Support\ImageStore;
 use App\Support\MediosPago;
 use App\Support\RedesSociales;
@@ -29,7 +30,6 @@ class PublicProfileController extends Controller
     {
         [$perfil, $linkMaestro] = $this->resolver($nickname);
 
-        $galeria = is_string($perfil->galeria) ? json_decode($perfil->galeria, true) : ($perfil->galeria ?? []);
         $diseno = is_array($perfil->design_config) ? $perfil->design_config : (json_decode($perfil->design_config ?? '', true) ?: []);
         $color = $diseno['color_primario'] ?? '#3b82f6';
 
@@ -54,7 +54,7 @@ class PublicProfileController extends Controller
             'pagos' => MediosPago::publicos($perfil->payment_methods),
             // El SVG de cada red sale del catálogo del servidor, nunca de lo guardado (anti-XSS)
             'redes' => RedesSociales::sanear($perfil->redes_sociales),
-            'galeria' => array_values(array_filter((array) $galeria, fn ($img) => ImageStore::esPropia($img))),
+            'galeria' => Galeria::publica($perfil->galeria),
             'enlace' => Profile::urlPublica($linkMaestro),
             'vcf' => url('/' . $linkMaestro . '/vcf'),
             // Botón "Agendar cita" solo cuando la agenda recibe reservas en línea y el dueño no lo ocultó en este perfil

@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Profile;
+use App\Support\Galeria;
 use Illuminate\Console\Command;
 
 /**
@@ -17,7 +18,7 @@ class LimpiarUploads extends Command
 
     public function handle(): int
     {
-        $enUso = Profile::all()->flatMap(fn ($p) => array_merge([$p->foto_perfil], (array) $p->galeria))
+        $enUso = Profile::all()->flatMap(fn ($p) => array_merge([$p->foto_perfil], Galeria::rutas($p->galeria)))
             ->filter()->map(fn ($ruta) => basename($ruta))->flip();
 
         $huerfanas = collect(glob(public_path('uploads/*')))

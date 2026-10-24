@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Market;
 use App\Models\Profile;
 use App\Models\Tarjeta;
+use App\Support\Galeria;
 use App\Support\ImageStore;
 use App\Support\MediosPago;
 use App\Support\Precios;
@@ -41,7 +42,7 @@ class DashboardController extends Controller
             'titulo_galeria' => $perfil->titulo_galeria ?? 'Servicios',
             'foto_portada' => $perfil->foto_portada ?? null,
             'foto_perfil' => $perfil->foto_perfil ?? null,
-            'galeria' => is_string($perfil->galeria ?? '') ? json_decode($perfil->galeria, true) : ($perfil->galeria ?? []),
+            'galeria' => Galeria::normalizar($perfil->galeria),
             // Con "plataforma" para que el selector de Configuración muestre la red correcta
             'redes_sociales' => RedesSociales::conPlataforma($perfil->redes_sociales ?? [])
         ];

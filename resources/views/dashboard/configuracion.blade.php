@@ -1,6 +1,16 @@
 @extends('layouts.app')
 
 @section('contenido')
+    <style>
+        /* Galería: miniaturas de tamaño fijo, cada una con el nombre del producto o servicio */
+        .cf-gal { display:grid; grid-template-columns:repeat(auto-fill, minmax(120px, 1fr)); gap:10px; margin-bottom:10px; }
+        .cf-gal-item { display:flex; flex-direction:column; gap:6px; min-width:0; }
+        .cf-gal-foto { position:relative; aspect-ratio:1; border-radius:8px; overflow:hidden; border:1px solid var(--border); background:var(--surface); }
+        .cf-gal-foto img { display:block; width:100%; height:100%; object-fit:cover; }
+        .cf-gal-foto .dt-ico { position:absolute; top:6px; right:6px; width:26px; height:26px; }
+        .cf-gal-item input { width:100%; height:34px; padding:0 10px; border:1px solid var(--border); border-radius:7px; background:var(--card); color:var(--text); font:inherit; font-size:12.5px; }
+        .cf-gal-item input:focus { outline:none; border-color:var(--primary); }
+    </style>
     <script>
         window.perfilCargado = {!! $datosJsonSeguros !!};
     </script>
@@ -41,11 +51,15 @@
 
                 <section class="dt-panel" style="margin:0">
                     <div class="dt-panel-h"><h2>Galería</h2><span class="dt-chip" x-text="`${galeria.length} / 6`"></span></div>
-                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px" x-show="galeria.length > 0">
+                    <p class="dt-sub" style="font-size:12px;margin:0 0 10px" x-show="galeria.length > 0">Escribe debajo de cada foto el nombre del producto o servicio; se verá en tu tarjeta.</p>
+                    <div class="cf-gal" x-show="galeria.length > 0">
                         <template x-for="(img, index) in galeria" :key="index">
-                            <div style="position:relative;aspect-ratio:1;border-radius:8px;overflow:hidden;border:1px solid var(--border)">
-                                <img :src="img" alt="" style="width:100%;height:100%;object-fit:cover">
-                                <button @click="eliminarFoto(index)" class="dt-ico" style="position:absolute;top:6px;right:6px;width:26px;height:26px" aria-label="Quitar foto">&times;</button>
+                            <div class="cf-gal-item">
+                                <div class="cf-gal-foto">
+                                    <img :src="img.url" alt="">
+                                    <button @click="eliminarFoto(index)" class="dt-ico" aria-label="Quitar foto">&times;</button>
+                                </div>
+                                <input type="text" x-model="img.titulo" maxlength="60" placeholder="Producto o servicio" :aria-label="'Producto o servicio de la foto ' + (index + 1)">
                             </div>
                         </template>
                     </div>
@@ -211,7 +225,7 @@
                     for (const archivo of files.slice(0, 6 - this.galeria.length)) {
                         try {
                             const img = await dtReducirImagen(archivo);
-                            if (this.galeria.length < 6) this.galeria.push(img);
+                            if (this.galeria.length < 6) this.galeria.push({ url: img, titulo: '' });
                         } catch (error) { this.avisar('No pudimos leer una de las imágenes. Prueba con otra foto.', true); }
                     }
                 },
