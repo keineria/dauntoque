@@ -1,7 +1,7 @@
 {{--
     Cuerpo del perfil público. Una sola plantilla para la página pública y para la vista previa del editor.
     Necesita en Alpine un objeto `p` con: nombre, profesion, bio, foto, tipo, alineacion, estructura, tema, color, forma,
-    telefono, correo, direccion, pagos [{type, value}], redes [{id, nombre, svg, usuario}], galeria [], enlace, vcf, preview.
+    telefono, correo, direccion, pagos [{type, value}], redes [{id, nombre, svg, usuario}], galeria [{url, titulo}], enlace, vcf, preview.
     Cada diseño vive en partials/perfil/*.blade.php; aquí van los colores por estilo, el idioma (t()), el ajuste de textos
     y las ventanas compartidas.
 --}}
@@ -88,6 +88,13 @@
     .pp-barra.oculta { opacity:0; transform:translateY(20px); }
     .pp-modal { position:fixed; inset:0; z-index:60; background:rgba(0,0,0,.72); display:flex; align-items:flex-end; justify-content:center; }
     .pp-modal.centro { align-items:center; padding:16px; }
+    /* Nombre del producto o servicio sobre cada foto de la galería (todos los diseños) */
+    .pp-gal-item { position:relative; }
+    .pp-gal-tit { position:absolute; left:0; right:0; bottom:0; padding:22px 10px 0; border-bottom:8px solid transparent; background:linear-gradient(transparent, rgba(0,0,0,.72)) border-box; color:#fff; font-size:12px; font-weight:600; line-height:1.25; text-align:left; pointer-events:none;
+                  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+    .pp-gal-item:has(.lupa) .pp-gal-tit { padding-right:42px; }
+    .pp-foto-grande { margin:0; display:flex; flex-direction:column; align-items:center; gap:10px; max-width:100%; }
+    .pp-foto-grande figcaption { color:#fff; font-size:15px; font-weight:600; text-align:center; }
     .pp-hoja { width:100%; max-width:440px; background:var(--card); color:var(--text); border-radius:22px 22px 0 0; padding:20px 18px calc(20px + env(safe-area-inset-bottom, 0px)); border:1px solid var(--line); }
     .pp-copia { margin:12px 0; padding:14px; border-radius:14px; background:var(--chip); border:1px dashed var(--line); text-align:center; font-weight:700; font-size:16px; word-break:break-all; }
     .pp-preview { min-height:100%; }
@@ -158,6 +165,8 @@
         const f = window.DT_FUENTES[id];
         return f ? `; --titulo:${f.titulo}; --titulo-bq:${f.titulo}; --texto:${f.texto}; font-synthesis-weight:none` : '';
     }
+    // Galería: [{url, titulo}]; también acepta la forma vieja (solo la ruta de cada foto)
+    function dtGal(lista) { return (lista || []).map(g => typeof g === 'string' ? { url: g, titulo: '' } : g).filter(g => g && g.url); }
     function dtSoloDigitos(t) { return String(t || '').replace(/[^0-9]/g, ''); }
     // Medios de pago (config/pagos.php). Cada medio del perfil llega como { type, value }
     window.DT_PAGOS = @json(config('pagos.medios'));
@@ -243,6 +252,9 @@
 
     {{-- Galería a pantalla completa --}}
     <div class="pp-modal centro" x-show="fotoGrande" x-transition.opacity x-cloak @click="fotoGrande = null">
-        <img :src="fotoGrande" alt="" style="max-width:100%;max-height:90vh;border-radius:14px">
+        <figure class="pp-foto-grande">
+            <img :src="fotoGrande && fotoGrande.url" :alt="fotoGrande && fotoGrande.titulo || ''" style="max-width:100%;max-height:82vh;border-radius:14px">
+            <figcaption x-show="fotoGrande && fotoGrande.titulo" x-text="fotoGrande && fotoGrande.titulo"></figcaption>
+        </figure>
     </div>
 </div>

@@ -6,6 +6,7 @@ use App\Models\Market;
 use App\Models\Profile;
 use App\Models\Tarjeta;
 use App\Services\GeminiBio;
+use App\Support\Galeria;
 use App\Support\ImageStore;
 use App\Support\MediosPago;
 use App\Support\RedesSociales;
@@ -152,23 +153,9 @@ class ProfileController extends Controller
             // Foto: dataURL validado como imagen, o una ruta que apunte a una imagen propia
             $perfil->foto_perfil = ImageStore::resolver($request->foto_perfil, 'avatar', $perfil->foto_perfil);
 
+            // Galería: [{url, titulo}]; las imágenes nuevas llegan como dataURL
             if ($request->has('galeria')) {
-                $galeriaActual = is_array($perfil->galeria) ? $perfil->galeria : [];
-                $galeriaUrls = [];
-                $galeriaData = json_decode($request->galeria, true);
-                if (is_array($galeriaData)) {
-                    foreach ($galeriaData as $img) {
-                        if (!is_string($img)) {
-                            continue;
-                        }
-                        if (str_starts_with($img, 'data:image')) {
-                            $galeriaUrls[] = ImageStore::guardarDataUrl($img, 'galeria');
-                        } elseif (in_array($img, $galeriaActual, true) || ImageStore::esPropia($img)) {
-                            $galeriaUrls[] = $img;
-                        }
-                    }
-                }
-                $perfil->galeria = $galeriaUrls;
+                $perfil->galeria = Galeria::guardar($request->galeria, (array) $perfil->galeria);
             }
             $perfil->save();
 
