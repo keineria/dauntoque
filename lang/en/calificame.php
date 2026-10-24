@@ -1,0 +1,32 @@
+<?php
+
+// Client-facing texts of the rating app. Spanish in lang/es/calificame.php.
+return [
+    'titulo' => 'How was your experience with :nombre?',
+    'subtitulo' => 'It takes 10 seconds and helps them improve.',
+    'estrellas' => 'Tap the stars',
+    'estrella' => ':n out of 5 stars',
+    'niveles' => [1 => 'Very bad', 2 => 'Bad', 3 => 'Okay', 4 => 'Good', 5 => 'Excellent!'],
+    'comentario' => 'Tell us more (optional)',
+    'comentario_bueno' => 'What did you like the most?',
+    'comentario_malo' => 'What could be better? Only :nombre will read it.',
+    'nombre' => 'Your name (optional)',
+    'contacto' => 'Your WhatsApp or email (optional)',
+    'contacto_ayuda' => 'In case :nombre wants to reply. It is never published.',
+    'privado' => 'Ratings of 3 stars or less go privately to :nombre.',
+    'enviar' => 'Send rating',
+    'falta_estrellas' => 'Choose from 1 to 5 stars.',
+    'gracias' => 'Thanks for your rating!',
+    'gracias_bueno' => 'We are glad it went well with :nombre.',
+    'gracias_malo' => ':nombre already received your comment privately.',
+    'google' => 'Would you leave a Google review?',
+    'google_boton' => 'Review on Google',
+    'volver' => 'Back to the profile',
+    'ya_calificaste' => 'You already rated a moment ago. Thank you!',
+    'cerrada' => 'This rating page is not active right now.',
+    'cita' => 'Your appointment: :servicio',
+    'asunto_pedir' => 'How was your experience with :nombre?',
+    'texto_pedir' => 'Thanks for your appointment with :nombre. How did it go? It only takes 10 seconds.',
+    'boton_pedir' => 'Rate my experience',
+    'pie' => 'You got this email because of your appointment booked with DaUnToque.',
+];

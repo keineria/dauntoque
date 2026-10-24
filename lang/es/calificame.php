@@ -1,0 +1,32 @@
+<?php
+
+// Textos que ve el cliente en Califícame (página para calificar y correo). Inglés en lang/en/calificame.php.
+return [
+    'titulo' => '¿Cómo te atendió :nombre?',
+    'subtitulo' => 'Tu opinión toma 10 segundos y le ayuda a mejorar.',
+    'estrellas' => 'Toca las estrellas',
+    'estrella' => ':n de 5 estrellas',
+    'niveles' => [1 => 'Muy mala', 2 => 'Mala', 3 => 'Regular', 4 => 'Buena', 5 => '¡Excelente!'],
+    'comentario' => 'Cuéntanos más (opcional)',
+    'comentario_bueno' => '¿Qué fue lo que más te gustó?',
+    'comentario_malo' => '¿Qué podemos mejorar? Solo lo leerá :nombre.',
+    'nombre' => 'Tu nombre (opcional)',
+    'contacto' => 'Tu WhatsApp o correo (opcional)',
+    'contacto_ayuda' => 'Por si :nombre quiere responderte. No se publica.',
+    'privado' => 'Las calificaciones de 3 estrellas o menos le llegan en privado a :nombre.',
+    'enviar' => 'Enviar calificación',
+    'falta_estrellas' => 'Elige de 1 a 5 estrellas.',
+    'gracias' => '¡Gracias por tu calificación!',
+    'gracias_bueno' => 'Nos alegra que te haya ido bien con :nombre.',
+    'gracias_malo' => ':nombre ya recibió tu comentario en privado.',
+    'google' => '¿Nos ayudas con una reseña en Google?',
+    'google_boton' => 'Dejar reseña en Google',
+    'volver' => 'Volver al perfil',
+    'ya_calificaste' => 'Ya calificaste hace poco. ¡Gracias!',
+    'cerrada' => 'Esta página de calificaciones no está activa por ahora.',
+    'cita' => 'Tu cita: :servicio',
+    'asunto_pedir' => '¿Cómo te atendió :nombre?',
+    'texto_pedir' => 'Gracias por tu cita con :nombre. ¿Nos cuentas cómo te fue? Solo toma 10 segundos.',
+    'boton_pedir' => 'Calificar mi atención',
+    'pie' => 'Recibiste este correo por tu cita reservada con DaUnToque.',
+];

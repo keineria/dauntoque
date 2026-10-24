@@ -60,6 +60,8 @@ class PublicProfileController extends Controller
             // Botón "Agendar cita" solo cuando la agenda recibe reservas en línea y el dueño no lo ocultó en este perfil
             'agenda' => \App\Services\Agenda\Agenda::modoPublico($perfil->user_id) === 'activa' && $boton['visible'] ? Profile::urlPublica($linkMaestro) . '/agenda' : null,
             'agenda_prioridad' => $boton['prioridad'],
+            // Califícame: sello de estrellas, los comentarios que eligió el dueño y el botón para calificar
+            'calificame' => \App\Services\Calificame\Calificame::publico($perfil->user_id, $linkMaestro),
             'preview' => false,
         ];
 

@@ -101,6 +101,8 @@
         </section>
     </div>
 
+    @include('partials.perfil._calificame')
+
     <footer class="bq-pie">
         <a href="https://dauntoque.com" target="_blank" rel="noopener" @click="if (p.preview) $event.preventDefault()"><span x-text="t('tarjetaPor')"></span> <b>dauntoque</b></a>
         <a class="crea" href="https://dauntoque.com" target="_blank" rel="noopener" @click="if (p.preview) $event.preventDefault()" x-text="t('quieresUna')"></a>

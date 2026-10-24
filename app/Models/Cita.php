@@ -25,7 +25,7 @@ class Cita extends Model
 
     protected $casts = [
         'inicia_en' => 'datetime', 'termina_en' => 'datetime', 'propuesta_inicia_en' => 'datetime',
-        'recordado_24h_en' => 'datetime', 'recordado_2h_en' => 'datetime',
+        'recordado_24h_en' => 'datetime', 'recordado_2h_en' => 'datetime', 'calificacion_pedida_en' => 'datetime',
     ];
 
     protected static function booted(): void
