@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Market;
 use App\Models\Pedido;
 use App\Models\Profile;
 use App\Models\SoporteConversacion;
@@ -9,6 +10,7 @@ use App\Models\Tarjeta;
 use App\Models\User;
 use App\Services\ClientesAdmin;
 use App\Services\MetricasAdmin;
+use App\Support\MediosPago;
 use App\Support\Precios;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -23,7 +25,7 @@ class AdminClientesController extends Controller
     {
         $pagina = User::whereKey($usuario->id)->paginate(1);
         $fila = ClientesAdmin::filas($pagina)[0];
-        $pais = Profile::activoDe($usuario->id)?->pais;
+        $pais = $usuario->paisFacturacion();
 
         return view('admin.cliente', [
             'u' => $usuario,
@@ -36,6 +38,8 @@ class AdminClientesController extends Controller
             'precioGeneral' => Precios::renovacion($pais),
             'precioActual' => Precios::renovacion($pais, $usuario),
             'moneda' => Precios::moneda($pais),
+            'paisFacturacion' => $pais,
+            'mercados' => Market::opciones(),
             'sinUso' => ClientesAdmin::sinUso()->whereKey($usuario->id)->exists(),
             'meses' => MetricasAdmin::MESES_SIN_USO,
             'chipPendiente' => ClientesAdmin::chipSinActivar($usuario),
@@ -50,9 +54,10 @@ class AdminClientesController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($usuario->id)],
             'precio_renovacion' => ['nullable', 'integer', 'min:0', 'max:100000000'],
+            'pais_facturacion' => ['sometimes', Rule::in(MediosPago::paises())],
         ], [
             'email.unique' => 'Ese correo ya es de otra cuenta.',
-        ], ['name' => 'nombre', 'email' => 'correo', 'precio_renovacion' => 'precio de renovación']);
+        ], ['name' => 'nombre', 'email' => 'correo', 'precio_renovacion' => 'precio de renovación', 'pais_facturacion' => 'país de facturación']);
 
         $datos['email'] = strtolower(trim($datos['email']));
         $cambioCorreo = $datos['email'] !== $usuario->email;

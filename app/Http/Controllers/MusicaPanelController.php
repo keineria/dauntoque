@@ -21,7 +21,7 @@ class MusicaPanelController extends Controller
         $userId = Auth::id();
         $app = Musica::app($userId);
         if (!$app) {
-            return view('dashboard.musica', ['app' => null, 'precio' => Agenda::precioRenovacion(Profile::activoDe($userId)?->pais, 'musica')]);
+            return view('dashboard.musica', ['app' => null, 'precio' => Agenda::precioRenovacion(Auth::user()->paisFacturacion(), 'musica')]);
         }
         $maestro = Profile::maestroDe($userId)?->nickname;
 

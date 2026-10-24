@@ -53,11 +53,6 @@
         .ed-gal-foto .dt-ico { position:absolute; top:6px; right:6px; width:26px; height:26px; border-radius:50%; }
         .ed-gal-item input { width:100%; height:34px; padding:0 10px; border:1px solid var(--border); border-radius:7px; background:var(--card); color:var(--text); font:inherit; font-size:12.5px; }
         .ed-gal-item input:focus { outline:none; border-color:var(--primary); }
-        .ed-paises { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:20px; }
-        .ed-pais { display:flex; align-items:center; gap:10px; padding:12px; border:1px solid var(--border); border-radius:10px; background:var(--card); color:var(--muted); font-size:13.5px; font-weight:600; cursor:pointer; text-align:left; }
-        .ed-pais b { width:30px; height:30px; flex:none; border-radius:8px; display:grid; place-items:center; background:var(--surface); font-size:11px; letter-spacing:.04em; color:var(--text); }
-        .ed-pais.on { border-color:var(--primary); background:var(--primary-soft); color:var(--text); box-shadow:0 0 0 3px var(--primary-soft); }
-        .ed-pais.on b { background:var(--primary); color:var(--on-pri); }
         .ed-preview { width:50%; display:flex; align-items:center; justify-content:center; background:var(--surface); border-left:1px solid var(--border); position:relative; }
         .ed-preview-label { position:absolute; top:18px; left:24px; font-size:12px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; }
 
@@ -258,14 +253,12 @@
 
                         {{-- PASO 7: billeteras --}}
                         <div x-show="paso === 7" x-cloak>
-                            <span class="dt-label">¿Dónde cobras?</span>
-                            <div class="ed-paises" role="radiogroup" aria-label="País de tus cobros">
-                                <template x-for="(nombrePais, codigo) in mercados" :key="codigo">
-                                    <button type="button" class="ed-pais" :class="pais === codigo ? 'on' : ''" role="radio" :aria-checked="pais === codigo" @click="pais = codigo">
-                                        <b x-text="codigo"></b><span x-text="nombrePais"></span>
-                                    </button>
-                                </template>
-                            </div>
+                            {{-- Sin elegir país: los medios salen de la ubicación (o del país que ya tiene el perfil); se cambian en Datos del perfil --}}
+                            <p class="dt-sub" style="margin:0 0 16px;font-size:12.5px">
+                                Medios de pago de <b style="color:var(--text)" x-text="mercados[pais] || pais"></b>.
+                                <span x-show="modoActual === 'crear'">Los elegimos según tu ubicación.</span>
+                                Si cobras en otro país, cámbialo luego en <b style="color:var(--text)">Datos del perfil → Métodos de pago por país</b>.
+                            </p>
                             <span class="dt-label">Medios de pago (opcional)</span>
                             <div style="display:flex;flex-direction:column;gap:10px">
                                 <template x-for="tipo in mediosPais" :key="tipo">
@@ -578,8 +571,8 @@
                         this.tarjetaVinculada = true;
                     @endif
 
-                    // Perfil nuevo: el país sale de la zona horaria (o del idioma) del navegador
-                    if (!this.porPais[this.pais]) this.pais = dtPaisDetectado(Object.keys(this.porPais));
+                    // Perfil nuevo: el país de sus otros perfiles o de su conexión; si no, la zona horaria (o el idioma) del navegador
+                    if (!this.porPais[this.pais]) this.pais = @json($paisSugerido ?? null) || dtPaisDetectado(Object.keys(this.porPais));
 
                     // Solo se edita un perfil que llegó cargado; sin él siempre se crea (empezando por el usuario, paso 1)
                     if (this.modoActual === 'editar') {

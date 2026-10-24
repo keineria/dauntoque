@@ -37,6 +37,15 @@ class User extends Authenticatable
         ];
     }
 
+    /**
+     * País de facturación (CO o US): decide la moneda y el precio de las renovaciones. Se fija con la ubicación
+     * al crear el primer perfil y solo lo cambia el administrador; el país de pagos de cada perfil no lo mueve.
+     */
+    public function paisFacturacion(): string
+    {
+        return \App\Support\MediosPago::pais($this->pais_facturacion ?? Profile::activoDe($this->id)?->pais);
+    }
+
     public function perfiles()
     {
         return $this->hasMany(Profile::class);

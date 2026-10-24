@@ -2,6 +2,8 @@
 
 namespace App\Support;
 
+use App\Models\Profile;
+use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
 /**
@@ -20,6 +22,26 @@ class MediosPago
         $pais = strtoupper((string) $pais);
 
         return in_array($pais, self::paises(), true) ? $pais : config('pagos.pais_defecto');
+    }
+
+    /** País de la conexión (encabezado CF-IPCountry que pone Cloudflare) si es uno de los países de pago; si no, null. */
+    public static function porConexion(Request $request): ?string
+    {
+        $pais = strtoupper((string) $request->header('CF-IPCountry'));
+
+        return in_array($pais, self::paises(), true) ? $pais : null;
+    }
+
+    /**
+     * País de pagos de un perfil nuevo: el de sus otros perfiles y, si es el primero, el de su conexión.
+     * null si ninguno sirve: entonces el editor lo adivina por la zona horaria del navegador.
+     * El usuario lo cambia luego en Datos del perfil → Métodos de pago por país.
+     */
+    public static function sugerido(Request $request, ?int $userId): ?string
+    {
+        $deSusPerfiles = $userId ? Profile::where('user_id', $userId)->whereNotNull('pais')->orderBy('id')->value('pais') : null;
+
+        return in_array($deSusPerfiles, self::paises(), true) ? $deSusPerfiles : self::porConexion($request);
     }
 
     /** Tipos que se piden en un país, en el orden en que se muestran. */

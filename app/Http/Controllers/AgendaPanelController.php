@@ -40,7 +40,7 @@ class AgendaPanelController extends Controller
         if (!$app) {
             return view('dashboard.agenda', [
                 'app' => null,
-                'precio' => Agenda::precioRenovacion($perfil?->pais),
+                'precio' => Agenda::precioRenovacion(Auth::user()->paisFacturacion()),
             ]);
         }
 
@@ -73,8 +73,8 @@ class AgendaPanelController extends Controller
             'servicios' => AgendaServicio::where('user_id', $userId)->where('activo', true)->orderBy('orden')->orderBy('id')->get(),
             'tieneHorario' => AgendaHorario::where('user_id', $userId)->exists(),
             'enlace' => $maestro ? Profile::urlPublica($maestro) . '/agenda' : null,
-            'precio' => Agenda::precioRenovacion($perfil?->pais),
-            'whatsappVentas' => Market::where('code', MediosPago::pais($perfil?->pais))->value('whatsapp'),
+            'precio' => Agenda::precioRenovacion(Auth::user()->paisFacturacion()),
+            'whatsappVentas' => Market::where('code', Auth::user()->paisFacturacion())->value('whatsapp'),
             'proximas' => Cita::where('user_id', $userId)->where('estado', 'confirmada')->where('inicia_en', '>', now())->count(),
             'lista' => Agenda::modoPublico($userId) === 'activa',
             'perfiles' => Profile::where('user_id', $userId)->orderBy('id')->get()->map(fn (Profile $p) => [

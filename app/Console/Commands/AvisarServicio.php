@@ -3,7 +3,6 @@
 namespace App\Console\Commands;
 
 use App\Mail\ServicioPorVencer;
-use App\Models\Profile;
 use App\Models\Tarjeta;
 use App\Support\Precios;
 use Illuminate\Console\Command;
@@ -38,7 +37,7 @@ class AvisarServicio extends Command
                 continue;
             }
             try {
-                Mail::to($correo)->send(new ServicioPorVencer($tarjeta, $etapa, Precios::renovacion(Profile::activoDe($tarjeta->user_id)?->pais, $tarjeta->user)));
+                Mail::to($correo)->send(new ServicioPorVencer($tarjeta, $etapa, Precios::renovacion($tarjeta->user?->paisFacturacion(), $tarjeta->user)));
                 $tarjeta->forceFill(['aviso_etapa' => $etapa])->save();
                 $enviados++;
                 $this->line($linea);
