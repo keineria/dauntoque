@@ -83,7 +83,7 @@
         </div>
         <form method="POST" action="/dashboard/ayuda" style="display:grid;gap:12px">
             @csrf
-            @if ($errors->any())<p style="color:#f87171;margin:0">{{ $errors->first() }}</p>@endif
+            @if ($errors->any())<p style="color:var(--bad-t);margin:0">{{ $errors->first() }}</p>@endif
             <div class="dt-seg" role="group" aria-label="Tipo de ayuda" style="justify-self:start">
                 <button type="button" :class="tipo === 'chat' ? 'on' : ''" @click="tipo = 'chat'">Chat con un asesor</button>
                 <button type="button" :class="tipo === 'ticket' ? 'on' : ''" @click="tipo = 'ticket'">Dejar un mensaje</button>
@@ -117,7 +117,7 @@
         .ay-temas { display:flex; flex-wrap:wrap; gap:8px }
         .ay-temas button { display:inline-flex; align-items:center; gap:6px; border:1px solid var(--border); background:transparent; color:inherit; border-radius:999px; padding:7px 12px; font:inherit; font-size:13px; font-weight:600; cursor:pointer }
         .ay-temas button svg { width:15px; height:15px }
-        .ay-temas button.on { background:var(--primary); border-color:var(--primary); color:#fff }
+        .ay-temas button.on { background:var(--pri-bg); border-color:var(--pri-bg); color:var(--on-pri) }
         .ay-titulo { display:flex; align-items:center; gap:10px }
         .ay-icono { width:32px; height:32px; border-radius:10px; display:grid; place-items:center; background:var(--primary-soft); color:var(--primary) }
         .ay-icono svg { width:18px; height:18px }
@@ -129,6 +129,6 @@
         .ay-r p { margin:0 0 10px } .ay-r ol, .ay-r ul { margin:0 0 10px; padding-left:22px } .ay-r ol { list-style:decimal } .ay-r ul { list-style:disc } .ay-r li { margin:4px 0 }
         .ay-img { margin:12px 0 0; max-width:420px; border-radius:14px; overflow:hidden; border:1px solid var(--border) }
         .ay-img svg { display:block; width:100%; height:auto }
-        .ay-asesor { border:1px solid rgba(59,130,246,.35); margin-top:18px }
+        .ay-asesor { border:1px solid var(--primary-line); margin-top:18px }
     </style>
 @endsection

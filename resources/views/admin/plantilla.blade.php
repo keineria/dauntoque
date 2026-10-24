@@ -4,13 +4,13 @@
     <div class="dt-head">
         <div>
             <h1 class="dt-h1">{{ $def['nombre'] }}</h1>
-            <p class="dt-sub">{{ $def['cuando'] }} @unless($activa)<b style="color:#fbbf24">Esta plantilla está apagada.</b>@endunless</p>
+            <p class="dt-sub">{{ $def['cuando'] }} @unless($activa)<b style="color:var(--warn-t)">Esta plantilla está apagada.</b>@endunless</p>
         </div>
         <a href="/admin/correos" class="dt-btn">Volver a Correos</a>
     </div>
     @include('admin._tabs')
 
-    @if ($errors->any())<p class="dt-panel" style="color:#f87171;margin:0 0 18px">{{ $errors->first() }}</p>@endif
+    @if ($errors->any())<p class="dt-panel" style="color:var(--bad-t);margin:0 0 18px">{{ $errors->first() }}</p>@endif
 
     <form method="POST" action="/admin/correos/plantilla/{{ $id }}" class="pl-editor"
           x-data="plantillaEditor(@js(['asunto' => $asunto, 'html' => $html, 'ejemplo' => $ejemplo]))">
@@ -65,9 +65,9 @@
         .pl-editor { display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:18px; align-items:stretch; }
         .pl-col { display:flex; flex-direction:column; gap:14px; margin:0; }
         .pl-campos { display:flex; flex-wrap:wrap; gap:6px; max-height:150px; overflow-y:auto; }
-        .pl-campo { display:flex; flex-direction:column; align-items:flex-start; gap:1px; padding:6px 10px; border:1px solid var(--border); border-radius:10px; background:rgba(0,0,0,.25); color:var(--text); cursor:pointer; text-align:left; }
-        .pl-campo:hover { border-color:#3b82f6; }
-        .pl-campo code { font-family:ui-monospace,Consolas,monospace; font-size:12px; color:#60a5fa; }
+        .pl-campo { display:flex; flex-direction:column; align-items:flex-start; gap:1px; padding:6px 10px; border:1px solid var(--border); border-radius:10px; background:var(--sunken); color:var(--text); cursor:pointer; text-align:left; }
+        .pl-campo:hover { border-color:var(--primary); }
+        .pl-campo code { font-family:ui-monospace,Consolas,monospace; font-size:12px; color:var(--link); }
         .pl-campo span { font-size:11px; color:var(--muted); }
         .pl-codigo { flex:1; min-height:420px; font-family:ui-monospace,Consolas,monospace; font-size:12.5px; line-height:1.5; white-space:pre; tab-size:2; }
         .pl-asunto { padding:10px 12px; border:1px solid var(--border); border-radius:12px; font-size:14px; }

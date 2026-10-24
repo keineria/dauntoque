@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" {!! \App\Support\TemaPanel::atributos(Auth::user()) !!}>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -29,7 +29,7 @@
         .ed-step.on { background:var(--surface); color:var(--text); font-weight:600; }
         .ed-step.on i { border-color:var(--primary); color:var(--primary); }
         .ed-step.done { color:var(--text); cursor:pointer; }
-        .ed-step.done i { background:var(--primary); border-color:var(--primary); color:#fff; }
+        .ed-step.done i { background:var(--primary); border-color:var(--primary); color:var(--on-pri); }
         .ed-step.done:hover { background:var(--surface); }
         .ed-main { flex:1; min-width:0; padding:28px 28px 120px; max-width:600px; }
         .ed-bar { height:5px; border-radius:9px; background:var(--surface); overflow:hidden; margin:14px 0 22px; }
@@ -57,7 +57,7 @@
         .ed-pais { display:flex; align-items:center; gap:10px; padding:12px; border:1px solid var(--border); border-radius:10px; background:var(--card); color:var(--muted); font-size:13.5px; font-weight:600; cursor:pointer; text-align:left; }
         .ed-pais b { width:30px; height:30px; flex:none; border-radius:8px; display:grid; place-items:center; background:var(--surface); font-size:11px; letter-spacing:.04em; color:var(--text); }
         .ed-pais.on { border-color:var(--primary); background:var(--primary-soft); color:var(--text); box-shadow:0 0 0 3px var(--primary-soft); }
-        .ed-pais.on b { background:var(--primary); color:#fff; }
+        .ed-pais.on b { background:var(--primary); color:var(--on-pri); }
         .ed-preview { width:50%; display:flex; align-items:center; justify-content:center; background:var(--surface); border-left:1px solid var(--border); position:relative; }
         .ed-preview-label { position:absolute; top:18px; left:24px; font-size:12px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; }
 
@@ -88,7 +88,7 @@
             .ed-preview .ed-telefono { position:absolute; top:0; left:0; transform:scale(.3); transform-origin:top left; cursor:zoom-in; box-shadow:0 20px 40px rgba(0,0,0,.35); }
             .ed-preview .ed-pantalla { pointer-events:none; }
             .ed-tocar { display:block; position:absolute; left:50%; bottom:-4px; transform:translate(-50%, 100%); white-space:nowrap; font-size:10.5px; font-weight:600; color:var(--text); background:var(--card); border:1px solid var(--border); border-radius:999px; padding:2px 8px; }
-            .ed-preview.abierta { position:fixed; inset:0; width:auto; height:auto; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; background:var(--surface); padding:16px; }
+            .ed-preview.abierta { position:fixed; inset:0; width:auto; height:auto; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; background:var(--bg); padding:16px; }
             .ed-preview.abierta .ed-telefono { position:relative; transform:scale(.9); transform-origin:center; cursor:default; }
             .ed-preview.abierta .ed-pantalla { pointer-events:auto; }
             .ed-preview.abierta .ed-cerrar { display:inline-flex; position:absolute; top:12px; left:50%; transform:translateX(-50%); z-index:5; }

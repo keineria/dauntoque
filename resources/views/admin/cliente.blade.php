@@ -21,7 +21,7 @@
                     @else
                         <span class="dt-chip">Tarjeta sin activar</span>
                     @endif
-                    @if ($sinUso)<span class="dt-chip" style="color:#fbbf24">{{ $meses }}+ meses sin visitas</span>@endif
+                    @if ($sinUso)<span class="dt-chip" style="color:var(--warn-t)">{{ $meses }}+ meses sin visitas</span>@endif
                     @if ($u->precio_renovacion !== null)<span class="dt-chip">Precio especial</span>@endif
                     @if ($c['admin'])<span class="dt-chip">Administrador</span>@endif
                 </div>
@@ -40,7 +40,7 @@
     </div>
     @include('admin._tabs')
 
-    @if ($errors->any())<p class="dt-panel" role="alert" style="color:#f87171;margin:0 0 18px">{{ $errors->first() }}</p>@endif
+    @if ($errors->any())<p class="dt-panel" role="alert" style="color:var(--bad-t);margin:0 0 18px">{{ $errors->first() }}</p>@endif
 
     <div class="ad-ficha">
         <div class="ad-ficha-col">
@@ -113,7 +113,7 @@
                 @forelse ($perfiles as $p)
                     <div class="ad-fila">
                         <span><b>{{ $p->nombre }}</b><small>{{ $p->nombre_perfil ?: 'Perfil' }}</small></span>
-                        <span><a href="{{ \App\Models\Profile::urlPublica($p->nickname) }}" target="_blank" rel="noopener" style="color:#60a5fa">/{{ $p->nickname }}</a></span>
+                        <span><a href="{{ \App\Models\Profile::urlPublica($p->nickname) }}" target="_blank" rel="noopener" style="color:var(--link)">/{{ $p->nickname }}</a></span>
                         <span style="text-align:right">@if ($p->nfc_uid)<span class="dt-chip up">Con tarjeta</span>@endif</span>
                     </div>
                 @empty
