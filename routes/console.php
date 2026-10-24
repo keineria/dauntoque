@@ -16,3 +16,6 @@ Schedule::command('citas:recordar')->everyFiveMinutes()->withoutOverlapping();
 
 // Califícame: pide la calificación por correo después de cada cita realizada. Usa el mismo cron de Laravel.
 Schedule::command('calificame:pedir')->everyFifteenMinutes()->withoutOverlapping();
+
+// Califícame: calificación y reseñas de Google de los negocios conectados, una vez al día.
+Schedule::command('calificame:google')->dailyAt('05:00')->timezone('America/Bogota')->withoutOverlapping();

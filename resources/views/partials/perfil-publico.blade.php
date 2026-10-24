@@ -122,6 +122,8 @@
     .pp-cf-com { margin:0; padding:14px 16px; border-radius:16px; background:var(--card); border:1px solid var(--line); color:var(--text); }
     .pp-cf-com blockquote { margin:4px 0 0; font-size:14.5px; line-height:1.5; }
     .pp-cf-com figcaption { margin-top:6px; font-size:12.5px; color:var(--muted); }
+    .pp-cf-google { display:grid; gap:10px; }
+    a.pp-cf-sello { text-decoration:none; }
     .pp-cf-btn { display:flex; align-items:center; justify-content:center; gap:8px; height:46px; border-radius:14px; border:1px solid var(--line); background:var(--chip); color:var(--text); font-weight:700; font-size:14px; text-decoration:none; }
     .pp-cf-btn:focus-visible { outline:none; box-shadow:0 0 0 3px color-mix(in srgb, var(--acc) 45%, transparent); }
     @keyframes pp-gira { to { transform:rotate(360deg); } }
@@ -135,13 +137,15 @@
               trabajos: 'Mis trabajos', pagos: 'Pagos', contacto: 'Contacto', telefono: 'Teléfono', ubicacion: 'Ubicación', verPerfil: 'Ver perfil', pagarCon: 'Pagar con',
               abreBanco: 'Abre tu banco y envía el pago a:', cerrar: 'Cerrar', copiar: 'Copiar', copiado: 'Copiado ✓', tarjetaPor: 'Tarjeta digital por', quieresUna: '¿Quieres una así? Crea la tuya',
               creaLaTuya: 'Crea la tuya', bienvenida: 'Bienvenido al perfil de', tuNombre: 'Tu nombre', tuProfesion: 'Tu profesión', tuBio: 'Tu biografía aparecerá aquí.', verImagen: 'Ver imagen', otroIdioma: 'EN', agendar: 'Agendar cita',
-              calificar: 'Califica mi atención', calificacion: 'calificación', calificaciones: 'calificaciones', opiniones: 'Lo que dicen mis clientes' },
+              calificar: 'Califica mi atención', calificacion: 'calificación', calificaciones: 'calificaciones', opiniones: 'Lo que dicen mis clientes',
+              resenasGoogle: 'reseñas en Google', escribirGoogle: 'Escribir una reseña en Google' },
         en: { guardar: 'Save contact', whatsapp: 'WhatsApp', escribeme: 'Message me on WhatsApp', reservar: 'Book on WhatsApp', llamar: 'Call', correo: 'Email', enviarCorreo: 'Send an email',
               compartir: 'Share', compartirTarjeta: 'Share my card', copiadoEnlace: 'Link copied', sobreMi: 'About me', perfil: 'About', redes: 'Social media', portafolio: 'Portfolio',
               trabajos: 'My work', pagos: 'Payments', contacto: 'Contact', telefono: 'Phone', ubicacion: 'Location', verPerfil: 'View profile', pagarCon: 'Pay with',
               abreBanco: 'Open your bank app and send the payment to:', cerrar: 'Close', copiar: 'Copy', copiado: 'Copied ✓', tarjetaPor: 'Digital card by', quieresUna: 'Want one like this? Create yours',
               creaLaTuya: 'Create yours', bienvenida: 'Welcome to the profile of', tuNombre: 'Your name', tuProfesion: 'Your profession', tuBio: 'Your bio will appear here.', verImagen: 'View image', otroIdioma: 'ES', agendar: 'Book an appointment',
-              calificar: 'Rate my service', calificacion: 'rating', calificaciones: 'ratings', opiniones: 'What my clients say' },
+              calificar: 'Rate my service', calificacion: 'rating', calificaciones: 'ratings', opiniones: 'What my clients say',
+              resenasGoogle: 'Google reviews', escribirGoogle: 'Write a Google review' },
     };
     // Idioma: el que eligió el visitante, si no el del celular (español si empieza por "es", si no inglés)
     function dtIdiomaInicial(preview) {

@@ -51,6 +51,13 @@ return [
         'timeout' => 10,
     ],
 
+    // Reseñas de Google en Califícame (API de Places, nueva). Llave de Google Cloud con "Places API (New)" activada
+    'google_places' => [
+        'key' => env('GOOGLE_PLACES_KEY'),
+        'url' => env('GOOGLE_PLACES_URL', 'https://places.googleapis.com/v1'),
+        'timeout' => 10,
+    ],
+
     'bold' => [
         'api_key' => env('BOLD_API_KEY'),
         // Llave secreta: firma los webhooks. En modo de pruebas Bold firma con una llave vacía.

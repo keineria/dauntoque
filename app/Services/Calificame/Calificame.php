@@ -67,7 +67,7 @@ class Calificame
     /**
      * Lo que muestra el perfil público, o null si la app no está activa.
      * El sello sale solo si el dueño lo dejó encendido y ya hay el mínimo de calificaciones;
-     * los comentarios son solo los que el dueño eligió.
+     * los comentarios son solo los que el dueño eligió. Si conectó su negocio de Google, también su calificación allá.
      */
     public static function publico(int $userId, string $maestro): ?array
     {
@@ -83,7 +83,9 @@ class Calificame
             ->latest()->limit(config('calificame.maximo_comentarios'))->get(['nombre', 'estrellas', 'comentario'])
             ->map(fn (Calificacion $c) => ['nombre' => $c->nombre, 'estrellas' => $c->estrellas, 'texto' => $c->comentario])->all();
 
-        if (!$sello && !$comentarios && !$ajustes->mostrar_boton) {
+        $google = GoogleNegocio::publico($ajustes);
+
+        if (!$sello && !$comentarios && !$ajustes->mostrar_boton && !$google) {
             return null;
         }
 
@@ -93,6 +95,8 @@ class Calificame
             'total' => $resumen['total'],
             'comentarios' => $comentarios,
             'enlace' => $ajustes->mostrar_boton ? Profile::urlPublica($maestro) . '/califica' : null,
+            // Calificación y reseñas del negocio en Google: van aparte, tal como las entrega Google
+            'google' => $google,
         ];
     }
 
