@@ -35,7 +35,7 @@
                         <label class="dt-label" for="activar-codigo" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Código de activación</label>
                         <input id="activar-codigo" name="codigo" type="text" value="{{ old('codigo') }}" maxlength="200" required autocomplete="off" autocapitalize="none" spellcheck="false"
                                placeholder="Ej.: k7mq-2xpa" class="dt-input" style="font-family:ui-monospace,Consolas,monospace" @error('codigo') aria-invalid="true" aria-describedby="activar-error" @enderror>
-                        @error('codigo')<p id="activar-error" style="margin:6px 0 0;color:#f87171;font-size:13px">{{ $message }}</p>@enderror
+                        @error('codigo')<p id="activar-error" style="margin:6px 0 0;color:var(--danger-text);font-size:13px">{{ $message }}</p>@enderror
                     </div>
                     <button type="submit" class="dt-btn pri">Activar</button>
                 </form>
@@ -63,12 +63,12 @@
         <section class="dt-panel" style="margin-bottom:18px">
             <div class="dt-panel-h">
                 <h2>Servicio de tu tarjeta</h2>
-                <span class="dt-chip {{ $estilo['chip'] }}" @if($t['estado'] === 'pronto') style="background:rgba(245,158,11,.14);color:#fbbf24" @endif>{{ $estilo['texto'] }}</span>
+                <span class="dt-chip {{ $estilo['chip'] }}" @if($t['estado'] === 'pronto') style="background:rgba(245,158,11,.14);color:var(--warn-text)" @endif>{{ $estilo['texto'] }}</span>
             </div>
             <div class="dt-servicio">
                 <div style="position:relative;width:132px;height:132px;flex:none">
                     <svg width="132" height="132" viewBox="0 0 132 132" style="transform:rotate(-90deg)" aria-hidden="true">
-                        <circle cx="66" cy="66" r="52" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="11"/>
+                        <circle cx="66" cy="66" r="52" fill="none" style="stroke:var(--hover-2)" stroke-width="11"/>
                         <circle cx="66" cy="66" r="52" fill="none" stroke="{{ $estilo['color'] }}" stroke-width="11" stroke-linecap="round"
                                 stroke-dasharray="{{ round($circ, 1) }}" stroke-dashoffset="{{ round($circ * (1 - $t['porcentaje'] / 100), 1) }}"/>
                     </svg>
@@ -108,7 +108,7 @@
 
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:18px">
         <div class="dt-stat">
-            <div class="ic" style="background:rgba(59,130,246,.18);color:#60a5fa"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></div>
+            <div class="ic" style="background:rgba(59,130,246,.18);color:var(--link)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></div>
             <b>{{ $fmt($stats['vistas']) }}</b><span>Vistas de perfil</span>
         </div>
         <div class="dt-stat">
@@ -116,7 +116,7 @@
             <b>{{ $fmt($stats['vcf']) }}</b><span>Contactos guardados</span>
         </div>
         <div class="dt-stat">
-            <div class="ic" style="background:rgba(37,211,102,.16);color:#4ade80"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.4 8.4 0 0 1-12.5 7.3L3 21l2.2-5.3A8.4 8.4 0 1 1 21 11.5z"/></svg></div>
+            <div class="ic" style="background:rgba(37,211,102,.16);color:var(--ok-text)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.4 8.4 0 0 1-12.5 7.3L3 21l2.2-5.3A8.4 8.4 0 1 1 21 11.5z"/></svg></div>
             <b>{{ $fmt($stats['whatsapp']) }}</b><span>Chats de WhatsApp</span>
         </div>
         <div class="dt-stat">

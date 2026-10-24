@@ -2,6 +2,8 @@
 
 namespace App\Support;
 
+use App\Models\Profile;
+use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
 /**
@@ -20,6 +22,25 @@ class MediosPago
         $pais = strtoupper((string) $pais);
 
         return in_array($pais, self::paises(), true) ? $pais : config('pagos.pais_defecto');
+    }
+
+    /**
+     * País de pagos que se le sugiere a quien crea un perfil: el de sus otros perfiles y, si es el primero,
+     * el de su conexión (encabezado CF-IPCountry que pone Cloudflare). null si no es uno de los países de pago:
+     * entonces el editor lo adivina por la zona horaria del navegador. El usuario siempre puede cambiarlo.
+     */
+    public static function sugerido(Request $request, ?int $userId): ?string
+    {
+        $deSusPerfiles = $userId ? Profile::where('user_id', $userId)->whereNotNull('pais')->orderBy('id')->value('pais') : null;
+        $porConexion = strtoupper((string) $request->header('CF-IPCountry'));
+
+        foreach ([$deSusPerfiles, $porConexion] as $pais) {
+            if (in_array($pais, self::paises(), true)) {
+                return $pais;
+            }
+        }
+
+        return null;
     }
 
     /** Tipos que se piden en un país, en el orden en que se muestran. */

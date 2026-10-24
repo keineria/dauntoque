@@ -2,15 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AparienciaRequest;
+use App\Support\Apariencia;
 use App\Support\DosPasos;
 use App\Support\Totp;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\View\View;
 
-/** Mi cuenta: cambiar la contraseña y la verificación en dos pasos (opcional para cualquier usuario). */
+/** Mi cuenta: apariencia del panel, cambiar la contraseña y la verificación en dos pasos (opcional para cualquier usuario). */
 class CuentaController extends Controller
 {
     public function index(Request $request): View
@@ -21,11 +24,23 @@ class CuentaController extends Controller
 
         return view('dashboard.cuenta', [
             'usuario' => $usuario,
+            'apariencia' => Apariencia::de($usuario),
             'secreto' => $secreto,
             'enlaceApp' => $secreto ? Totp::enlace($secreto, $usuario->email) : null,
             'respaldoRestante' => DosPasos::respaldoRestante($usuario),
             'codigos' => $request->session()->get('codigos_respaldo'),
         ]);
+    }
+
+    /** Guarda la paleta y el modo del panel; la pantalla ya los aplicó al tocarlos. */
+    public function apariencia(AparienciaRequest $request): JsonResponse
+    {
+        $request->user()->forceFill([
+            'panel_paleta' => $request->validated('paleta'),
+            'panel_modo' => $request->validated('modo'),
+        ])->save();
+
+        return response()->json(['status' => 'success']);
     }
 
     public function cambiarClave(Request $request): RedirectResponse

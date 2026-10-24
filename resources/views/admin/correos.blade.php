@@ -9,7 +9,7 @@
     </div>
     @include('admin._tabs')
 
-    @if ($errors->any())<p class="dt-panel" style="color:#f87171;margin:0 0 18px">{{ $errors->first() }}</p>@endif
+    @if ($errors->any())<p class="dt-panel" style="color:var(--danger-text);margin:0 0 18px">{{ $errors->first() }}</p>@endif
 
     <section class="dt-panel" id="servidor">
         <div class="dt-panel-h">
@@ -65,7 +65,7 @@
                 @foreach ($plantillas as $id => $p)
                     <div style="display:flex;gap:12px;align-items:center;padding:12px;border:1px solid var(--border);border-radius:14px;flex-wrap:wrap">
                         <label style="display:flex;gap:12px;align-items:flex-start;cursor:pointer;flex:1;min-width:220px">
-                            <input type="checkbox" name="activas[]" value="{{ $id }}" @checked($p['activa']) style="margin-top:3px;width:18px;height:18px;accent-color:#3b82f6">
+                            <input type="checkbox" name="activas[]" value="{{ $id }}" @checked($p['activa']) style="margin-top:3px;width:18px;height:18px;accent-color:var(--primary)">
                             <span><b>{{ $p['nombre'] }}</b>@if ($p['propia']) <span class="dt-chip up" style="font-size:10px">Diseño propio</span>@endif<small style="display:block;color:var(--muted);font-size:12.5px">{{ $p['desc'] }}</small></span>
                         </label>
                         @if ($p['editable'])

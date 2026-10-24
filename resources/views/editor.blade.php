@@ -29,7 +29,7 @@
         .ed-step.on { background:var(--surface); color:var(--text); font-weight:600; }
         .ed-step.on i { border-color:var(--primary); color:var(--primary); }
         .ed-step.done { color:var(--text); cursor:pointer; }
-        .ed-step.done i { background:var(--primary); border-color:var(--primary); color:#fff; }
+        .ed-step.done i { background:var(--primary); border-color:var(--primary); color:var(--on-primary); }
         .ed-step.done:hover { background:var(--surface); }
         .ed-main { flex:1; min-width:0; padding:28px 28px 120px; max-width:600px; }
         .ed-bar { height:5px; border-radius:9px; background:var(--surface); overflow:hidden; margin:14px 0 22px; }
@@ -57,7 +57,7 @@
         .ed-pais { display:flex; align-items:center; gap:10px; padding:12px; border:1px solid var(--border); border-radius:10px; background:var(--card); color:var(--muted); font-size:13.5px; font-weight:600; cursor:pointer; text-align:left; }
         .ed-pais b { width:30px; height:30px; flex:none; border-radius:8px; display:grid; place-items:center; background:var(--surface); font-size:11px; letter-spacing:.04em; color:var(--text); }
         .ed-pais.on { border-color:var(--primary); background:var(--primary-soft); color:var(--text); box-shadow:0 0 0 3px var(--primary-soft); }
-        .ed-pais.on b { background:var(--primary); color:#fff; }
+        .ed-pais.on b { background:var(--primary); color:var(--on-primary); }
         .ed-preview { width:50%; display:flex; align-items:center; justify-content:center; background:var(--surface); border-left:1px solid var(--border); position:relative; }
         .ed-preview-label { position:absolute; top:18px; left:24px; font-size:12px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; }
 
@@ -146,6 +146,21 @@
                             </div>
                             <p x-show="nickValidado" style="margin:8px 0 0;font-size:12.5px;font-weight:600;color:var(--success)">✓ Usuario disponible</p>
                             <p x-show="nickError !== ''" style="margin:8px 0 0;font-size:12.5px;font-weight:600;color:var(--danger)" x-text="nickError"></p>
+
+                            {{-- País de residencia: define los medios de pago del perfil y la moneda de la renovación --}}
+                            <span class="dt-label" style="margin-top:22px">¿En qué país vives?</span>
+                            <div class="ed-paises" style="margin-bottom:8px" role="radiogroup" aria-label="País de residencia">
+                                <template x-for="(nombrePais, codigo) in mercados" :key="codigo">
+                                    <button type="button" class="ed-pais" :class="pais === codigo ? 'on' : ''" role="radio" :aria-checked="pais === codigo" @click="pais = codigo; paisSugerido = false">
+                                        <b x-text="codigo"></b><span x-text="nombrePais"></span>
+                                    </button>
+                                </template>
+                            </div>
+                            <p class="dt-sub" style="font-size:12px;margin:0">
+                                <span x-show="paisSugerido">Lo elegimos según tu ubicación; cámbialo si vives en otro país. </span>
+                                <span x-text="pais === 'US' ? 'Tus clientes te pagarán con Zelle, Cash App o Venmo y tu renovación será en dólares (USD).' : 'Tus clientes te pagarán con Nequi o Llave Bre-B y tu renovación será en pesos (COP).'"></span>
+                                Puedes cambiarlo después en Datos del perfil.
+                            </p>
                         </div>
 
                         {{-- PASO 2: tipo, foto y nombre --}}
@@ -258,7 +273,7 @@
 
                         {{-- PASO 7: billeteras --}}
                         <div x-show="paso === 7" x-cloak>
-                            <span class="dt-label">¿Dónde cobras?</span>
+                            <span class="dt-label">País de pagos</span>
                             <div class="ed-paises" role="radiogroup" aria-label="País de tus cobros">
                                 <template x-for="(nombrePais, codigo) in mercados" :key="codigo">
                                     <button type="button" class="ed-pais" :class="pais === codigo ? 'on' : ''" role="radio" :aria-checked="pais === codigo" @click="pais = codigo">
@@ -460,7 +475,7 @@
                 mercados: @json($mercados ?? []),
                 porPais: @json(config('pagos.por_pais')),
                 mediosPago: @json(config('pagos.medios')),
-                pais: '', pagos: { nequi: '', llave_breb: '', zelle: '', cashapp: '', venmo: '' },
+                pais: '', paisSugerido: false, pagos: { nequi: '', llave_breb: '', zelle: '', cashapp: '', venmo: '' },
                 get mediosPais() { return this.porPais[this.pais] || []; },
                 get listaPagos() {
                     return this.mediosPais.filter(t => String(this.pagos[t] || '').trim()).map(t => ({ type: t, value: String(this.pagos[t]).trim() }));
@@ -520,7 +535,7 @@
                     7: 'Módulo de Pagos', 8: 'Diseño Personalizado', 9: 'Guardar Perfil'
                 },
                 subtitulos: {
-                    1: 'Crea tu usuario único.', 2: 'Define tu estilo y sube tu foto de perfil.', 3: 'Añade tu cargo principal.',
+                    1: 'Crea tu usuario único y elige tu país.', 2: 'Define tu estilo y sube tu foto de perfil.', 3: 'Añade tu cargo principal.',
                     4: 'Describe brevemente lo que haces.', 5: 'Sube fotos para crear una cuadrícula visual.',
                     6: 'Elige cómo prefieres que te contacten.', 7: 'Agiliza tus cobros rápidamente.',
                     8: 'Mezcla la distribución y los colores a tu gusto.', 9: 'Bautiza tu configuración.'
@@ -578,8 +593,11 @@
                         this.tarjetaVinculada = true;
                     @endif
 
-                    // Perfil nuevo: el país sale de la zona horaria (o del idioma) del navegador
-                    if (!this.porPais[this.pais]) this.pais = dtPaisDetectado(Object.keys(this.porPais));
+                    // Perfil nuevo: el país de sus otros perfiles o de su conexión; si no, la zona horaria (o el idioma) del navegador
+                    if (!this.porPais[this.pais]) {
+                        this.pais = @json($paisSugerido ?? null) || dtPaisDetectado(Object.keys(this.porPais));
+                        this.paisSugerido = true;
+                    }
 
                     // Solo se edita un perfil que llegó cargado; sin él siempre se crea (empezando por el usuario, paso 1)
                     if (this.modoActual === 'editar') {
