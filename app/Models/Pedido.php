@@ -75,9 +75,22 @@ class Pedido extends Model
         ];
     }
 
-    /** Enlace para crear la cuenta en el portal con el correo ya escrito. */
+    /** El correo de la compra ya tiene cuenta en el portal (compró una segunda tarjeta o se registró antes de pagar). */
+    public function tieneCuenta(): bool
+    {
+        return User::where('email', $this->correo)->exists();
+    }
+
+    /**
+     * Enlace para crear la cuenta en el portal con el correo ya escrito.
+     * Si ese correo ya tiene cuenta, lleva a iniciar sesión (registrarse otra vez daría "correo en uso").
+     */
     public function enlaceRegistro(): string
     {
+        if ($this->tieneCuenta()) {
+            return url('/login');
+        }
+
         return url('/register?' . http_build_query(['correo' => $this->correo, 'pedido' => $this->codigo]));
     }
 }

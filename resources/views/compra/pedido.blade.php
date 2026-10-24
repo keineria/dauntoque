@@ -26,7 +26,7 @@
             <span class="estado pagado">Pago confirmado</span>
             <h1 style="font-size:clamp(28px,5vw,38px)">¡Gracias, {{ \Illuminate\Support\Str::before($pedido->nombre, ' ') }}! Tu tarjeta está en camino.</h1>
             <p style="margin:0">Te enviamos este enlace a <b>{{ $pedido->correo }}</b>. Crea tu perfil ahora y el día que llegue la tarjeta solo la acercas a tu celular.</p>
-            <a class="btn" href="{{ $pedido->enlaceRegistro() }}">Crear mi perfil</a>
+            <a class="btn" href="{{ $pedido->enlaceRegistro() }}">{{ $pedido->tieneCuenta() ? 'Entrar a mi panel' : 'Crear mi perfil' }}</a>
         @elseif ($pedido->estado === 'rechazado')
             <span class="estado rechazado">Pago rechazado</span>
             <h1 style="font-size:32px">Tu pago no se completó</h1>

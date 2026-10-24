@@ -102,6 +102,8 @@
         </div>
     </section>
 
+    @include('partials.perfil._calificame')
+
     <footer class="px-pie">
         <a href="https://dauntoque.com" target="_blank" rel="noopener" @click="if (p.preview) $event.preventDefault()"><span x-text="t('tarjetaPor')">Tarjeta digital por</span> <b>dauntoque</b> · Crea la tuya</a>
     </footer>

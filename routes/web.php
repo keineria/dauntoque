@@ -57,6 +57,13 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard/configuracion', [DashboardController::class, 'configuracion']);
     // Apps adicionales
     Route::get('/dashboard/apps', [App\Http\Controllers\AppsController::class, 'index']);
+    // Califícame (app adicional): calificaciones de los clientes y qué comentarios salen en el perfil
+    Route::controller(App\Http\Controllers\CalificamePanelController::class)->prefix('dashboard/calificame')->group(function () {
+        Route::get('/', 'index');
+        Route::post('/activar', 'activar');
+        Route::post('/ajustes', 'ajustes');
+        Route::post('/{id}/visible', 'visible')->whereNumber('id');
+    });
     // Agenda de citas (app adicional)
     Route::controller(App\Http\Controllers\AgendaPanelController::class)->prefix('dashboard/agenda')->group(function () {
         Route::get('/', 'index');
@@ -149,6 +156,8 @@ require __DIR__.'/auth.php';
 // ==========================================
 Route::get('/{nickname}', [App\Http\Controllers\PublicProfileController::class, 'show']);
 Route::get('/{nickname}/vcf', [App\Http\Controllers\PublicProfileController::class, 'descargarVCF']);
+Route::get('/{nickname}/califica', [App\Http\Controllers\CalificamePublicaController::class, 'mostrar']);
+Route::post('/{nickname}/califica', [App\Http\Controllers\CalificamePublicaController::class, 'guardar'])->middleware('throttle:10,1');
 Route::get('/{nickname}/agenda', [App\Http\Controllers\AgendaPublicaController::class, 'mostrar']);
 Route::get('/{nickname}/agenda/horas', [App\Http\Controllers\AgendaPublicaController::class, 'horas'])->middleware('throttle:60,1');
 Route::post('/{nickname}/agenda', [App\Http\Controllers\AgendaPublicaController::class, 'reservar'])->middleware('throttle:10,1');

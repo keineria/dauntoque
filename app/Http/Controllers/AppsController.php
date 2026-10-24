@@ -28,6 +28,16 @@ class AppsController extends Controller
                 'app' => $activas->get('agenda'),
             ],
             [
+                'clave' => 'calificame',
+                'icono' => '⭐',
+                'nombre' => 'Califícame',
+                'resumen' => 'Tus clientes califican tu atención en un toque. Sello de estrellas en tu perfil, tú eliges qué comentarios se ven y las bajas te llegan en privado.',
+                'precio' => 'Gratis el primer año.',
+                'abrir' => '/dashboard/calificame',
+                'activar' => '/dashboard/calificame/activar',
+                'app' => $activas->get('calificame'),
+            ],
+            [
                 'clave' => 'asistente',
                 'icono' => '🤖',
                 'nombre' => 'Asistente con IA',

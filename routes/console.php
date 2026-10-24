@@ -13,3 +13,6 @@ Schedule::command('servicio:avisar')->dailyAt('09:00')->timezone('America/Bogota
 
 // Recordatorios de la agenda de citas (24 horas y 2 horas antes). Usa el mismo cron de Laravel.
 Schedule::command('citas:recordar')->everyFiveMinutes()->withoutOverlapping();
+
+// Califícame: pide la calificación por correo después de cada cita realizada. Usa el mismo cron de Laravel.
+Schedule::command('calificame:pedir')->everyFifteenMinutes()->withoutOverlapping();

@@ -1,4 +1,4 @@
-{{-- Página pública de la agenda (reserva, cita, Mis citas): ligera, primero celular, con el color del perfil. --}}
+{{-- Página pública de la agenda (reserva, cita, Mis citas) y de Califícame: ligera, primero celular, con el color del perfil. --}}
 <!DOCTYPE html>
 <html lang="{{ app()->getLocale() }}">
 <head>
@@ -68,7 +68,11 @@
         </a>
     @endisset
     @yield('contenido')
-    <p class="ag-pie"><a href="/mis-citas">{{ __('agenda.mis_citas') }}</a> · DaUnToque</p>
+    @hasSection('pie')
+        @yield('pie')
+    @else
+        <p class="ag-pie"><a href="/mis-citas">{{ __('agenda.mis_citas') }}</a> · DaUnToque</p>
+    @endif
 </main>
 </body>
 </html>

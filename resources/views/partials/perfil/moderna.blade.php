@@ -74,6 +74,8 @@
             </template>
         </section>
 
+        @include('partials.perfil._calificame')
+
         <footer class="pp-pie">
             <a class="marca" href="https://dauntoque.com" target="_blank" rel="noopener" @click="if (p.preview) $event.preventDefault()"><span x-text="t('tarjetaPor')">Tarjeta digital por</span> <b>dauntoque</b></a>
             <a class="crea" href="https://dauntoque.com" target="_blank" rel="noopener" @click="if (p.preview) $event.preventDefault()" x-text="t('quieresUna')">¿Quieres una así? Crea la tuya</a>
