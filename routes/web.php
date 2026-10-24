@@ -64,6 +64,12 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/ajustes', 'ajustes');
         Route::post('/{id}/visible', 'visible')->whereNumber('id');
     });
+    // Música (app adicional): canción destacada y lista de Spotify en el perfil
+    Route::controller(App\Http\Controllers\MusicaPanelController::class)->prefix('dashboard/musica')->group(function () {
+        Route::get('/', 'index');
+        Route::post('/activar', 'activar');
+        Route::post('/ajustes', 'ajustes');
+    });
     // Agenda de citas (app adicional)
     Route::controller(App\Http\Controllers\AgendaPanelController::class)->prefix('dashboard/agenda')->group(function () {
         Route::get('/', 'index');

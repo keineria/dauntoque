@@ -128,6 +128,8 @@
         </section>
     </div>
 
+    @include('partials.perfil._musica')
+
     @include('partials.perfil._calificame')
 
     <footer class="pr-pie" style="margin-top:16px">

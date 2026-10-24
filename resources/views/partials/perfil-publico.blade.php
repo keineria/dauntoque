@@ -124,6 +124,10 @@
     .pp-cf-com figcaption { margin-top:6px; font-size:12.5px; color:var(--muted); }
     .pp-cf-btn { display:flex; align-items:center; justify-content:center; gap:8px; height:46px; border-radius:14px; border:1px solid var(--line); background:var(--chip); color:var(--text); font-weight:700; font-size:14px; text-decoration:none; }
     .pp-cf-btn:focus-visible { outline:none; box-shadow:0 0 0 3px color-mix(in srgb, var(--acc) 45%, transparent); }
+    /* App Música: canción destacada y lista de Spotify (mismo bloque en todos los diseños) */
+    .pp-mu { display:grid; gap:10px; width:100%; max-width:520px; margin:18px auto 0; padding:0 16px; box-sizing:border-box; }
+    .pp-mu-h { margin:6px 0 0; font-size:12px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); text-align:center; }
+    .pp-mu-player { display:block; width:100%; border:0; border-radius:12px; background:var(--card); }
     @keyframes pp-gira { to { transform:rotate(360deg); } }
     @media (prefers-reduced-motion: reduce) { .pp-bienvenida .aro, .pp-bienvenida .aro > div { animation:none; } }
 </style>
@@ -135,13 +139,15 @@
               trabajos: 'Mis trabajos', pagos: 'Pagos', contacto: 'Contacto', telefono: 'Teléfono', ubicacion: 'Ubicación', verPerfil: 'Ver perfil', pagarCon: 'Pagar con',
               abreBanco: 'Abre tu banco y envía el pago a:', cerrar: 'Cerrar', copiar: 'Copiar', copiado: 'Copiado ✓', tarjetaPor: 'Tarjeta digital por', quieresUna: '¿Quieres una así? Crea la tuya',
               creaLaTuya: 'Crea la tuya', bienvenida: 'Bienvenido al perfil de', tuNombre: 'Tu nombre', tuProfesion: 'Tu profesión', tuBio: 'Tu biografía aparecerá aquí.', verImagen: 'Ver imagen', otroIdioma: 'EN', agendar: 'Agendar cita',
-              calificar: 'Califica mi atención', calificacion: 'calificación', calificaciones: 'calificaciones', opiniones: 'Lo que dicen mis clientes' },
+              calificar: 'Califica mi atención', calificacion: 'calificación', calificaciones: 'calificaciones', opiniones: 'Lo que dicen mis clientes',
+              musica: 'Mi música', cancionDestacada: 'Canción destacada en Spotify', listaMusica: 'Lista en Spotify' },
         en: { guardar: 'Save contact', whatsapp: 'WhatsApp', escribeme: 'Message me on WhatsApp', reservar: 'Book on WhatsApp', llamar: 'Call', correo: 'Email', enviarCorreo: 'Send an email',
               compartir: 'Share', compartirTarjeta: 'Share my card', copiadoEnlace: 'Link copied', sobreMi: 'About me', perfil: 'About', redes: 'Social media', portafolio: 'Portfolio',
               trabajos: 'My work', pagos: 'Payments', contacto: 'Contact', telefono: 'Phone', ubicacion: 'Location', verPerfil: 'View profile', pagarCon: 'Pay with',
               abreBanco: 'Open your bank app and send the payment to:', cerrar: 'Close', copiar: 'Copy', copiado: 'Copied ✓', tarjetaPor: 'Digital card by', quieresUna: 'Want one like this? Create yours',
               creaLaTuya: 'Create yours', bienvenida: 'Welcome to the profile of', tuNombre: 'Your name', tuProfesion: 'Your profession', tuBio: 'Your bio will appear here.', verImagen: 'View image', otroIdioma: 'ES', agendar: 'Book an appointment',
-              calificar: 'Rate my service', calificacion: 'rating', calificaciones: 'ratings', opiniones: 'What my clients say' },
+              calificar: 'Rate my service', calificacion: 'rating', calificaciones: 'ratings', opiniones: 'What my clients say',
+              musica: 'My music', cancionDestacada: 'Featured song on Spotify', listaMusica: 'Playlist on Spotify' },
     };
     // Idioma: el que eligió el visitante, si no el del celular (español si empieza por "es", si no inglés)
     function dtIdiomaInicial(preview) {
