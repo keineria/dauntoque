@@ -63,6 +63,9 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/activar', 'activar');
         Route::post('/ajustes', 'ajustes');
         Route::post('/{id}/visible', 'visible')->whereNumber('id');
+        Route::get('/google/buscar', 'buscarGoogle')->middleware('throttle:20,1');
+        Route::post('/google', 'conectarGoogle')->middleware('throttle:10,1');
+        Route::delete('/google', 'desconectarGoogle');
     });
     // Agenda de citas (app adicional)
     Route::controller(App\Http\Controllers\AgendaPanelController::class)->prefix('dashboard/agenda')->group(function () {

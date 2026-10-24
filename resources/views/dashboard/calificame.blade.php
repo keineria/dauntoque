@@ -129,12 +129,63 @@
                 </section>
             </div>
 
+            <div style="display:grid;gap:18px;min-width:0">
+            <section class="dt-panel" style="margin:0" x-data="negocioGoogle()">
+                <div class="dt-panel-h"><h2>Tu negocio en Google</h2>@if($ajustes->googleConectado())<span class="dt-chip up">Conectado</span>@endif</div>
+                @if($ajustes->googleConectado())
+                    <div style="display:grid;gap:6px">
+                        <b>{{ $ajustes->google_nombre }}</b>
+                        @if($ajustes->google_direccion)<span class="dt-sub" style="margin:0">{{ $ajustes->google_direccion }}</span>@endif
+                        @if($ajustes->google_rating)
+                            <span><b style="font-size:20px">{{ \App\Services\Calificame\Calificame::promedioTexto($ajustes->google_rating) }}</b> <span class="cf-est" aria-hidden="true">{!! $estrellas((int) round($ajustes->google_rating)) !!}</span> <span class="dt-sub" style="margin:0">{{ $ajustes->google_total }} reseñas en Google</span></span>
+                        @else
+                            <span class="dt-sub" style="margin:0">Tu negocio todavía no tiene reseñas en Google.</span>
+                        @endif
+                        <span class="dt-sub" style="margin:0">Se actualiza solo una vez al día{{ $ajustes->google_actualizado_en ? ' · última vez ' . $ajustes->google_actualizado_en->diffForHumans() : '' }}.</span>
+                    </div>
+                    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:14px">
+                        @if($ajustes->google_maps_url)<a class="dt-btn" href="{{ $ajustes->google_maps_url }}" target="_blank" rel="noopener">Ver en Google</a>@endif
+                        <form method="POST" action="/dashboard/calificame/google" onsubmit="return confirm('¿Desconectar tu negocio de Google? Tu calificación de Google dejará de salir en tu perfil.')">
+                            @csrf @method('DELETE')
+                            <button class="dt-btn danger" type="submit">Desconectar</button>
+                        </form>
+                    </div>
+                @elseif(!$googleDisponible)
+                    <p class="dt-sub" style="margin:0">Muy pronto podrás conectar tu negocio de Google para mostrar tu calificación de allá en tu perfil.</p>
+                @else
+                    <p class="dt-sub" style="margin:0 0 12px">¿Tu negocio aparece en Google Maps? Búscalo y conéctalo: tu calificación y tus mejores reseñas de Google salen en tu perfil, aparte de Califícame.</p>
+                    <form @submit.prevent="buscar" style="display:flex;gap:8px">
+                        <label for="g-buscar" style="position:absolute;left:-9999px">Nombre del negocio y ciudad</label>
+                        <input class="dt-input" id="g-buscar" x-model="q" placeholder="Ej.: Palacio Barbershop Medellín" maxlength="120" required minlength="3">
+                        <button class="dt-btn pri" type="submit" style="height:44px" :disabled="buscando" x-text="buscando ? 'Buscando…' : 'Buscar'">Buscar</button>
+                    </form>
+                    <p class="dt-sub" x-show="error" x-text="error" style="color:#f87171" role="alert"></p>
+                    <p class="dt-sub" x-show="buscado && !negocios.length && !error">No encontramos negocios con ese nombre. Prueba con el nombre exacto como sale en Google Maps y la ciudad.</p>
+                    <div style="display:grid;gap:8px;margin-top:12px">
+                        <template x-for="n in negocios" :key="n.id">
+                            <form method="POST" action="/dashboard/calificame/google" style="display:flex;justify-content:space-between;gap:10px;align-items:center;border:1px solid var(--border);border-radius:14px;padding:10px 12px">
+                                @csrf
+                                <input type="hidden" name="place_id" :value="n.id">
+                                <span style="min-width:0"><b x-text="n.nombre"></b><br><span class="dt-sub" style="margin:0" x-text="n.direccion"></span><br>
+                                    <span class="dt-sub" style="margin:0" x-text="n.rating ? n.rating.toFixed(1).replace('.', ',') + ' ★ · ' + n.total + ' reseñas' : 'Sin reseñas todavía'"></span></span>
+                                <button class="dt-btn pri" type="submit" style="flex:none">Es mi negocio</button>
+                            </form>
+                        </template>
+                    </div>
+                @endif
+            </section>
+
             <section class="dt-panel" style="margin:0">
                 <div class="dt-panel-h"><h2>En tu perfil</h2></div>
                 <form method="POST" action="/dashboard/calificame/ajustes" style="display:grid;gap:16px">
                     @csrf
                     <label class="cf-sw"><input type="checkbox" name="mostrar_sello" value="1" @checked($ajustes->mostrar_sello)> Mostrar el sello de estrellas</label>
                     <label class="cf-sw"><input type="checkbox" name="mostrar_boton" value="1" @checked($ajustes->mostrar_boton)> Botón "Califica mi atención"</label>
+                    @if($ajustes->googleConectado())
+                        <label class="cf-sw"><input type="checkbox" name="mostrar_google" value="1" @checked($ajustes->mostrar_google)> Mostrar mi calificación de Google</label>
+                    @else
+                        <input type="hidden" name="mostrar_google" value="{{ $ajustes->mostrar_google ? 1 : 0 }}">
+                    @endif
                     @if($tieneAgenda)
                         <label class="cf-sw"><input type="checkbox" name="pedir_tras_cita" value="1" @checked($ajustes->pedir_tras_cita)> Pedir calificación por correo después de cada cita</label>
                     @else
@@ -149,9 +200,28 @@
                     <button class="dt-btn pri" type="submit" style="justify-self:start">Guardar</button>
                 </form>
             </section>
+            </div>
         </div>
 
         <script>
+            function negocioGoogle() {
+                return {
+                    q: '', negocios: [], buscando: false, buscado: false, error: '',
+                    async buscar() {
+                        this.buscando = true; this.error = '';
+                        try {
+                            const r = await fetch('/dashboard/calificame/google/buscar?q=' + encodeURIComponent(this.q), { headers: { Accept: 'application/json' } });
+                            const datos = await r.json();
+                            if (!r.ok) throw new Error(datos.message || 'No se pudo buscar.');
+                            this.negocios = datos.negocios;
+                        } catch (err) {
+                            this.negocios = [];
+                            this.error = err.message || 'No se pudo buscar. Revisa tu conexión.';
+                        }
+                        this.buscando = false; this.buscado = true;
+                    },
+                };
+            }
             function comentarios(visibles) {
                 return {
                     visibles, error: '',
