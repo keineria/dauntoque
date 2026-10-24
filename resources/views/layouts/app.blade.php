@@ -101,6 +101,7 @@
                         <p class="dt-sub" style="margin:0" x-text="correoUsuario"></p>
                         <div class="dt-sep" style="margin:12px 0 8px"></div>
                         <a href="/dashboard/cuenta#apariencia" class="dt-nav" style="padding:8px 10px">Apariencia y colores</a>
+                        <a href="/dashboard/configuracion#pagos" class="dt-nav" style="padding:8px 10px">Métodos de pago por país</a>
                         <a href="/dashboard/cuenta" class="dt-nav" style="padding:8px 10px">Mi cuenta y seguridad</a>
                         <a href="/dashboard/ayuda" class="dt-nav" style="padding:8px 10px">Ayuda y preguntas frecuentes</a>
                         @if ($usuarioPanel?->esAdmin())<a href="/admin" class="dt-nav" style="padding:8px 10px">Administrador</a>@endif
