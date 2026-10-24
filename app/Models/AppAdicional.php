@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-/** App adicional de un usuario (por ahora solo "agenda") y hasta cuándo está paga. */
+/** App adicional de un usuario (agenda, calificame, musica) y hasta cuándo está paga. */
 class AppAdicional extends Model
 {
     protected $table = 'apps_adicionales';

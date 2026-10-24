@@ -81,10 +81,10 @@ class Agenda
     }
 
     /** Precio de renovación de la agenda en la moneda del país: "$99.000 COP" o "$39 USD". */
-    public static function precioRenovacion(?string $pais): string
+    public static function precioRenovacion(?string $pais, string $app = 'agenda'): string
     {
         $pais = MediosPago::pais($pais);
-        $monto = config("agenda.precio_renovacion.$pais", 0);
+        $monto = config("$app.precio_renovacion.$pais", 0);
         $moneda = Market::where('code', $pais)->value('currency') ?? ($pais === 'US' ? 'USD' : 'COP');
 
         return '$' . number_format($monto, 0, ',', $pais === 'US' ? ',' : '.') . ' ' . $moneda;
