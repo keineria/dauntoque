@@ -86,9 +86,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/google/volver', 'googleVolver');
         Route::post('/google/desconectar', 'googleDesconectar');
     });
-    // Mi cuenta: contraseña y verificación en dos pasos
+    // Mi cuenta: apariencia, contraseña y verificación en dos pasos
     Route::controller(App\Http\Controllers\CuentaController::class)->prefix('dashboard/cuenta')->group(function () {
         Route::get('/', 'index');
+        Route::post('/apariencia', 'apariencia')->middleware('throttle:30,1');
         Route::post('/clave', 'cambiarClave')->middleware('throttle:10,1');
         Route::post('/dos-pasos', 'iniciarDosPasos');
         Route::post('/dos-pasos/confirmar', 'confirmarDosPasos')->middleware('throttle:10,1');

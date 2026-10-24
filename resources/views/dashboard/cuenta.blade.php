@@ -4,19 +4,45 @@
     <div class="dt-head">
         <div>
             <h1 class="dt-h1">Mi cuenta</h1>
-            <p class="dt-sub">{{ $usuario->email }} · contraseña y verificación en dos pasos.</p>
+            <p class="dt-sub">{{ $usuario->email }} · apariencia, contraseña y verificación en dos pasos.</p>
         </div>
     </div>
 
     @if ($usuario->debe_cambiar_clave)
-        <p class="dt-panel" style="color:#fbbf24;margin:0 0 18px">Entraste con una contraseña temporal. Escribe una nueva para seguir usando el panel.</p>
+        <p class="dt-panel" style="color:var(--warn-text);margin:0 0 18px">Entraste con una contraseña temporal. Escribe una nueva para seguir usando el panel.</p>
     @endif
+
+    {{-- Apariencia: se aplica al tocar y se guarda en la cuenta (sirve en cualquier celular o computador) --}}
+    <section class="dt-panel" id="apariencia" x-data="aparienciaPanel(@js($apariencia))">
+        <div class="dt-panel-h">
+            <h2>Apariencia</h2>
+            <div class="dt-seg" role="radiogroup" aria-label="Modo claro u oscuro">
+                @foreach (config('apariencia.modos') as $clave => $nombre)
+                    <button type="button" role="radio" :aria-checked="modo === '{{ $clave }}'" :class="modo === '{{ $clave }}' ? 'on' : ''" @click="elegir(paleta, '{{ $clave }}')">{{ $nombre }}</button>
+                @endforeach
+            </div>
+        </div>
+        <div class="ap-grid" role="radiogroup" aria-label="Paleta de colores">
+            @foreach (\App\Support\Apariencia::paletas() as $clave => $p)
+                <button type="button" class="ap-op" role="radio" :aria-checked="paleta === '{{ $clave }}'" :class="paleta === '{{ $clave }}' ? 'on' : ''" @click="elegir('{{ $clave }}', modo)">
+                    <span class="ap-mini" style="{{ \App\Support\Apariencia::variablesMiniatura($p) }}" aria-hidden="true">
+                        <span class="ap-puntos"><i></i><i></i><i></i></span>
+                        <span class="ap-ventana"><i class="ap-linea"></i><i class="ap-bloque"></i><i class="ap-caja"></i></span>
+                        <span class="ap-check" x-show="paleta === '{{ $clave }}'">✓</span>
+                    </span>
+                    <b>{{ $p['nombre'] }}</b>
+                    <span class="dt-sub" style="margin:0;font-size:12.5px">{{ $p['descripcion'] }}</span>
+                </button>
+            @endforeach
+        </div>
+        <p class="dt-sub" style="margin:14px 0 0;font-size:12.5px" x-text="estado || 'Automático sigue el modo claro u oscuro de tu celular o computador. Solo cambia tu panel: tu perfil público conserva su diseño.'" role="status"></p>
+    </section>
 
     <section class="dt-panel" id="clave">
         <div class="dt-panel-h"><h2>Cambiar contraseña</h2></div>
         <form method="POST" action="/dashboard/cuenta/clave" style="display:grid;gap:12px;max-width:420px">
             @csrf
-            @if ($errors->clave->any())<p style="color:#f87171;margin:0">{{ $errors->clave->first() }}</p>@endif
+            @if ($errors->clave->any())<p style="color:var(--danger-text);margin:0">{{ $errors->clave->first() }}</p>@endif
             <div><span class="dt-label">Contraseña actual</span><input class="dt-input" type="password" name="actual" required autocomplete="current-password"></div>
             <div><span class="dt-label">Nueva contraseña</span><input class="dt-input" type="password" name="nueva" required minlength="10" autocomplete="new-password"></div>
             <div><span class="dt-label">Repite la nueva contraseña</span><input class="dt-input" type="password" name="nueva_confirmation" required minlength="10" autocomplete="new-password"></div>
@@ -30,7 +56,7 @@
             <h2>Verificación en dos pasos</h2>
             <span class="dt-chip {{ $usuario->tieneDosPasos() ? 'up' : '' }}">{{ $usuario->tieneDosPasos() ? 'Activa' : 'Apagada' }}</span>
         </div>
-        @if ($errors->dosPasos->any())<p style="color:#f87171;margin:0 0 12px">{{ $errors->dosPasos->first() }}</p>@endif
+        @if ($errors->dosPasos->any())<p style="color:var(--danger-text);margin:0 0 12px">{{ $errors->dosPasos->first() }}</p>@endif
 
         @if ($codigos)
             <div class="sp-aviso" style="margin-bottom:16px">
@@ -79,4 +105,54 @@
         <span><b>Ayuda y preguntas frecuentes</b><br><span class="dt-sub">Respuestas paso a paso y, si las necesitas, un asesor.</span></span>
         <span class="dt-btn">Abrir</span>
     </a>
+
+    <style>
+        .ap-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(190px, 1fr)); gap:18px; }
+        .ap-op { display:flex; flex-direction:column; align-items:flex-start; gap:2px; padding:0; border:0; background:none; color:var(--text); text-align:left; cursor:pointer; font:inherit; }
+        .ap-op b { margin-top:8px; font-size:15px; }
+        /* Miniatura: toma los colores claros u oscuros de su paleta según el modo que se ve ahora */
+        .ap-mini { --f:var(--m-fondo-claro); --t:var(--m-tarjeta-claro); --s:var(--m-superficie-claro); --i:var(--m-tinta-claro); --a:var(--m-acento-claro);
+                   position:relative; display:flex; gap:12px; width:100%; aspect-ratio:16/9; padding:12px; border-radius:18px; background:var(--f); border:1px solid var(--border); transition:border-color .15s, box-shadow .15s, transform .15s; }
+        html[data-esquema="oscuro"] .ap-mini { --f:var(--m-fondo-oscuro); --t:var(--m-tarjeta-oscuro); --s:var(--m-superficie-oscuro); --i:var(--m-tinta-oscuro); --a:var(--m-acento-oscuro); }
+        .ap-op:hover .ap-mini { transform:translateY(-2px); border-color:var(--primary-line); }
+        .ap-op.on .ap-mini { border-color:var(--text); box-shadow:0 0 0 2px var(--text); }
+        .ap-op:focus-visible { outline:none; }
+        .ap-op:focus-visible .ap-mini { box-shadow:0 0 0 3px var(--primary-line); }
+        .ap-puntos { display:flex; flex-direction:column; gap:6px; padding-top:4px; }
+        .ap-puntos i { width:12px; height:12px; border-radius:50%; background:var(--i); }
+        .ap-puntos i:nth-child(2) { background:var(--a); opacity:.55; }
+        .ap-puntos i:nth-child(3) { background:var(--a); opacity:.25; }
+        .ap-ventana { flex:1; display:grid; grid-template-columns:1fr 1fr; grid-template-rows:8px 1fr; gap:8px; padding:10px; border-radius:12px; background:var(--t); }
+        .ap-linea { grid-column:1 / -1; width:60%; border-radius:9px; background:var(--i); }
+        .ap-bloque { border-radius:8px; background:var(--i); }
+        .ap-caja { border-radius:8px; background:var(--s); }
+        .ap-check { position:absolute; right:10px; bottom:10px; width:24px; height:24px; border-radius:50%; display:grid; place-items:center; font-size:12px; font-weight:800; background:var(--text); color:var(--bg); }
+        @media (max-width: 520px) { .ap-grid { grid-template-columns:1fr 1fr; gap:12px; } .ap-mini { padding:8px; gap:8px; } }
+    </style>
+    <script>
+        function aparienciaPanel(inicial) {
+            return {
+                paleta: inicial.paleta, modo: inicial.modo, estado: '',
+                async elegir(paleta, modo) {
+                    const antes = { paleta: this.paleta, modo: this.modo };
+                    this.paleta = paleta; this.modo = modo;
+                    window.dtApariencia(paleta, modo);
+                    this.estado = 'Guardando…';
+                    try {
+                        const r = await fetch('/dashboard/cuenta/apariencia', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content },
+                            body: JSON.stringify({ paleta, modo }),
+                        });
+                        if (!r.ok) throw new Error();
+                        this.estado = 'Listo: así se verá tu panel en todos tus dispositivos.';
+                    } catch (e) {
+                        this.paleta = antes.paleta; this.modo = antes.modo;
+                        window.dtApariencia(antes.paleta, antes.modo);
+                        this.estado = 'No se pudo guardar. Revisa tu conexión e inténtalo de nuevo.';
+                    }
+                },
+            };
+        }
+    </script>
 @endsection

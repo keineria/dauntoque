@@ -2,21 +2,21 @@
 
 @section('contenido')
     <style>
-        .cf-est { color:#fbbf24; letter-spacing:1px; white-space:nowrap; }
-        .cf-est .off { color:rgba(255,255,255,.16); }
+        .cf-est { color:var(--warn-text); letter-spacing:1px; white-space:nowrap; }
+        .cf-est .off { color:var(--muted); opacity:.35; }
         .cf-barra { display:grid; grid-template-columns:34px 1fr 34px; gap:10px; align-items:center; font-size:12.5px; color:var(--muted); }
-        .cf-barra div { height:8px; border-radius:99px; background:rgba(255,255,255,.07); overflow:hidden; }
+        .cf-barra div { height:8px; border-radius:99px; background:var(--hover-2); overflow:hidden; }
         .cf-barra i { display:block; height:100%; background:#fbbf24; border-radius:99px; }
         .dt-seg a { border-radius:9px; padding:6px 14px; font-size:12.5px; font-weight:600; color:var(--muted); text-decoration:none; }
-        .dt-seg a.on { background:rgba(255,255,255,.1); color:#fff; }
+        .dt-seg a.on { background:var(--seg-on); color:var(--text); }
         .cf-item { display:grid; gap:6px; padding:16px 0; border-top:1px solid var(--border); }
         .cf-item:first-child { border-top:0; padding-top:0; }
         .cf-sw { display:inline-flex; align-items:center; gap:8px; font-size:13px; font-weight:600; cursor:pointer; }
-        .cf-sw input { width:38px; height:22px; appearance:none; border-radius:99px; background:rgba(255,255,255,.12); position:relative; cursor:pointer; transition:background .15s; flex:none; margin:0; }
+        .cf-sw input { width:38px; height:22px; appearance:none; border-radius:99px; background:color-mix(in srgb, var(--muted) 35%, transparent); position:relative; cursor:pointer; transition:background .15s; flex:none; margin:0; }
         .cf-sw input::after { content:""; position:absolute; top:3px; left:3px; width:16px; height:16px; border-radius:50%; background:#fff; transition:transform .15s; }
-        .cf-sw input:checked { background:#2563eb; }
-        .cf-sw input:checked::after { transform:translateX(16px); }
-        .cf-sw input:focus-visible { outline:none; box-shadow:0 0 0 3px rgba(59,130,246,.35); }
+        .cf-sw input:checked { background:var(--primary); }
+        .cf-sw input:checked::after { transform:translateX(16px); background:var(--on-primary); }
+        .cf-sw input:focus-visible { outline:none; box-shadow:0 0 0 3px var(--primary-soft); }
         .cf-sw input:disabled { opacity:.4; cursor:not-allowed; }
         @media (min-width: 900px) { .cf-grid { grid-template-columns:minmax(0, 1fr) 360px; } }
     </style>
@@ -49,8 +49,8 @@
             <div>
                 <h1 class="dt-h1">Califícame</h1>
                 <p class="dt-sub">
-                    @if($enlace)Tus clientes califican en <a href="{{ $enlace }}" target="_blank" rel="noopener" style="color:#60a5fa">{{ preg_replace('#^https?://#', '', $enlace) }}</a>.@else Crea tu perfil para tener tu enlace de calificaciones.@endif
-                    @unless($app->vigente()) <b style="color:#f87171">Venció el {{ $app->vence_en->format('d/m/Y') }}.</b>@endunless
+                    @if($enlace)Tus clientes califican en <a href="{{ $enlace }}" target="_blank" rel="noopener" style="color:var(--link)">{{ preg_replace('#^https?://#', '', $enlace) }}</a>.@else Crea tu perfil para tener tu enlace de calificaciones.@endif
+                    @unless($app->vigente()) <b style="color:var(--danger-text)">Venció el {{ $app->vence_en->format('d/m/Y') }}.</b>@endunless
                 </p>
             </div>
             @if($enlace)
@@ -91,7 +91,7 @@
                         </div>
                     </div>
                     <p class="dt-sub" style="margin:-8px 0 14px">Enciende "Mostrar en mi perfil" en los comentarios que quieras que se vean, o en ninguno. Van <b x-text="visibles"></b> de {{ config('calificame.maximo_comentarios') }}.</p>
-                    <p class="dt-sub" x-show="error" x-text="error" style="color:#f87171" role="alert"></p>
+                    <p class="dt-sub" x-show="error" x-text="error" style="color:var(--danger-text)" role="alert"></p>
 
                     @forelse($calificaciones as $c)
                         <article class="cf-item">
@@ -144,7 +144,7 @@
                         <label class="dt-label" for="google_url">Tu enlace de reseñas de Google (opcional)</label>
                         <input class="dt-input" id="google_url" name="google_url" type="url" inputmode="url" placeholder="https://g.page/r/..." value="{{ old('google_url', $ajustes->google_url) }}">
                         <p class="dt-sub">A quien te dé 4 o 5 estrellas lo invitamos a dejarte también la reseña en Google.</p>
-                        @error('google_url')<p class="dt-sub" style="color:#f87171" role="alert">{{ $message }}</p>@enderror
+                        @error('google_url')<p class="dt-sub" style="color:var(--danger-text)" role="alert">{{ $message }}</p>@enderror
                     </div>
                     <button class="dt-btn pri" type="submit" style="justify-self:start">Guardar</button>
                 </form>
