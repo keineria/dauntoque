@@ -30,6 +30,7 @@
                 @csrf
                 <button class="dt-btn pri" type="submit" style="height:46px;padding:0 22px">Activar gratis por un año</button>
             </form>
+            <p class="dt-sub" style="margin-top:10px">Después del primer año, {{ $precio }} al año.</p>
         </section>
     @else
         <div class="dt-head">

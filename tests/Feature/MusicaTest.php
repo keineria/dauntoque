@@ -33,7 +33,8 @@ class MusicaTest extends TestCase
 
     public function test_se_activa_desde_ver_apps_con_un_anio_gratis_y_sale_en_apps_activas(): void
     {
-        $this->actingAs($this->dueno)->get('/dashboard/apps')->assertSee('Música');
+        $this->actingAs($this->dueno)->get('/dashboard/apps')->assertSee('Música')->assertSee('luego $12.000 COP al año.');
+        $this->get('/dashboard/musica')->assertSee('Después del primer año, $12.000 COP al año.');
         $this->post('/dashboard/musica/activar')->assertRedirect('/dashboard/musica');
 
         $app = Musica::app($this->dueno->id);

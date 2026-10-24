@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\MusicaAjustesRequest;
 use App\Models\MusicaAjuste;
 use App\Models\Profile;
+use App\Services\Agenda\Agenda;
 use App\Services\Musica\Musica;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
@@ -20,7 +21,7 @@ class MusicaPanelController extends Controller
         $userId = Auth::id();
         $app = Musica::app($userId);
         if (!$app) {
-            return view('dashboard.musica', ['app' => null]);
+            return view('dashboard.musica', ['app' => null, 'precio' => Agenda::precioRenovacion(Profile::activoDe($userId)?->pais, 'musica')]);
         }
         $maestro = Profile::maestroDe($userId)?->nickname;
 
