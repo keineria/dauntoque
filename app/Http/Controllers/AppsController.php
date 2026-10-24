@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\AppAdicional;
-use App\Models\Profile;
 use App\Services\Agenda\Agenda;
 use Illuminate\Support\Facades\Auth;
 
@@ -14,7 +13,7 @@ class AppsController extends Controller
     {
         $userId = Auth::id();
         $activas = AppAdicional::where('user_id', $userId)->get()->keyBy('app');
-        $pais = Profile::activoDe($userId)?->pais;
+        $pais = Auth::user()->paisFacturacion();
         $precio = Agenda::precioRenovacion($pais);
 
         $apps = [

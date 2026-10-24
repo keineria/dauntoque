@@ -117,9 +117,9 @@ class DashboardController extends Controller
             'stats' => AnaliticasController::resumen(Auth::id()),
             'fichas' => $this->fichasPerfiles(Auth::id()),
             'tarjetas' => $this->tarjetas(Auth::id()),
-            'whatsappRenovar' => $this->whatsappVentas(Profile::activoDe(Auth::id())?->pais),
+            'whatsappRenovar' => $this->whatsappVentas(Auth::user()->paisFacturacion()),
             'pagosEnLinea' => \App\Services\Bold::configurado(),
-            'precioRenovacion' => Precios::renovacion(Profile::activoDe(Auth::id())?->pais, Auth::user()),
+            'precioRenovacion' => Precios::renovacion(Auth::user()->paisFacturacion(), Auth::user()),
         ]);
     }
 

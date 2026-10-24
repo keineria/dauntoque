@@ -55,6 +55,15 @@
                         <small class="dt-sub" style="display:block;font-size:12px;margin-top:4px">Si lo cambias, desde ese momento entra con el correo nuevo y su contraseña de siempre.</small>
                     </div>
                     <div>
+                        <label class="dt-label" for="cl-pais">País de facturación</label>
+                        <select id="cl-pais" class="dt-input" name="pais_facturacion" required>
+                            @foreach ($mercados as $codigo => $nombre)
+                                <option value="{{ $codigo }}" @selected(old('pais_facturacion', $paisFacturacion) === $codigo)>{{ $nombre }} ({{ \App\Support\Precios::moneda($codigo) }})</option>
+                            @endforeach
+                        </select>
+                        <small class="dt-sub" style="display:block;font-size:12px;margin-top:4px">Moneda y precio de sus renovaciones. Se fijó con su ubicación al crear su primer perfil; el cliente no lo puede cambiar.</small>
+                    </div>
+                    <div>
                         <label class="dt-label" for="cl-precio">Precio de renovación ({{ $moneda }})</label>
                         <input id="cl-precio" class="dt-input" type="number" min="0" step="1" name="precio_renovacion" value="{{ old('precio_renovacion', $u->precio_renovacion) }}" placeholder="Vacío = precio general {{ $precioGeneral }}">
                         <small class="dt-sub" style="display:block;font-size:12px;margin-top:4px">Hoy paga <b>{{ $precioActual ?? '—' }}</b> al renovar. Se usa en su panel, en el pago con Bold y en los avisos por correo.</small>

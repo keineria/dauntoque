@@ -100,9 +100,10 @@
                     <button x-show="redes.length < 4" @click="agregarRed" class="dt-btn" style="width:100%;border-style:dashed">+ Añadir red social</button>
                 </section>
 
-                <section class="dt-panel" style="margin:0">
-                    <div class="dt-panel-h"><h2>Pagos rápidos</h2></div>
+                <section class="dt-panel" id="pagos" style="margin:0">
+                    <div class="dt-panel-h"><h2>Métodos de pago por país</h2></div>
                     {{-- País de cobro: Nequi y Llave Bre-B en Colombia; Zelle, Cash App y Venmo en EE. UU. --}}
+                    <p class="dt-sub" style="margin:-8px 0 12px;font-size:12.5px">Elige el país donde cobras: tu perfil mostrará sus métodos de pago.</p>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px" role="radiogroup" aria-label="País de tus cobros">
                         <template x-for="(nombrePais, codigo) in mercados" :key="codigo">
                             <button type="button" class="dt-btn" :class="pais === codigo ? 'pri' : ''" role="radio" :aria-checked="pais === codigo" @click="pais = codigo" x-text="nombrePais"></button>
@@ -113,6 +114,8 @@
                             <div class="dt-inline"><span :style="'color:' + mediosPago[tipo].acento" x-text="mediosPago[tipo].nombre"></span><input type="text" x-model="pagos[tipo]" :placeholder="mediosPago[tipo].placeholder" :inputmode="mediosPago[tipo].inputmode" :aria-label="mediosPago[tipo].nombre"></div>
                         </template>
                     </div>
+                    <p class="dt-sub" style="margin:12px 0 0;font-size:12px" x-text="pais === 'US' ? 'Estados Unidos: Zelle se copia; Cash App y Venmo abren la app con tu usuario.' : 'Colombia: tus clientes copian tu número de Nequi o tu Llave Bre-B.'"></p>
+                    <p class="dt-sub" x-show="pais !== paisGuardado" x-cloak style="margin:6px 0 0;font-size:12px;color:var(--warn-t)">Al guardar, tu perfil mostrará solo los medios de pago de este país.</p>
                 </section>
             </div>
         </div>
@@ -163,7 +166,7 @@
                 mercados: @json($mercados ?? []),
                 porPais: @json(config('pagos.por_pais')),
                 mediosPago: @json(config('pagos.medios')),
-                pais: db.pais || 'CO',
+                pais: db.pais || 'CO', paisGuardado: db.pais || 'CO',
                 pagos: (db.payment_methods || []).reduce((o, m) => ({ ...o, [m.type]: m.value }), { nequi: '', llave_breb: '', zelle: '', cashapp: '', venmo: '' }),
                 get listaPagos() {
                     return (this.porPais[this.pais] || []).filter(t => String(this.pagos[t] || '').trim()).map(t => ({ type: t, value: String(this.pagos[t]).trim() }));
@@ -264,6 +267,7 @@
                             ? { message: 'Las fotos pesan demasiado para guardarlas juntas. Usa imágenes más livianas o sube menos a la vez.' }
                             : await respuesta.json();
                         if(resultado.status === 'success') {
+                            this.paisGuardado = this.pais;
                             this.avisar('Cambios guardados');
                         } else {
                             this.avisar(resultado.message || 'No se pudieron guardar los cambios.', true);
