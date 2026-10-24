@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Market;
 use App\Models\Profile;
-use App\Models\Tarjeta;
 use App\Services\GeminiBio;
 use App\Support\ImageStore;
 use App\Support\MediosPago;
@@ -173,10 +172,7 @@ class ProfileController extends Controller
             $perfil->save();
 
             // Chip escaneado antes de tener perfil: va al perfil activo, igual que en NfcController
-            if (session()->has('nfc_pendiente')) {
-                Tarjeta::vincular(Profile::activoDe($usuario->id), session('nfc_pendiente'), session()->pull('nfc_medio', 'tarjeta'));
-                session()->forget('nfc_pendiente');
-            }
+            ActivarTarjetaController::enlazarPendiente($usuario->id);
 
             // nickname = link maestro de la cuenta (el botón "Ver mi perfil" del editor)
             return response()->json(['status' => 'success', 'message' => 'Guardado exitoso', 'nickname' => Profile::maestroDe($usuario->id)?->nickname]);

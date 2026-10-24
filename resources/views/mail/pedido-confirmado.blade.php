@@ -13,7 +13,7 @@
     <tr><td style="padding:26px 28px">
         <p style="margin:0 0 14px;font-size:16px;line-height:1.5"><b>Mientras te llega la tarjeta, crea tu perfil.</b> Así, el día que la recibas solo la acercas a tu celular y queda activa.</p>
         <table role="presentation" cellpadding="0" cellspacing="0" style="margin:20px 0"><tr><td style="background:#2fae6e;border-radius:999px">
-            <a href="{{ $pedido->enlaceRegistro() }}" style="display:inline-block;padding:15px 28px;color:#04140b;font-weight:700;font-size:16px;text-decoration:none">Crear mi perfil</a>
+            <a href="{{ $pedido->enlaceRegistro() }}" style="display:inline-block;padding:15px 28px;color:#04140b;font-weight:700;font-size:16px;text-decoration:none">{{ $pedido->tieneCuenta() ? 'Entrar a mi panel' : 'Crear mi perfil' }}</a>
         </td></tr></table>
         <p style="margin:0 0 22px;font-size:13px;color:#5d655f">Si el botón no abre, copia este enlace: <br><a href="{{ $pedido->enlaceRegistro() }}" style="color:#14633b;word-break:break-all">{{ $pedido->enlaceRegistro() }}</a></p>
 

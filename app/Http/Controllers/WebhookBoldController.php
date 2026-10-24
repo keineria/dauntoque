@@ -7,6 +7,7 @@ use App\Mail\PedidoNuevo;
 use App\Models\Chip;
 use App\Models\Pago;
 use App\Models\Pedido;
+use App\Models\User;
 use App\Services\Bold;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -48,7 +49,9 @@ class WebhookBoldController extends Controller
                 return false;
             }
             if ($tipo === 'SALE_APPROVED') {
-                $pedido->update(['estado' => 'pagado', 'pagado_en' => now(), 'pago_proveedor_id' => $pagoId]);
+                // Si el correo ya tiene cuenta, la compra queda a su nombre de una vez (si no, al registrarse)
+                $pedido->update(['estado' => 'pagado', 'pagado_en' => now(), 'pago_proveedor_id' => $pagoId,
+                    'user_id' => $pedido->user_id ?? User::where('email', $pedido->correo)->value('id')]);
                 Chip::deCompra($pedido);
 
                 return true;
