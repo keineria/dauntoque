@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" {!! \App\Support\TemaPanel::atributos(Auth::user()) !!}>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -87,14 +87,15 @@
                 <div><div style="font-size:20px;font-weight:900;letter-spacing:-.02em" x-text="`Hola, ${nombreUsuario.split(' ')[0]} 👋`"></div><div class="dt-sub" style="margin:0;font-size:12.5px">Tu centro de mando digital.</div></div>
                 <div style="position:relative">
                     <button @click="menuCuenta = !menuCuenta" class="dt-btn" style="border-radius:999px;padding:0 12px 0 4px;height:36px">
-                        <span style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#fff;display:grid;place-items:center;font-size:12px;font-weight:800;box-shadow:0 0 14px rgba(59,130,246,.45)" x-text="nombreUsuario.charAt(0).toUpperCase()"></span>
+                        <span style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--primary-2));color:var(--on-pri);display:grid;place-items:center;font-size:12px;font-weight:800;box-shadow:var(--glow)" x-text="nombreUsuario.charAt(0).toUpperCase()"></span>
                         <span x-text="nombreUsuario"></span>
                     </button>
-                    <div x-show="menuCuenta" x-cloak @click.away="menuCuenta = false" class="dt-panel" style="position:absolute;right:0;top:44px;width:280px;z-index:60;box-shadow:0 12px 32px rgba(0,0,0,.12)">
+                    <div x-show="menuCuenta" x-cloak @click.away="menuCuenta = false" class="dt-panel" style="position:absolute;right:0;top:44px;width:280px;z-index:60;box-shadow:var(--shadow-lg)">
                         <p class="dt-label" style="margin:0">Configuración</p>
                         <p style="margin:4px 0 0;font-weight:600" x-text="nombreUsuario"></p>
                         <p class="dt-sub" style="margin:0" x-text="correoUsuario"></p>
                         <div class="dt-sep" style="margin:12px 0 8px"></div>
+                        <a href="/dashboard/cuenta#apariencia" class="dt-nav" style="padding:8px 10px">Apariencia y colores</a>
                         <a href="/dashboard/cuenta" class="dt-nav" style="padding:8px 10px">Mi cuenta y seguridad</a>
                         <a href="/dashboard/ayuda" class="dt-nav" style="padding:8px 10px">Ayuda y preguntas frecuentes</a>
                         @if ($usuarioPanel?->esAdmin())<a href="/admin" class="dt-nav" style="padding:8px 10px">Administrador</a>@endif

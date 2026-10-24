@@ -13,7 +13,7 @@
             @php $activa = $a['app'] ?? null; @endphp
             <section class="dt-panel" style="display:flex;flex-direction:column;gap:12px;margin:0;{{ !empty($a['proximamente']) ? 'opacity:.6' : '' }}">
                 <div style="display:flex;gap:12px;align-items:center">
-                    <span style="width:46px;height:46px;border-radius:14px;background:rgba(255,255,255,.06);display:grid;place-items:center;font-size:24px;flex:none">{{ $a['icono'] }}</span>
+                    <span style="width:46px;height:46px;border-radius:14px;background:var(--soft-2);display:grid;place-items:center;font-size:24px;flex:none">{{ $a['icono'] }}</span>
                     <div>
                         <b style="font-size:15px">{{ $a['nombre'] }}</b><br>
                         @if(!empty($a['proximamente']))

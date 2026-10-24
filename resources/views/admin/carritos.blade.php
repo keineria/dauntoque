@@ -10,7 +10,7 @@
     @include('admin._tabs')
 
     @unless ($promoActiva)
-        <p class="dt-panel" style="color:#fbbf24;margin:0 0 18px">El correo de promoción está apagado. Enciéndelo en <a href="/admin/correos" style="color:inherit">Correos</a> para poder enviarlo.</p>
+        <p class="dt-panel" style="color:var(--warn-t);margin:0 0 18px">El correo de promoción está apagado. Enciéndelo en <a href="/admin/correos" style="color:inherit">Correos</a> para poder enviarlo.</p>
     @endunless
 
     <section class="dt-panel" x-data="{ abierta: {{ $errors->any() ? 'true' : 'false' }} }">
@@ -21,7 +21,7 @@
         <p class="dt-sub" style="margin:0">El correo lleva un enlace a /comprar con el descuento y sus datos ya escritos. Vale {{ $diasPromo }} días.</p>
         <form x-show="abierta" x-cloak method="POST" action="/admin/carritos/promo" style="display:grid;gap:12px;margin-top:16px">
             @csrf
-            @if ($errors->any())<p style="color:#f87171;margin:0">{{ $errors->first() }}</p>@endif
+            @if ($errors->any())<p style="color:var(--bad-t);margin:0">{{ $errors->first() }}</p>@endif
             <div><span class="dt-label">Descuento (%)</span><input class="dt-input" style="max-width:140px" type="number" name="promo_descuento" min="0" max="50" required value="{{ old('promo_descuento', $descuento) }}"></div>
             <div><span class="dt-label">Asunto del correo (opcional)</span><input class="dt-input" name="promo_asunto" maxlength="120" value="{{ old('promo_asunto', $promoAsunto) }}" placeholder="Tu tarjeta DaUnToque te espera con un {{ $descuento }} % de descuento"></div>
             <div><span class="dt-label">Mensaje (opcional)</span><textarea class="dt-input" name="promo_mensaje" rows="3" maxlength="1000" placeholder="Vimos que no terminaste tu compra. Te guardamos tu tarjeta con un descuento especial, solo por estos días.">{{ old('promo_mensaje', $promoMensaje) }}</textarea></div>

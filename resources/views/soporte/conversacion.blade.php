@@ -43,7 +43,7 @@
             <button class="dt-btn pri" type="submit" :disabled="enviando || !texto.trim()">Enviar</button>
         </form>
         <p class="dt-sub" x-show="estado === 'cerrada'" x-cloak style="text-align:center">Esta conversación está cerrada.</p>
-        <p style="color:#f87171;margin:8px 0 0;font-size:13px" x-show="error" x-text="error" x-cloak></p>
+        <p style="color:var(--bad-t);margin:8px 0 0;font-size:13px" x-show="error" x-text="error" x-cloak></p>
     </section>
 
     <script>
