@@ -5,9 +5,12 @@ use App\Http\Controllers\AnaliticasController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController;
 
-// Página de inicio del portal (Redirige al login)
+// Inicio de dauntoque.com: la página del sitio de ventas (sitio:generar --dentro-de-laravel) si existe;
+// si no, el portal manda al login. (Si el servidor ya sirve public/index.html primero, esto ni se usa.)
 Route::get('/', function () {
-    return redirect('/login');
+    $inicio = public_path('index.html');
+
+    return is_file($inicio) ? response()->file($inicio, ['Content-Type' => 'text/html; charset=UTF-8']) : redirect('/login');
 });
 
 // Ruta libre para leer la tarjeta física (con límite de intentos para evitar barridos de códigos)

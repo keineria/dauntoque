@@ -30,3 +30,14 @@ Thumbs.db
 /public/uploads
 /database/*.sqlite
 /public/nuevo
+
+# Sitio de ventas generado dentro de public/ (php artisan sitio:generar --dentro-de-laravel)
+/public/es-co
+/public/es-us
+/public/en-us
+/public/media
+/public/sitio.css
+/public/sitio.js
+/public/index.html
+/public/sitemap.xml
+/public/robots.txt
