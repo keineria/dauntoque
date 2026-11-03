@@ -28,13 +28,29 @@ class WebhookBoldController extends Controller
         }
 
         $tipo = $request->input('type');
-        // En links de pago, metadata.reference es el id del link (LNK_...)
-        $link = (string) $request->input('data.metadata.reference');
-        $pagoId = $request->input('data.payment_id');
+        $pagoId = $request->input('data.payment_id') ?? $request->input('subject');
+        // En links de pago, metadata.reference es el id del link (LNK_...); por si Bold lo manda en otro campo, se prueban varios
+        $candidatos = array_values(array_unique(array_filter(array_map(
+            fn ($campo) => (string) $request->input($campo),
+            ['data.metadata.reference', 'data.reference', 'data.payment_link', 'data.payment_link_id', 'data.link_id']
+        ))));
 
-        if ($pedido = Pedido::where('link_id', $link)->first()) {
+        $pedido = $candidatos ? Pedido::whereIn('link_id', $candidatos)->first() : null;
+        $pago = !$pedido && $candidatos ? Pago::where('proveedor', 'bold')->whereIn('link_id', $candidatos)->first() : null;
+
+        // Huella de cada aviso (sin datos personales) para saber qué manda Bold y por qué un aviso no encuentra su pedido
+        Log::info('Webhook de Bold', [
+            'tipo' => $tipo,
+            'pago_id' => $pagoId,
+            'referencias' => $candidatos,
+            'campos_data' => array_keys((array) $request->input('data', [])),
+            'campos_metadata' => array_keys((array) $request->input('data.metadata', [])),
+            'resultado' => $pedido ? 'pedido ' . $pedido->id : ($pago ? 'pago ' . $pago->id : 'sin coincidencia'),
+        ]);
+
+        if ($pedido) {
             $this->pedido($pedido, $tipo, $pagoId);
-        } elseif ($pago = Pago::where('proveedor', 'bold')->where('link_id', $link)->first()) {
+        } elseif ($pago) {
             $this->renovacion($pago, $tipo, $pagoId);
         }
 
