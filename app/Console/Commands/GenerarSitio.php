@@ -22,6 +22,7 @@ class GenerarSitio extends Command
         {--dominio=https://dauntoque.com : Dominio de las URL canónicas}
         {--portal=https://portal.dauntoque.com : Portal donde se compra en línea (/comprar)}
         {--indexar : Permite que Google indexe (solo para la publicación final)}
+        {--dentro-de-laravel : El destino es la carpeta public/ de Laravel: no la vacía entera ni crea .htaccess/portal.php}
         {--fuente= : Carpeta con textos, CSS, JS y media (por defecto resources/sitio)}';
 
     protected $description = 'Genera el sitio estático de ventas por país e idioma';
@@ -48,7 +49,13 @@ class GenerarSitio extends Command
         $textos = require $fuente . '/textos.php';
         $paginas = [];
 
-        File::deleteDirectory($destino);
+        $dentroDeLaravel = (bool) $this->option('dentro-de-laravel');
+        if ($dentroDeLaravel) {
+            // En public/ conviven index.php, build, uploads…: solo se reemplaza lo que genera este comando
+            $this->limpiarGenerados($destino);
+        } else {
+            File::deleteDirectory($destino);
+        }
         File::ensureDirectoryExists($destino);
 
         foreach (self::VERSIONES as $codigo => $version) {
@@ -104,13 +111,14 @@ class GenerarSitio extends Command
 
         // En la raíz del dominio, dauntoque.com/keiner muestra el perfil: lo que no es del sitio de ventas
         // lo sirve portal.php pidiéndolo al portal, sin cambiar la dirección
-        if ($base === '') {
+        // (dentro de Laravel no hace falta: su propio .htaccess ya sirve primero los archivos que existen)
+        if ($base === '' && !$dentroDeLaravel) {
             File::put($destino . '/.htaccess', self::htaccess());
             File::put($destino . '/portal.php', strtr(File::get(resource_path('sitio/servidor/portal.php')), ['__PORTAL__' => $portal]));
         }
 
         // Versión de cada archivo en sus enlaces (sitio.css?v=…): así Cloudflare y el navegador no muestran los viejos
-        $this->versionarEnlaces($destino, $base);
+        $this->versionarEnlaces($destino, $base, $dentroDeLaravel ? $this->generados() : null);
 
         $this->info(count($paginas) . " páginas generadas en $destino");
 
@@ -149,13 +157,37 @@ class GenerarSitio extends Command
             . "RewriteRule ^ portal.php [L]\n";
     }
 
-    /** Agrega ?v=<huella del archivo> a sitio.css, sitio.js y media/… en todas las páginas generadas. */
-    private function versionarEnlaces(string $destino, string $base): void
+    /** Carpetas y archivos que genera este comando en la raíz del destino (nada más se toca en public/). */
+    public function generados(): array
+    {
+        return [...array_keys(self::VERSIONES), 'media', 'sitio.css', 'sitio.js', 'index.html', 'sitemap.xml', 'robots.txt'];
+    }
+
+    private function limpiarGenerados(string $destino): void
+    {
+        foreach ($this->generados() as $nombre) {
+            File::isDirectory("$destino/$nombre") ? File::deleteDirectory("$destino/$nombre") : File::delete("$destino/$nombre");
+        }
+    }
+
+    /**
+     * Agrega ?v=<huella del archivo> a sitio.css, sitio.js y media/… en todas las páginas generadas.
+     * $solo = nombres dentro de $destino que se revisan (en public/ de Laravel no se recorre todo).
+     */
+    private function versionarEnlaces(string $destino, string $base, ?array $solo = null): void
     {
         $huellas = [];
         $patron = '#(?<=["\'(])' . preg_quote($base, '#') . '/((?:media/[^"\'()?\s]+)|sitio\.css|sitio\.js)(?=["\')])#';
 
-        foreach (File::allFiles($destino) as $archivo) {
+        $archivos = $solo === null ? File::allFiles($destino) : collect($solo)->flatMap(function ($nombre) use ($destino) {
+            if (File::isDirectory("$destino/$nombre")) {
+                return File::allFiles("$destino/$nombre");
+            }
+
+            return File::isFile("$destino/$nombre") ? [new \SplFileInfo("$destino/$nombre")] : [];
+        });
+
+        foreach ($archivos as $archivo) {
             if ($archivo->getExtension() !== 'html') {
                 continue;
             }
