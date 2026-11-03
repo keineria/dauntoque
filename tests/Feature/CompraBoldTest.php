@@ -7,6 +7,7 @@ use App\Mail\PedidoNuevo;
 use App\Models\Pedido;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
@@ -87,6 +88,23 @@ class CompraBoldTest extends TestCase
 
         $this->assertSame('rechazado', $pedido->fresh()->estado);
         Mail::assertNothingSent();
+    }
+
+    public function test_cada_aviso_deja_huella_en_el_registro_y_busca_la_referencia_en_otros_campos(): void
+    {
+        Mail::fake();
+        Log::spy();
+        $pedido = $this->pedido();
+
+        // Aviso de ejemplo que no coincide con ningún pedido: responde 200 y lo deja anotado
+        $this->webhook(json_encode(['type' => 'SALE_APPROVED', 'data' => ['payment_id' => 'PAY_X', 'metadata' => ['reference' => 'OTRA']]]))->assertOk();
+        Log::shouldHaveReceived('info')->withArgs(fn ($m, $c) => $m === 'Webhook de Bold' && $c['resultado'] === 'sin coincidencia' && $c['referencias'] === ['OTRA'])->once();
+        $this->assertSame('pendiente', $pedido->fresh()->estado);
+
+        // Si Bold manda la referencia en otro campo, también encuentra el pedido
+        $this->webhook(json_encode(['type' => 'SALE_APPROVED', 'subject' => 'PAY_2', 'data' => ['payment_link' => 'LNK_777']]))->assertOk();
+        $this->assertSame('pagado', $pedido->fresh()->estado);
+        $this->assertSame('PAY_2', $pedido->fresh()->pago_proveedor_id);
     }
 
     public function test_al_registrarse_con_el_correo_el_pedido_queda_en_su_cuenta(): void
