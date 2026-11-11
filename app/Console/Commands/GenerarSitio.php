@@ -104,10 +104,8 @@ class GenerarSitio extends Command
         File::copyDirectory($fuente . '/media', $destino . '/media');
         File::put($destino . '/sitio.css', $this->minificarCss(File::get($fuente . '/sitio.css')));
         File::put($destino . '/sitio.js', File::get($fuente . '/sitio.js'));
-        File::put($destino . '/sitemap.xml', view('sitio.sitemap', ['paginas' => $paginas, 'dominio' => $dominio, 'base' => $base])->render());
-        File::put($destino . '/robots.txt', $indexar
-            ? "User-agent: *\nDisallow: /pedido\nSitemap: $dominio$base/sitemap.xml\n"
-            : "User-agent: *\nDisallow: /\n");
+        File::put($destino . '/sitemap.xml', view('sitio.sitemap', ['paginas' => $paginas, 'dominio' => $dominio, 'base' => $base, 'fecha' => now()->toDateString()])->render());
+        File::put($destino . '/robots.txt', $indexar ? self::robots($dominio, $base) : "User-agent: *\nDisallow: /\n");
 
         // En la raíz del dominio, dauntoque.com/keiner muestra el perfil: lo que no es del sitio de ventas
         // lo sirve portal.php pidiéndolo al portal, sin cambiar la dirección
@@ -145,6 +143,21 @@ class GenerarSitio extends Command
                 'pagos' => DB::table('payment_methods')->where('market_code', $m->code)->orderBy('sort')->pluck('label')->all(),
             ]];
         })->all();
+    }
+
+    /**
+     * robots.txt de la publicación: deja fuera el panel, el administrador y las páginas privadas
+     * (pedidos, citas, activación) y anuncia los dos mapas: el del sitio de ventas y el de los perfiles.
+     */
+    public static function robots(string $dominio, string $base = ''): string
+    {
+        // Las páginas con noindex propio (comprar, login, agenda) no se bloquean aquí: Google debe poder leer ese noindex
+        $privadas = ['/dashboard', '/admin', '/editor', '/pedido/', '/cita/', '/activar/', '/api/', '/webhooks/', '/*/vcf$'];
+
+        return "User-agent: *\nAllow: /\n"
+            . implode('', array_map(fn ($ruta) => "Disallow: $ruta\n", $privadas))
+            . "\nSitemap: $dominio$base/sitemap.xml\n"
+            . ($base === '' ? "Sitemap: $dominio/sitemap-perfiles.xml\n" : '');
     }
 
     /** Reglas para dauntoque.com: toda ruta que no sea un archivo o carpeta del sitio la atiende portal.php. */
@@ -208,6 +221,25 @@ class GenerarSitio extends Command
     public static function dinero($monto, string $moneda): string
     {
         return '$' . ($moneda === 'COP' ? number_format((float) $monto, 0, ',', '.') : rtrim(rtrim(number_format((float) $monto, 2, '.', ','), '0'), '.'));
+    }
+
+    /**
+     * Oferta del producto para schema.org: precio del país, producto nuevo, vendido por DaUnToque
+     * y la garantía de 30 días (devolución del dinero) que promete el sitio.
+     */
+    public static function oferta(array $mercado, string $url): array
+    {
+        return [
+            '@type' => 'Offer', 'price' => $mercado['precio'], 'priceCurrency' => $mercado['moneda'],
+            'availability' => 'https://schema.org/InStock', 'itemCondition' => 'https://schema.org/NewCondition', 'url' => $url,
+            'eligibleRegion' => ['@type' => 'Country', 'name' => $mercado['code']],
+            'seller' => ['@type' => 'Organization', 'name' => 'DaUnToque'],
+            'hasMerchantReturnPolicy' => [
+                '@type' => 'MerchantReturnPolicy', 'applicableCountry' => $mercado['code'],
+                'returnPolicyCategory' => 'https://schema.org/MerchantReturnFiniteReturnWindow', 'merchantReturnDays' => 30,
+                'returnMethod' => 'https://schema.org/ReturnByMail',
+            ],
+        ];
     }
 
     /** Ruta de una página dentro de una versión: '' (inicio), 'tarjetas/crystal', 'faq'… */
