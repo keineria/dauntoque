@@ -42,6 +42,8 @@
     @endphp
     <script type="application/ld+json">{!! json_encode($org, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG) !!}</script>
     @yield('schema')
+    {{-- Píxeles conectados en el Centro de mando y origen de la visita (lo sirve Laravel, cambia sin regenerar el sitio) --}}
+    <script src="/etiquetas.js" async></script>
 </head>
 <body>
     {{-- Iconos del sitio: <svg><use href="#ok"/></svg> --}}

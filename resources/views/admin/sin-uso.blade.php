@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('contenido')
     <div class="dt-head">
@@ -8,7 +8,6 @@
         </div>
         <a href="/admin" class="dt-btn">Volver al resumen</a>
     </div>
-    @include('admin._tabs')
 
     @unless ($activa)
         <p class="dt-panel" style="color:var(--warn-t);margin:0 0 18px">El recordatorio de uso está apagado. Enciéndelo en <a href="/admin/correos" style="color:inherit">Correos</a> para poder enviarlo.</p>

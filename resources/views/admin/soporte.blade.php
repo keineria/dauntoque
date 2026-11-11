@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('contenido')
     <div class="dt-head">
@@ -11,7 +11,6 @@
             <button class="dt-btn pri" type="submit" @disabled($cola->isEmpty())>Atender al siguiente ({{ $cola->count() }} en cola)</button>
         </form>
     </div>
-    @include('admin._tabs')
 
     <div x-data="{ firma: null }" x-init="
         const revisar = async () => {

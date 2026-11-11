@@ -41,6 +41,8 @@
         @media (max-width:880px){.grid{grid-template-columns:1fr}.resumen{position:static;order:-1}}
         @media (max-width:460px){.dos{grid-template-columns:1fr}}
     </style>
+    <script>window.dtq = window.dtq || []; dtq.push(['inicio_compra', {valor: {{ (float) $precio->amount }}, moneda: @js($moneda)}]);</script>
+    <script src="/etiquetas.js" async></script>
 </head>
 <body>
 <header class="top"><div class="w">

@@ -17,6 +17,10 @@
         ol{margin:0;padding-left:20px;line-height:1.7}
     </style>
     @if ($pedido->estado === 'pendiente')<meta http-equiv="refresh" content="8">@endif
+    @if ($pedido->estado === 'pagado')
+        <script>window.dtq = window.dtq || []; dtq.push(['compra', {valor: {{ (float) $pedido->monto }}, moneda: @js($pedido->moneda), id: @js($pedido->codigo)}]);</script>
+    @endif
+    <script src="/etiquetas.js" async></script>
 </head>
 <body>
 <header class="top"><div class="w"><a class="logo" href="https://dauntoque.com">dauntoque<span>.com</span></a><span class="seguro">Pedido {{ $pedido->codigo }}</span></div></header>

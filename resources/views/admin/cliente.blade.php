@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('contenido')
     @php
@@ -38,7 +38,6 @@
             @endif
         </div>
     </div>
-    @include('admin._tabs')
 
     @if ($errors->any())<p class="dt-panel" role="alert" style="color:var(--bad-t);margin:0 0 18px">{{ $errors->first() }}</p>@endif
 

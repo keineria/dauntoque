@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('contenido')
     <div class="dt-head">
@@ -8,7 +8,6 @@
         </div>
         <a href="/admin/correos" class="dt-btn">Volver a Correos</a>
     </div>
-    @include('admin._tabs')
 
     @if ($errors->any())<p class="dt-panel" style="color:var(--bad-t);margin:0 0 18px">{{ $errors->first() }}</p>@endif
 

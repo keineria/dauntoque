@@ -14,7 +14,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         // Bold no envía token CSRF: el webhook se valida con su firma
-        $middleware->validateCsrfTokens(except: ['webhooks/bold']);
+        $middleware->validateCsrfTokens(except: ['webhooks/bold', 'etiquetas/visita']);
+        // Galletas que escribe /etiquetas.js en el navegador (origen de la visita): Laravel no las cifra
+        $middleware->encryptCookies(except: ['dt_utm', 'dt_v', 'dt_yo']);
         $middleware->alias(['admin' => \App\Http\Middleware\SoloAdmin::class]);
         // Contraseña temporal (cuentas creadas con admin:crear): se cambia antes de usar el panel
         $middleware->web(append: [\App\Http\Middleware\CambiarClaveTemporal::class]);

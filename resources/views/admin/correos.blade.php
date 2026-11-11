@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('contenido')
     <div class="dt-head">
@@ -7,7 +7,6 @@
             <p class="dt-sub">El servidor que envía los correos, quién los firma, a dónde llegan los avisos y el diseño de cada plantilla.</p>
         </div>
     </div>
-    @include('admin._tabs')
 
     @if ($errors->any())<p class="dt-panel" style="color:var(--bad-t);margin:0 0 18px">{{ $errors->first() }}</p>@endif
 
