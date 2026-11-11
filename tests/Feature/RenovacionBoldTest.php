@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Mail\RenovacionConfirmada;
 use App\Models\Pago;
 use App\Models\Profile;
 use App\Models\Tarjeta;
@@ -9,6 +10,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
 class RenovacionBoldTest extends TestCase
@@ -61,6 +63,35 @@ class RenovacionBoldTest extends TestCase
 
         $this->assertSame('2028-10-13', $this->tarjeta->fresh()->vence_en->toDateString());
         $this->assertDatabaseHas('pagos', ['link_id' => 'LNK_123', 'estado' => 'pagado', 'pago_proveedor_id' => 'PAY_9']);
+    }
+
+    public function test_la_renovacion_pagada_manda_el_comprobante_una_sola_vez(): void
+    {
+        Mail::fake();
+        config(['pedidos.aviso_correo' => 'ventas@dauntoque.com']);
+        $this->pagoPendiente();
+        $cuerpo = $this->evento('SALE_APPROVED');
+
+        $this->webhook($cuerpo)->assertOk();
+        $this->webhook($cuerpo)->assertOk();
+
+        Mail::assertSent(RenovacionConfirmada::class, 2);
+        Mail::assertSent(RenovacionConfirmada::class, fn ($m) => ! $m->interno && $m->hasTo($this->usuario->email));
+        Mail::assertSent(RenovacionConfirmada::class, fn ($m) => $m->interno && $m->hasTo('ventas@dauntoque.com'));
+
+        $correo = new RenovacionConfirmada(Pago::first());
+        $this->assertStringContainsString('13/10/2028', $correo->envelope()->subject);
+        $this->assertStringContainsString('$120.000 COP', $correo->render());
+    }
+
+    public function test_un_pago_rechazado_no_manda_comprobante(): void
+    {
+        Mail::fake();
+        $this->pagoPendiente();
+
+        $this->webhook($this->evento('SALE_REJECTED'))->assertOk();
+
+        Mail::assertNothingSent();
     }
 
     public function test_renovar_vencida_cuenta_desde_hoy(): void

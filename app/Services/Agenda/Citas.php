@@ -178,9 +178,10 @@ class Citas
         return 'https://wa.me/' . $numero . '?text=' . rawurlencode($texto);
     }
 
-    public static function alCliente(Cita $cita, string $tipo): void
+    /** Devuelve false solo si el correo falló al salir (para poder reintentar, como en los recordatorios). */
+    public static function alCliente(Cita $cita, string $tipo): bool
     {
-        self::enviar($cita->cliente_correo, (new AgendaCorreo($tipo, $cita))->locale($cita->idioma));
+        return self::enviar($cita->cliente_correo, (new AgendaCorreo($tipo, $cita))->locale($cita->idioma));
     }
 
     public static function alDuenio(Cita $cita, string $tipo): void
@@ -189,15 +190,19 @@ class Citas
     }
 
     /** Un correo que no sale no debe tumbar la reserva: se registra y se sigue. */
-    private static function enviar(?string $correo, AgendaCorreo $correoAgenda): void
+    private static function enviar(?string $correo, AgendaCorreo $correoAgenda): bool
     {
         if (!$correo) {
-            return;
+            return true;
         }
         try {
             Mail::to($correo)->send($correoAgenda);
+
+            return true;
         } catch (Throwable $e) {
             Log::error('Agenda: no se pudo enviar el correo', ['tipo' => $correoAgenda->tipo, 'correo' => $correo, 'error' => $e->getMessage()]);
+
+            return false;
         }
     }
 }

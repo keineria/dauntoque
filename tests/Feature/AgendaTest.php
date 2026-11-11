@@ -219,6 +219,24 @@ class AgendaTest extends TestCase
         $this->artisan('citas:recordar')->assertSuccessful();
 
         $this->assertSame('cancelada', Cita::first()->estado);
+        Mail::assertSent(AgendaCorreo::class, fn ($m) => $m->tipo === 'vencida' && $m->hasTo(Cita::first()->cliente_correo));
+        $this->assertStringContainsString('no alcanzó', (new AgendaCorreo('vencida', Cita::first()))->render());
+    }
+
+    public function test_un_recordatorio_que_falla_se_reintenta_en_la_siguiente_pasada(): void
+    {
+        $this->reservar('2026-10-13', '10:00');
+        Carbon::setTestNow(Carbon::parse('2026-10-12 10:05', 'America/Bogota'));
+
+        Mail::swap(new \Illuminate\Mail\MailManager($this->app));
+        config(['mail.default' => 'smtp', 'mail.mailers.smtp.host' => '127.0.0.1', 'mail.mailers.smtp.port' => 1]); // nadie contesta: correo caído
+        $this->artisan('citas:recordar')->assertSuccessful();
+        $this->assertNull(Cita::first()->recordado_24h_en);
+
+        Mail::fake();
+        $this->artisan('citas:recordar')->assertSuccessful();
+        $this->assertNotNull(Cita::first()->recordado_24h_en);
+        Mail::assertSent(AgendaCorreo::class, fn ($m) => $m->tipo === 'recordatorio');
     }
 
     public function test_google_calendar_bloquea_lo_ocupado_y_recibe_la_cita(): void
