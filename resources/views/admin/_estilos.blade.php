@@ -55,5 +55,9 @@
     .ad-campo small { font-weight:400; color:var(--muted); }
     .ad-form { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap:14px; align-items:end; }
     .ad-url { font-family:ui-monospace,Consolas,monospace; font-size:12.5px; overflow-wrap:anywhere; padding:12px 14px; border-radius:12px; background:var(--sunken); border:1px solid var(--border); }
+    .ad-mas { border:1px solid var(--border); border-radius:14px; padding:12px 14px; background:var(--sunken); }
+    .ad-mas summary { cursor:pointer; font-size:13.5px; font-weight:700; }
+    .ad-mas summary small { font-weight:400; color:var(--muted); }
+    .ad-mas summary:focus-visible { outline:2px solid var(--primary); outline-offset:3px; border-radius:6px; }
     .ad-acciones { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
 </style>

@@ -13,7 +13,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
-/** Centro de mando · marketing: píxeles, campañas con UTM y rendimiento. */
+/** Centro de mando · marketing: píxeles, enlaces UTM y QR, y rendimiento. */
 class AdminMarketingController extends Controller
 {
     public function pixeles(): View
@@ -30,11 +30,14 @@ class AdminMarketingController extends Controller
 
     public function campanas(Request $request): View
     {
-        $rendimiento = new Rendimiento((int) $request->query('dias', 30));
+        $dias = (int) $request->query('dias', 30);
+        $rendimiento = new Rendimiento($dias);
 
         return view('admin.campanas', [
-            'campanas' => Campana::latest('id')->paginate(20),
-            'resultados' => $rendimiento->porCampana()->keyBy('utm'),
+            'dias' => array_key_exists($dias, Rendimiento::PERIODOS) ? $dias : 30,
+            'periodos' => Rendimiento::PERIODOS,
+            'enlaces' => $rendimiento->porCampana(),
+            'pedidos' => $rendimiento->pedidosPorCampana(),
             'canales' => Campana::CANALES,
             'destinos' => $this->destinos(),
         ]);
@@ -44,21 +47,21 @@ class AdminMarketingController extends Controller
     {
         $campana = Campana::create($request->validated());
 
-        return redirect('/admin/campanas#campana-' . $campana->id)->with('status', 'Campaña creada. Copia su enlace y úsalo en el anuncio.');
+        return redirect('/admin/campanas#campana-' . $campana->id)->with('status', 'Enlace creado. Cópialo o descarga su QR y compártelo.');
     }
 
     public function actualizarCampana(CampanaRequest $request, Campana $campana): RedirectResponse
     {
         $campana->update($request->validated());
 
-        return redirect('/admin/campanas#campana-' . $campana->id)->with('status', 'Campaña actualizada.');
+        return redirect('/admin/campanas#campana-' . $campana->id)->with('status', 'Enlace actualizado.');
     }
 
     public function eliminarCampana(Campana $campana): RedirectResponse
     {
         $campana->delete();
 
-        return redirect('/admin/campanas')->with('status', 'Campaña eliminada. Sus visitas y ventas siguen en Rendimiento con su UTM.');
+        return redirect('/admin/campanas')->with('status', 'Enlace eliminado. Sus visitas y compras se siguen viendo por su UTM.');
     }
 
     public function rendimiento(Request $request): View

@@ -31,7 +31,7 @@
         ],
         'Marketing' => [
             ['admin/rendimiento', 'Rendimiento', '<path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 6-7"/>', ['admin/rendimiento*']],
-            ['admin/campanas', 'Campañas y UTM', '<path d="M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1zM15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/>', ['admin/campanas*']],
+            ['admin/campanas', 'Enlaces UTM y QR', '<path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/>', ['admin/campanas*']],
             ['admin/pixeles', 'Píxeles', '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/>', ['admin/pixeles*']],
         ],
         'Ajustes' => [

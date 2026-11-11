@@ -6,7 +6,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-/** Campaña de marketing: sus UTM, a dónde lleva y cuánto se invierte (lo escribe el administrador). */
+/** Enlace con UTM (o su QR): a dónde lleva, por qué canal se comparte y, si se paga publicidad, cuánto se invierte. */
 class Campana extends Model
 {
     protected $table = 'campanas';
@@ -23,17 +23,20 @@ class Campana extends Model
     ];
 
     /**
-     * Canales con sus UTM recomendados (fuente y medio). Los anuncios pagos usan "paid_social" o "cpc"
-     * para que Google Analytics y Meta los agrupen como tráfico pago.
+     * Canales con sus UTM recomendados (fuente y medio), primero los digitales. Los anuncios pagos usan
+     * "paid_social" o "cpc" para que Google Analytics y Meta los agrupen como tráfico pago.
      */
     public const CANALES = [
-        'meta' => ['nombre' => 'Meta (Facebook e Instagram)', 'source' => 'facebook', 'medium' => 'paid_social'],
-        'google' => ['nombre' => 'Google Ads', 'source' => 'google', 'medium' => 'cpc'],
-        'tiktok' => ['nombre' => 'TikTok Ads', 'source' => 'tiktok', 'medium' => 'paid_social'],
+        'instagram' => ['nombre' => 'Instagram (bio, historias, publicaciones)', 'source' => 'instagram', 'medium' => 'social'],
+        'facebook' => ['nombre' => 'Facebook (página, grupos, publicaciones)', 'source' => 'facebook', 'medium' => 'social'],
+        'tiktok' => ['nombre' => 'TikTok (perfil, videos)', 'source' => 'tiktok', 'medium' => 'social'],
+        'whatsapp' => ['nombre' => 'WhatsApp (estados, mensajes, grupos)', 'source' => 'whatsapp', 'medium' => 'social'],
+        'linkedin' => ['nombre' => 'LinkedIn', 'source' => 'linkedin', 'medium' => 'social'],
         'correo' => ['nombre' => 'Correo', 'source' => 'newsletter', 'medium' => 'email'],
-        'whatsapp' => ['nombre' => 'WhatsApp', 'source' => 'whatsapp', 'medium' => 'social'],
-        'organico' => ['nombre' => 'Redes (publicación sin pagar)', 'source' => 'instagram', 'medium' => 'social'],
-        'qr' => ['nombre' => 'QR impreso (volante, evento)', 'source' => 'qr', 'medium' => 'offline'],
+        'meta_ads' => ['nombre' => 'Anuncio pagado en Meta (Facebook e Instagram)', 'source' => 'facebook', 'medium' => 'paid_social'],
+        'google_ads' => ['nombre' => 'Anuncio pagado en Google', 'source' => 'google', 'medium' => 'cpc'],
+        'tiktok_ads' => ['nombre' => 'Anuncio pagado en TikTok', 'source' => 'tiktok', 'medium' => 'paid_social'],
+        'qr' => ['nombre' => 'QR (impreso, tarjeta, evento)', 'source' => 'qr', 'medium' => 'offline'],
         'aliado' => ['nombre' => 'Aliado o influenciador', 'source' => 'aliado', 'medium' => 'referral'],
         'otro' => ['nombre' => 'Otro', 'source' => '', 'medium' => ''],
     ];

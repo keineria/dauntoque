@@ -76,10 +76,10 @@ class Rendimiento
             ->selectRaw('utm_campaign, COUNT(DISTINCT visitante) as personas, COUNT(*) as paginas')
             ->get()->keyBy('utm_campaign');
         $pedidos = $this->pedidosAgrupados(['utm_campaign'], fn ($q) => $q->whereNotNull('utm_campaign'));
-        $campanas = Campana::query()
-            ->whereIn('utm_campaign', $visitas->keys()->merge($pedidos->keys())->unique())
-            ->orWhere('termina_en', '>=', $this->desde)->orWhereNull('termina_en')
-            ->get(['id', 'nombre', 'canal', 'utm_campaign', 'presupuesto', 'moneda'])->keyBy('utm_campaign');
+        // Todos los enlaces creados (aunque aún no tengan visitas) y cualquier otro UTM que llegue
+        $campanas = Campana::query()->latest('id')
+            ->get(['id', 'nombre', 'canal', 'utm_source', 'utm_medium', 'utm_campaign', 'destino', 'presupuesto', 'moneda', 'inicia_en', 'termina_en', 'notas'])
+            ->keyBy('utm_campaign');
 
         return $campanas->keys()->merge($visitas->keys())->merge($pedidos->keys())->unique()->map(function (string $utm) use ($visitas, $pedidos, $campanas) {
             $fila = $this->fila($visitas->get($utm), $pedidos->get($utm));
@@ -93,7 +93,20 @@ class Rendimiento
                 'costoCompra' => $presupuesto && $fila['pagados'] > 0 ? $presupuesto / $fila['pagados'] : null,
                 'roas' => $presupuesto ? round($ventasMoneda / $presupuesto, 2) : null,
             ];
-        })->sortByDesc(fn ($f) => [$f['pagados'], $f['personas']])->values();
+        })->sortByDesc(fn ($f) => [$f['pagados'], $f['personas'], $f['campana']?->id ?? 0])->values();
+    }
+
+    /**
+     * Pedidos del periodo que llegaron por cada UTM de campaña (para ver quién compró con cada enlace).
+     *
+     * @return Collection<string, Collection<int, \App\Models\Pedido>>
+     */
+    public function pedidosPorCampana(int $limite = 300): Collection
+    {
+        return Pedido::where('created_at', '>=', $this->desde)->whereNotNull('utm_campaign')
+            ->latest('id')->limit($limite)
+            ->get(['id', 'codigo', 'nombre', 'estado', 'moneda', 'monto', 'utm_campaign', 'utm_content', 'created_at'])
+            ->groupBy('utm_campaign');
     }
 
     /** Personas y compras por día, para la gráfica. @return list<array{dia: string, personas: int, pagados: int}> */

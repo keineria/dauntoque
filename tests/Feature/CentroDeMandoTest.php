@@ -117,7 +117,7 @@ class CentroDeMandoTest extends TestCase
     {
         $admin = $this->admin();
         $this->actingAs($admin)->post('/admin/campanas', [
-            'nombre' => 'Lanzamiento Navidad', 'canal' => 'meta', 'utm_source' => 'Facebook', 'utm_medium' => 'paid_social',
+            'nombre' => 'Lanzamiento Navidad', 'canal' => 'meta_ads', 'utm_source' => 'Facebook', 'utm_medium' => 'paid_social',
             'destino' => 'https://dauntoque.com/es-co/', 'presupuesto' => '$600.000', 'moneda' => 'COP',
         ])->assertSessionHasNoErrors();
 
@@ -126,8 +126,8 @@ class CentroDeMandoTest extends TestCase
         $this->assertSame('https://dauntoque.com/es-co/?utm_source=facebook&utm_medium=paid_social&utm_campaign=lanzamiento_navidad', $campana->enlace());
 
         // Mismo UTM o destino fuera de dauntoque.com: no
-        $this->actingAs($admin)->post('/admin/campanas', ['nombre' => 'Lanzamiento navidad', 'canal' => 'meta', 'utm_source' => 'facebook', 'utm_medium' => 'cpc', 'destino' => 'https://dauntoque.com/', 'moneda' => 'COP'])->assertSessionHasErrors('utm_campaign');
-        $this->actingAs($admin)->post('/admin/campanas', ['nombre' => 'Otra', 'canal' => 'meta', 'utm_source' => 'facebook', 'utm_medium' => 'cpc', 'destino' => 'https://otro.com/', 'moneda' => 'COP'])->assertSessionHasErrors('destino');
+        $this->actingAs($admin)->post('/admin/campanas', ['nombre' => 'Lanzamiento navidad', 'canal' => 'meta_ads', 'utm_source' => 'facebook', 'utm_medium' => 'cpc', 'destino' => 'https://dauntoque.com/', 'moneda' => 'COP'])->assertSessionHasErrors('utm_campaign');
+        $this->actingAs($admin)->post('/admin/campanas', ['nombre' => 'Otra', 'canal' => 'meta_ads', 'utm_source' => 'facebook', 'utm_medium' => 'cpc', 'destino' => 'https://otro.com/', 'moneda' => 'COP'])->assertSessionHasErrors('destino');
 
         // 3 personas de la campaña, 2 compras pagadas de $299.900 → costo $300.000 por compra y retorno 1 x ($599.800 / $600.000)
         foreach (['a', 'b', 'c'] as $i => $v) {
@@ -140,9 +140,13 @@ class CentroDeMandoTest extends TestCase
 
         $this->actingAs($admin)->get('/admin/rendimiento?dias=30')->assertOk()
             ->assertSee('Lanzamiento Navidad')->assertSee('$300.000 COP')->assertSee('1 x')->assertSee('Directo');
-        $this->actingAs($admin)->get('/admin/campanas')->assertOk()->assertSee('$599.800 COP');
+        $this->actingAs($admin)->get('/admin/campanas')->assertOk()->assertSee('$599.800 COP')->assertSee('Ver quién llegó al pago (3)')->assertSee('Compró');
 
-        $this->actingAs($admin)->put('/admin/campanas/' . $campana->id, ['nombre' => 'Navidad', 'canal' => 'meta', 'utm_source' => 'facebook', 'utm_medium' => 'paid_social', 'utm_campaign' => 'lanzamiento_navidad', 'destino' => 'https://dauntoque.com/comprar', 'moneda' => 'COP'])->assertSessionHasNoErrors();
+        // Un UTM armado por fuera (sin crearlo aquí) también se cuenta
+        VisitaMarketing::create(['visitante' => str_repeat('e', 32), 'pagina' => '/es-co/', 'utm_source' => 'instagram', 'utm_medium' => 'social', 'utm_campaign' => 'bio_ig']);
+        $this->actingAs($admin)->get('/admin/campanas')->assertSee('bio_ig')->assertSee('UTM creado por fuera del Centro de mando');
+
+        $this->actingAs($admin)->put('/admin/campanas/' . $campana->id, ['nombre' => 'Navidad', 'canal' => 'meta_ads', 'utm_source' => 'facebook', 'utm_medium' => 'paid_social', 'utm_campaign' => 'lanzamiento_navidad', 'destino' => 'https://dauntoque.com/comprar', 'moneda' => 'COP'])->assertSessionHasNoErrors();
         $this->assertSame('Navidad', $campana->fresh()->nombre);
         $this->actingAs($admin)->delete('/admin/campanas/' . $campana->id)->assertRedirect('/admin/campanas');
         $this->assertSame(0, Campana::count());

@@ -67,7 +67,7 @@ class EstadoPagos
             ['hecho' => (bool) $bold['ultimoPagoReal'], 'texto' => 'Primer pago real confirmado por Bold', 'ayuda' => 'Una compra pequeña en producción que Bold avise al webhook (y luego se reembolsa).', 'enlace' => '/admin/pagos'],
             ['hecho' => $correo, 'texto' => 'Correo de salida configurado', 'ayuda' => 'Para enviar el código de activación y los avisos.', 'enlace' => '/admin/correos'],
             ['hecho' => Etiquetas::ids() !== [], 'texto' => 'Al menos un píxel conectado', 'ayuda' => 'Meta, Google o TikTok, para medir y optimizar los anuncios.', 'enlace' => '/admin/pixeles'],
-            ['hecho' => Campana::exists(), 'texto' => 'Primera campaña con su enlace UTM', 'ayuda' => 'Así se sabe qué anuncio trae cada venta.', 'enlace' => '/admin/campanas'],
+            ['hecho' => Campana::exists(), 'texto' => 'Primer enlace UTM o QR', 'ayuda' => 'Así se sabe qué publicación, anuncio o QR trae cada venta.', 'enlace' => '/admin/campanas'],
         ];
     }
 }

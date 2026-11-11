@@ -62,16 +62,16 @@
         </section>
 
         <section class="dt-panel" aria-labelledby="campanas-h">
-            <div class="dt-panel-h"><h2 id="campanas-h">Por campaña</h2><a class="dt-btn" href="/admin/campanas">Crear campaña</a></div>
+            <div class="dt-panel-h"><h2 id="campanas-h">Por enlace UTM (utm_campaign)</h2><a class="dt-btn" href="/admin/campanas">Crear enlace o QR</a></div>
             @if ($campanas->isEmpty())
-                <p class="dt-sub" style="margin:0">Sin campañas en este periodo. Crea una en «Campañas y UTM» y usa su enlace.</p>
+                <p class="dt-sub" style="margin:0">Sin enlaces en este periodo. Crea uno en «Enlaces UTM y QR» y compártelo.</p>
             @else
                 <div class="ad-scroll"><table class="ad-t" style="min-width:720px">
-                    <thead><tr><th scope="col">Campaña</th><th scope="col">Personas</th><th scope="col">Compras</th><th scope="col">Ventas</th><th scope="col">Costo por compra</th><th scope="col">Retorno</th></tr></thead>
+                    <thead><tr><th scope="col">Enlace</th><th scope="col">Personas</th><th scope="col">Compras</th><th scope="col">Ventas</th><th scope="col">Costo por compra</th><th scope="col">Retorno</th></tr></thead>
                     <tbody>
                         @foreach ($campanas as $f)
                             <tr>
-                                <td><b>{{ $f['campana']?->nombre ?? $f['utm'] }}</b><small>{{ $f['campana'] ? $f['campana']->canalNombre() : 'UTM sin campaña creada' }} · <code>{{ $f['utm'] }}</code></small></td>
+                                <td><b>{{ $f['campana']?->nombre ?? $f['utm'] }}</b><small>{{ $f['campana'] ? $f['campana']->canalNombre() : 'UTM creado por fuera del Centro de mando' }} · <code>{{ $f['utm'] }}</code></small></td>
                                 <td>{{ $fmt($f['personas']) }}</td>
                                 <td>{{ $fmt($f['pagados']) }}<small>{{ $fmt($f['pedidos']) }} llegaron al pago</small></td>
                                 <td>{{ $ventas($f['ventas']) }}</td>
