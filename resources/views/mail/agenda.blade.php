@@ -29,7 +29,7 @@
     }
     $boton = $paraDuenio
         ? ['Abrir mi agenda', url('/dashboard/agenda?fecha=' . $c->inicia_en->copy()->setTimezone($zona)->format('Y-m-d'))]
-        : ($tipo === 'codigo' ? null : (in_array($tipo, ['rechazada', 'cancelada'], true) && $perfil
+        : ($tipo === 'codigo' ? null : (in_array($tipo, ['rechazada', 'cancelada', 'vencida'], true) && $perfil
             ? [__('agenda.boton_reservar'), \App\Models\Profile::urlPublica(\App\Models\Profile::maestroDe($c->user_id)?->nickname ?? '') . '/agenda']
             : [__('agenda.boton_ver'), $c->enlace()]));
 @endphp

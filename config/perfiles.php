@@ -18,7 +18,7 @@ return [
         'forgot-password', 'reset-password', 'verify-email', 'confirm-password', 'email', 'up',
         'configuracion', 'analiticas', 'nuevo', 'build', 'uploads', 'storage', 'renovar', 'webhooks', 'comprar', 'pedido',
         'agenda', 'cita', 'mis-citas', 'dos-pasos', 'ayuda', 'soporte',
-        'robots.txt', 'sitemap.xml', 'favicon.ico', 'index.php',
+        'robots.txt', 'sitemap.xml', 'sitemap-perfiles.xml', 'favicon.ico', 'index.php',
         // Carpetas y archivos del sitio de ventas en dauntoque.com (ver sitio:generar)
         'es-co', 'es-us', 'en-us', 'media', 'sitio.css', 'sitio.js', 'index.html', '.htaccess', '.well-known',
     ],

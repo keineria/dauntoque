@@ -17,5 +17,8 @@ Schedule::command('citas:recordar')->everyFiveMinutes()->withoutOverlapping();
 // Califícame: pide la calificación por correo después de cada cita realizada. Usa el mismo cron de Laravel.
 Schedule::command('calificame:pedir')->everyFifteenMinutes()->withoutOverlapping();
 
+// Compras pagadas cuyo correo no salió (correo caído en ese momento): se reintenta cada hora durante 3 días.
+Schedule::command('pedidos:reintentar-correos')->hourly()->withoutOverlapping();
+
 // Centro de mando: borra las visitas de más de 13 meses y los avisos de pago de más de 6. Usa el mismo cron de Laravel.
 Schedule::command('model:prune', ['--model' => [App\Models\VisitaMarketing::class, App\Models\AvisoPago::class]])->dailyAt('03:30')->withoutOverlapping();

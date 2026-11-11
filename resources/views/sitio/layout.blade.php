@@ -11,7 +11,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>@yield('titulo')</title>
     <meta name="description" content="@yield('descripcion')">
-    @if (!$indexar)<meta name="robots" content="noindex, nofollow">@endif
+    @if ($indexar)<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">@else<meta name="robots" content="noindex, nofollow">@endif
     <link rel="canonical" href="{{ $canonica($codigo) }}">
     @foreach ($versiones as $c => $v)
         <link rel="alternate" hreflang="{{ $v['hreflang'] }}" href="{{ $canonica($c) }}">
@@ -27,16 +27,26 @@
     <meta property="og:image" content="{{ $dominio . $base }}/media/og-{{ $version['idioma'] }}.jpg">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="@yield('titulo')">
     <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="@yield('titulo')">
+    <meta name="twitter:description" content="@yield('descripcion')">
+    <meta name="twitter:image" content="{{ $dominio . $base }}/media/og-{{ $version['idioma'] }}.jpg">
+    {{-- Tipografías sin frenar el primer pintado: se piden como "print" y se aplican al llegar (con respaldo sin JavaScript) --}}
+    @php $fuentes = 'https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap'; @endphp
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+    <link rel="stylesheet" href="{{ $fuentes }}" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="{{ $fuentes }}"></noscript>
     @yield('precarga')
     <link rel="stylesheet" href="{{ $base }}/sitio.css">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230d0f10'/%3E%3Cpath d='M11 10.5a7.5 7.5 0 0 1 0 11M15 8a11 11 0 0 1 0 16M19 6a14.5 14.5 0 0 1 0 20' stroke='%232fae6e' stroke-width='2.4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
     @php
         $org = ['@context' => 'https://schema.org', '@graph' => [
-            ['@type' => 'Organization', '@id' => $dominio . '/#org', 'name' => 'DaUnToque', 'url' => $dominio . '/', 'sameAs' => ['https://portal.dauntoque.com']],
+            ['@type' => 'Organization', '@id' => $dominio . '/#org', 'name' => 'DaUnToque', 'alternateName' => ['Da Un Toque', 'dauntoque.com'], 'url' => $dominio . '/',
+                'image' => $dominio . $base . '/media/og-' . $version['idioma'] . '.jpg', 'description' => $x($t['inicio']['descripcion']),
+                'areaServed' => ['CO', 'US'],
+                'contactPoint' => ['@type' => 'ContactPoint', 'contactType' => 'sales', 'telephone' => '+' . $mercado['whatsapp'], 'areaServed' => $mercado['code'], 'availableLanguage' => [$version['idioma']]]],
             ['@type' => 'WebSite', '@id' => $dominio . '/#web', 'name' => 'DaUnToque', 'url' => $dominio . '/', 'inLanguage' => $version['hreflang'], 'publisher' => ['@id' => $dominio . '/#org']],
         ]];
     @endphp
@@ -76,6 +86,18 @@
                 <a href="{{ $ir($codigo, 'preguntas') }}" @if ($vista === 'preguntas') aria-current="page" @endif>{{ $t['nav']['preguntas'] }}</a>
             </nav>
             <div class="top-r">
+                {{-- Menú del celular (sin JavaScript): las mismas secciones de la barra de arriba --}}
+                <details class="selector menu-movil">
+                    <summary aria-label="{{ $t['nav']['menu'] }}"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16"/></svg></summary>
+                    <nav class="selector-menu" aria-label="{{ $t['nav']['menu'] }}">
+                        <a href="{{ $ancla('pruebalo') }}">{{ $t['nav']['pruebalo'] }}</a>
+                        <a href="{{ $ancla('panel') }}">{{ $t['nav']['panel'] }}</a>
+                        <a href="{{ $ir($codigo, 'tarjeta', 'matte-black') }}" @if ($vista === 'tarjeta') aria-current="page" @endif>{{ $t['nav']['tarjetas'] }}</a>
+                        <a href="{{ $ancla('precio') }}">{{ $t['nav']['precio'] }}</a>
+                        <a href="{{ $ir($codigo, 'preguntas') }}" @if ($vista === 'preguntas') aria-current="page" @endif>{{ $t['nav']['preguntas'] }}</a>
+                        <a href="https://portal.dauntoque.com/login">{{ $t['pie']['portal'] }}</a>
+                    </nav>
+                </details>
                 <details class="selector">
                     <summary aria-label="{{ $t['nav']['pais'] }}">@include('sitio._ico', ['n' => 'globo']) {{ strtoupper($version['mercado']) }} · {{ strtoupper($version['idioma']) }}</summary>
                     <div class="selector-menu">

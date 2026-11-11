@@ -13,6 +13,9 @@ Route::get('/', function () {
     return is_file($inicio) ? response()->file($inicio, ['Content-Type' => 'text/html; charset=UTF-8']) : redirect('/login');
 });
 
+// Mapa del sitio de los perfiles públicos (el del sitio de ventas es el archivo sitemap.xml que genera sitio:generar)
+Route::get('/sitemap-perfiles.xml', App\Http\Controllers\SitemapPerfilesController::class);
+
 // Ruta libre para leer la tarjeta física (con límite de intentos para evitar barridos de códigos)
 Route::get('/activar/{hash}', [App\Http\Controllers\NfcController::class, 'vincularTarjeta'])->middleware('throttle:20,1');
 

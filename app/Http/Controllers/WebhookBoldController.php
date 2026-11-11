@@ -2,18 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Mail\PedidoConfirmado;
-use App\Mail\PedidoNuevo;
 use App\Models\AvisoPago;
 use App\Models\Chip;
 use App\Models\Pago;
 use App\Models\Pedido;
 use App\Models\User;
+use App\Services\AvisosPago;
 use App\Services\Bold;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 
 /**
  * Avisos de pago de Bold: compras de tarjetas (pedidos) y renovaciones (pagos).
@@ -85,44 +83,33 @@ class WebhookBoldController extends Controller
         });
 
         if ($recienPagado) {
-            $this->avisarCompra($pedido->fresh());
-        }
-    }
-
-    /** Correo al cliente (compra, enlace para crear su perfil y código de activación) y aviso interno para despachar. */
-    private function avisarCompra(Pedido $pedido): void
-    {
-        try {
-            Mail::to($pedido->correo)->send(new PedidoConfirmado($pedido));
-            $pedido->update(['correo_enviado_en' => now()]);
-        } catch (\Throwable $e) {
-            Log::error('No se pudo enviar el correo del pedido', ['pedido' => $pedido->id, 'error' => $e->getMessage()]);
-        }
-
-        if ($aviso = config('pedidos.aviso_correo')) {
-            try {
-                Mail::to($aviso)->send(new PedidoNuevo($pedido));
-            } catch (\Throwable $e) {
-                Log::error('No se pudo enviar el aviso interno del pedido', ['pedido' => $pedido->id, 'error' => $e->getMessage()]);
-            }
+            AvisosPago::compra($pedido->fresh());
         }
     }
 
     private function renovacion(Pago $pago, ?string $tipo, ?string $pagoId): void
     {
-        DB::transaction(function () use ($pago, $tipo, $pagoId) {
+        $recienRenovado = DB::transaction(function () use ($pago, $tipo, $pagoId) {
             $pago = Pago::whereKey($pago->id)->lockForUpdate()->first();
             if ($pago->estado === 'pagado') {
-                return;
+                return false;
             }
             if ($tipo === 'SALE_APPROVED') {
                 $pago->update(['estado' => 'pagado', 'pagado_en' => now(), 'pago_proveedor_id' => $pagoId]);
                 if ($pago->concepto === 'renovacion' && $pago->tarjeta) {
                     $pago->tarjeta->renovar();
+
+                    return true;
                 }
             } elseif ($tipo === 'SALE_REJECTED') {
                 $pago->update(['estado' => 'rechazado']);
             }
+
+            return false;
         });
+
+        if ($recienRenovado) {
+            AvisosPago::renovacion($pago->fresh());
+        }
     }
 }

@@ -31,11 +31,12 @@ class RecordarCitas extends Command
                 $sirve = $cita->created_at->lt($cita->inicia_en->copy()->subHours($horas + 1));
                 // El de 24 horas no se manda si ya toca el de 2 horas
                 $sirve = $sirve && ($horas === 2 || $cita->inicia_en->gt(now()->addHours(2)));
-                $cita->forceFill([$campo => now()])->save();
-                if ($sirve) {
-                    Citas::alCliente($cita, 'recordatorio');
-                    $enviados++;
+                // Si el correo falla al salir, no se marca: se reintenta en la próxima pasada (cada 5 minutos)
+                if ($sirve && !Citas::alCliente($cita, 'recordatorio')) {
+                    continue;
                 }
+                $cita->forceFill([$campo => now()])->save();
+                $enviados += (int) $sirve;
             }
         }
 
@@ -44,6 +45,8 @@ class RecordarCitas extends Command
         foreach ($vencidas as $cita) {
             $cita->update(['estado' => 'cancelada', 'cancelada_por' => 'sistema', 'motivo' => null]);
             $cita->registrar('vencida', 'sistema');
+            // El cliente no se queda esperando una respuesta que ya no llega
+            Citas::alCliente($cita, 'vencida');
         }
 
         // Cambios sin respuesta cuya nueva hora ya pasó: la cita sigue a su hora original

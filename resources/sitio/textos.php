@@ -12,7 +12,7 @@ return [
     'es' => [
         'lang' => 'es',
         'marca' => 'DaUnToque',
-        'nav' => ['inicio' => 'Inicio', 'pruebalo' => 'Pruébalo', 'panel' => 'Tu panel', 'tarjetas' => 'Tarjetas', 'precio' => 'Precio', 'preguntas' => 'Preguntas', 'comprar' => 'Quiero mi tarjeta', 'pais' => 'País e idioma', 'saltar' => 'Saltar al contenido'],
+        'nav' => ['inicio' => 'Inicio', 'pruebalo' => 'Pruébalo', 'panel' => 'Tu panel', 'tarjetas' => 'Tarjetas', 'precio' => 'Precio', 'preguntas' => 'Preguntas', 'comprar' => 'Quiero mi tarjeta', 'pais' => 'País e idioma', 'menu' => 'Menú', 'saltar' => 'Saltar al contenido'],
         'versiones' => ['es-co' => 'Colombia · Español', 'es-us' => 'EE. UU. · Español', 'en-us' => 'USA · English'],
         'wa' => 'Hola, quiero mi tarjeta DaUnToque',
         'waAcabado' => 'Hola, quiero mi tarjeta DaUnToque :acabado (:precio)',
@@ -338,7 +338,7 @@ return [
     'en' => [
         'lang' => 'en',
         'marca' => 'DaUnToque',
-        'nav' => ['inicio' => 'Home', 'pruebalo' => 'Try it', 'panel' => 'Your dashboard', 'tarjetas' => 'Cards', 'precio' => 'Pricing', 'preguntas' => 'FAQ', 'comprar' => 'Get my card', 'pais' => 'Country & language', 'saltar' => 'Skip to content'],
+        'nav' => ['inicio' => 'Home', 'pruebalo' => 'Try it', 'panel' => 'Your dashboard', 'tarjetas' => 'Cards', 'precio' => 'Pricing', 'preguntas' => 'FAQ', 'comprar' => 'Get my card', 'pais' => 'Country & language', 'menu' => 'Menu', 'saltar' => 'Skip to content'],
         'versiones' => ['es-co' => 'Colombia · Español', 'es-us' => 'EE. UU. · Español', 'en-us' => 'USA · English'],
         'wa' => 'Hi, I want my DaUnToque card',
         'waAcabado' => 'Hi, I want my DaUnToque :acabado card (:precio)',
