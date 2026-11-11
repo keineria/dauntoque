@@ -46,7 +46,13 @@ class Bold
         if ($firma === null || $firma === '') {
             return false;
         }
-        $esperada = hash_hmac('sha256', base64_encode($cuerpo), (string) config('services.bold.secret'));
+        $secreta = (string) config('services.bold.secret');
+        // Sin llave secreta cualquiera podría firmar un aviso falso (HMAC con llave vacía) y marcar pedidos como pagados.
+        // Solo se acepta en modo de pruebas de Bold, activándolo a propósito con BOLD_FIRMA_VACIA=true.
+        if ($secreta === '' && !config('services.bold.firma_vacia')) {
+            return false;
+        }
+        $esperada = hash_hmac('sha256', base64_encode($cuerpo), $secreta);
 
         return hash_equals($esperada, strtolower($firma));
     }

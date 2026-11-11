@@ -83,6 +83,22 @@ class RenovacionBoldTest extends TestCase
         $this->assertSame('2027-10-14', $this->tarjeta->fresh()->vence_en->toDateString());
     }
 
+    public function test_sin_llave_secreta_no_se_acepta_un_aviso_firmado_con_llave_vacia(): void
+    {
+        $this->pagoPendiente();
+        config(['services.bold.secret' => '']);
+        $cuerpo = $this->evento('SALE_APPROVED');
+        $firma = hash_hmac('sha256', base64_encode($cuerpo), '');
+        $servidor = ['HTTP_X_BOLD_SIGNATURE' => $firma, 'CONTENT_TYPE' => 'application/json'];
+
+        $this->call('POST', '/webhooks/bold', [], [], [], $servidor, $cuerpo)->assertStatus(401);
+        $this->assertSame('2027-10-14', $this->tarjeta->fresh()->vence_en->toDateString());
+
+        // Solo el modo de pruebas de Bold, activado a propósito, acepta la firma con llave vacía
+        config(['services.bold.firma_vacia' => true]);
+        $this->call('POST', '/webhooks/bold', [], [], [], $servidor, $cuerpo)->assertOk();
+    }
+
     private function pagoPendiente(): void
     {
         Pago::create(['user_id' => $this->usuario->id, 'tarjeta_id' => $this->tarjeta->id, 'concepto' => 'renovacion', 'proveedor' => 'bold',
