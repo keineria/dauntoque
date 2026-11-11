@@ -31,7 +31,8 @@
     $producto = [
         '@context' => 'https://schema.org', '@type' => 'Product', 'name' => $i['producto'], 'brand' => ['@type' => 'Brand', 'name' => 'DaUnToque'],
         'description' => $x($i['descripcion']), 'image' => [$dominio . $base . '/media/og-' . $version['idioma'] . '.jpg'],
-        'offers' => ['@type' => 'Offer', 'price' => $mercado['precio'], 'priceCurrency' => $mercado['moneda'], 'availability' => 'https://schema.org/InStock', 'url' => $canonica($codigo)],
+        'sku' => 'DT-NFC', 'category' => 'NFC business card',
+        'offers' => \App\Console\Commands\GenerarSitio::oferta($mercado, $canonica($codigo)),
     ];
     $como = ['@context' => 'https://schema.org', '@type' => 'HowTo', 'name' => $i['viajeH'],
         'step' => array_map(fn ($p, $n) => ['@type' => 'HowToStep', 'position' => $n + 1, 'name' => $p[0], 'text' => $x($p[1], [':envio' => $envio])], $i['viaje'], array_keys($i['viaje']))];

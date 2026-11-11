@@ -6,7 +6,8 @@
     $producto = [
         '@context' => 'https://schema.org', '@type' => 'Product', 'name' => 'DaUnToque ' . $a['nombre'], 'brand' => ['@type' => 'Brand', 'name' => 'DaUnToque'],
         'description' => $x($t['tarjeta']['descripcion'], $rep), 'image' => [$dominio . $base . '/media/og-' . $version['idioma'] . '.jpg'],
-        'offers' => ['@type' => 'Offer', 'price' => $mercado['precio'], 'priceCurrency' => $mercado['moneda'], 'availability' => 'https://schema.org/InStock', 'url' => $canonica($codigo)],
+        'sku' => 'DT-NFC-' . strtoupper($acabado), 'category' => 'NFC business card',
+        'offers' => \App\Console\Commands\GenerarSitio::oferta($mercado, $canonica($codigo)),
     ];
     $migas = ['@context' => 'https://schema.org', '@type' => 'BreadcrumbList', 'itemListElement' => [
         ['@type' => 'ListItem', 'position' => 1, 'name' => 'DaUnToque', 'item' => $dominio . '/' . $codigo . '/'],

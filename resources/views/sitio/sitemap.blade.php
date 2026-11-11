@@ -3,6 +3,7 @@
 @foreach ($paginas as $p)
     <url>
         <loc>{{ $dominio }}/{{ $p['codigo'] }}/{{ $p['ruta'] === '' ? '' : $p['ruta'] . '/' }}</loc>
+        <lastmod>{{ $fecha }}</lastmod>
 @foreach (\App\Console\Commands\GenerarSitio::VERSIONES as $c => $v)
 @php $r = \App\Console\Commands\GenerarSitio::rutaDe($c, $p['vista'], $p['acabado']); @endphp
         <xhtml:link rel="alternate" hreflang="{{ $v['hreflang'] }}" href="{{ $dominio }}/{{ $c }}/{{ $r === '' ? '' : $r . '/' }}"/>

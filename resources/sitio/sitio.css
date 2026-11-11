@@ -74,7 +74,11 @@ button { font-family: inherit; }
 .selector-menu a { display: flex; justify-content: space-between; gap: 12px; padding: 11px 12px; border-radius: 10px; text-decoration: none; font-size: 14px; font-weight: 600; }
 .selector-menu a:hover { background: var(--ink-3); }
 .selector-menu a[aria-current] { color: var(--signal-2); }
-@media (max-width: 900px) { .nav { display: none; } }
+/* Menú del celular: aparece cuando la barra de secciones ya no cabe */
+.menu-movil { display: none; order: 2; }
+.menu-movil summary { width: 40px; padding: 0; justify-content: center; }
+.menu-movil .selector-menu a { justify-content: flex-start; padding: 13px 12px; }
+@media (max-width: 900px) { .nav { display: none; } .menu-movil { display: block; } }
 @media (max-width: 560px) { .top .btn { display: none; } .logo { font-size: 18px; } }
 
 /* Héroe */
