@@ -14,6 +14,7 @@ class Pedido extends Model
         'user_id', 'nombre', 'correo', 'celular', 'documento', 'departamento', 'ciudad', 'direccion',
         'acabado', 'nombre_tarjeta', 'pais', 'moneda', 'monto', 'estado', 'link_id', 'pago_proveedor_id',
         'pagado_en', 'correo_enviado_en', 'promo_de_pedido_id',
+        'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'clic', 'visitante',
     ];
 
     protected $casts = [

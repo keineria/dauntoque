@@ -1,15 +1,34 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('contenido')
     <div class="dt-head">
         <div>
-            <h1 class="dt-h1">Administrador</h1>
+            <h1 class="dt-h1">Resumen</h1>
             <p class="dt-sub">Cómo va el negocio: compras, clientes, uso de las tarjetas, carritos y ayuda.</p>
         </div>
     </div>
-    @include('admin._tabs')
 
     @php($fmt = fn ($n) => number_format((float) $n, 0, ',', '.'))
+    @php($hechos = collect($listo)->where('hecho', true)->count())
+    <div class="ad-dos" style="margin-bottom:18px">
+        <section class="dt-panel" aria-labelledby="listo-h">
+            <div class="dt-panel-h" style="margin-bottom:4px"><h2 id="listo-h">Listo para vender</h2><span class="ad-chip {{ $hechos === count($listo) ? 'ok' : 'aviso' }}">{{ $hechos }} de {{ count($listo) }}</span></div>
+            <div class="ad-barra" role="progressbar" aria-valuemin="0" aria-valuemax="{{ count($listo) }}" aria-valuenow="{{ $hechos }}"><i style="width:{{ round($hechos * 100 / max(1, count($listo))) }}%"></i></div>
+            @include('admin._listo')
+        </section>
+        <section class="dt-panel" aria-labelledby="embudo-h">
+            <div class="dt-panel-h"><h2 id="embudo-h">Embudo de los últimos 30 días</h2><a class="dt-btn" href="/admin/rendimiento">Ver rendimiento</a></div>
+            <div class="ad-embudo">
+                <div class="ad-paso"><span>Personas en el sitio</span><b>{{ $fmt($embudo['personas']) }}</b><small>{{ $fmt($embudo['paginas']) }} páginas vistas</small></div>
+                <div class="ad-paso"><span>Llegaron al pago</span><b>{{ $fmt($embudo['pedidos']) }}</b><small>pedidos creados</small></div>
+                <div class="ad-paso"><span>Compraron</span><b class="ad-ok">{{ $fmt($embudo['pagados']) }}</b><small>{{ $embudo['conversion'] !== null ? str_replace('.', ',', (string) $embudo['conversion']) . ' % de las personas' : 'aún sin visitas medidas' }}</small></div>
+            </div>
+            @if ($embudo['personas'] === 0)
+                <p class="dt-sub" style="margin:12px 0 0">Las visitas se empiezan a contar cuando este cambio esté publicado y el sitio de ventas se regenere una vez.</p>
+            @endif
+        </section>
+    </div>
+
     <div class="ad-grid">
         <a class="dt-stat ad-link" href="#compras"><span>Compras realizadas</span><b>{{ $fmt($m['compras']) }}</b><small>{{ $fmt($m['comprasMes']) }} este mes</small></a>
         <div class="dt-stat"><span>Ventas</span>

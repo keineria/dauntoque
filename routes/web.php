@@ -22,6 +22,18 @@ Route::get('/activar/{hash}', [App\Http\Controllers\NfcController::class, 'vincu
 // Avisos de pago de Bold (firmados con x-bold-signature; sin CSRF, ver bootstrap/app.php)
 Route::post('/webhooks/bold', App\Http\Controllers\WebhookBoldController::class);
 
+// Centro de mando: píxeles conectados (/etiquetas.js) y medición propia de visitas del sitio de ventas.
+// Sin sesión ni galletas de Laravel: así Cloudflare puede guardar el script en caché y las visitas no crean sesiones.
+Route::withoutMiddleware([
+    \Illuminate\Session\Middleware\StartSession::class,
+    \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+    \Illuminate\Foundation\Http\Middleware\PreventRequestForgery::class,
+    \App\Http\Middleware\CambiarClaveTemporal::class,
+])->controller(App\Http\Controllers\EtiquetasController::class)->group(function () {
+    Route::get('/etiquetas.js', 'script');
+    Route::post('/etiquetas/visita', 'visita')->middleware('throttle:120,1');
+});
+
 // Compra de la tarjeta en línea (Colombia, Bold) y página privada del pedido
 Route::get('/comprar', [App\Http\Controllers\CompraController::class, 'formulario']);
 Route::post('/comprar', [App\Http\Controllers\CompraController::class, 'crear'])->middleware('throttle:10,1');
@@ -149,6 +161,18 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/{id}/mensajes', 'mensajes')->whereNumber('id');
             Route::post('/{id}/mensajes', 'responder')->whereNumber('id');
             Route::post('/{id}/cerrar', 'cerrar')->whereNumber('id');
+        });
+        // Centro de mando: pagos y marketing
+        Route::get('/pagos', [App\Http\Controllers\AdminPagosController::class, 'index']);
+        Route::post('/pagos/probar-bold', [App\Http\Controllers\AdminPagosController::class, 'probarBold'])->middleware('throttle:6,1');
+        Route::controller(App\Http\Controllers\AdminMarketingController::class)->group(function () {
+            Route::get('/pixeles', 'pixeles');
+            Route::post('/pixeles', 'guardarPixeles');
+            Route::get('/campanas', 'campanas');
+            Route::post('/campanas', 'guardarCampana');
+            Route::put('/campanas/{campana}', 'actualizarCampana')->whereNumber('campana');
+            Route::delete('/campanas/{campana}', 'eliminarCampana')->whereNumber('campana');
+            Route::get('/rendimiento', 'rendimiento');
         });
         Route::get('/chips', [App\Http\Controllers\AdminChipsController::class, 'index']);
         Route::post('/chips', [App\Http\Controllers\AdminChipsController::class, 'guardar']);

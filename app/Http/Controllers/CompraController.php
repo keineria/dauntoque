@@ -6,6 +6,7 @@ use App\Models\Market;
 use App\Models\Pedido;
 use App\Services\Bold;
 use App\Services\Carritos;
+use App\Services\Marketing\Origen;
 use App\Support\Precios;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -36,7 +37,7 @@ class CompraController extends Controller
         ]);
     }
 
-    public function crear(Request $request)
+    public function crear(Request $request, Origen $origen)
     {
         $datos = $request->validate([
             'nombre' => ['required', 'string', 'max:120'],
@@ -70,7 +71,7 @@ class CompraController extends Controller
             'moneda' => $moneda,
             'monto' => $precio->amount,
             'promo_de_pedido_id' => $promo?->id,
-        ]));
+        ], $origen->deLaCompra($request)));
 
         try {
             $link = Bold::crearLink(

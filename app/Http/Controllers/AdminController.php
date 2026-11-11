@@ -10,6 +10,8 @@ use App\Models\Pedido;
 use App\Models\User;
 use App\Services\ClientesAdmin;
 use App\Services\Carritos;
+use App\Services\EstadoPagos;
+use App\Services\Marketing\Rendimiento;
 use App\Services\MetricasAdmin;
 use App\Support\Correos;
 use App\Support\Plantillas;
@@ -23,7 +25,7 @@ use Illuminate\View\View;
 /** Administrador del negocio: resumen, carritos abandonados y correos de notificación. */
 class AdminController extends Controller
 {
-    public function inicio(Request $request, MetricasAdmin $metricas): View
+    public function inicio(Request $request, MetricasAdmin $metricas, EstadoPagos $pagos): View
     {
         $lista = array_key_exists($request->query('lista'), ClientesAdmin::LISTAS) ? $request->query('lista') : 'todos';
         $buscar = trim((string) $request->query('buscar'));
@@ -39,6 +41,8 @@ class AdminController extends Controller
             'por' => $por,
             'clientes' => $clientes,
             'filas' => ClientesAdmin::filas($clientes),
+            'listo' => $pagos->listoParaVender(),
+            'embudo' => (new Rendimiento(30))->totales(),
         ]);
     }
 

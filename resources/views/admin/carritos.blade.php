@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('contenido')
     <div class="dt-head">
@@ -7,7 +7,6 @@
             <p class="dt-sub">Personas que empezaron a comprar y no pagaron. A cada una le puedes mandar una última promoción, una sola vez.</p>
         </div>
     </div>
-    @include('admin._tabs')
 
     @unless ($promoActiva)
         <p class="dt-panel" style="color:var(--warn-t);margin:0 0 18px">El correo de promoción está apagado. Enciéndelo en <a href="/admin/correos" style="color:inherit">Correos</a> para poder enviarlo.</p>

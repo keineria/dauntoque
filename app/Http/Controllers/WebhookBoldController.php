@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AvisoPago;
 use App\Models\Chip;
 use App\Models\Pago;
 use App\Models\Pedido;
@@ -22,6 +23,8 @@ class WebhookBoldController extends Controller
     public function __invoke(Request $request)
     {
         if (!Bold::firmaValida($request->getContent(), $request->header('x-bold-signature'))) {
+            AvisoPago::anotar('bold', (string) $request->input('type') ?: null, 'firma inválida');
+
             return response()->json(['ok' => false], 401);
         }
 
@@ -45,6 +48,8 @@ class WebhookBoldController extends Controller
             'campos_metadata' => array_keys((array) $request->input('data.metadata', [])),
             'resultado' => $pedido ? 'pedido ' . $pedido->id : ($pago ? 'pago ' . $pago->id : 'sin coincidencia'),
         ]);
+
+        AvisoPago::anotar('bold', $tipo, $pedido ? 'pedido ' . $pedido->codigo : ($pago ? 'renovación' : 'sin coincidencia'), $candidatos[0] ?? null);
 
         if ($pedido) {
             $this->pedido($pedido, $tipo, $pagoId);

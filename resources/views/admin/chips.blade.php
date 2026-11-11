@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('contenido')
     <div class="dt-head">
@@ -7,7 +7,6 @@
             <p class="dt-sub">Solo los chips registrados aquí se pueden activar. Cada compra pagada crea su código y se lo enviamos al cliente en el correo. {{ $total }} registrados · {{ $activados }} activados.</p>
         </div>
     </div>
-    @include('admin._tabs')
 
     @if ($generados)
         <section class="dt-panel" style="margin-bottom:18px" x-data="{ copiado: false }">
