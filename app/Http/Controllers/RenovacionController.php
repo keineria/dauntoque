@@ -3,10 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Pago;
-use App\Models\Profile;
 use App\Models\Tarjeta;
 use App\Services\Bold;
-use App\Support\MediosPago;
 use App\Support\Precios;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -23,7 +21,7 @@ class RenovacionController extends Controller
             return redirect('/dashboard')->with('status', 'Los pagos en línea aún no están activos. Escríbenos por WhatsApp para renovar.');
         }
 
-        $pais = MediosPago::pais(Profile::activoDe(Auth::id())?->pais);
+        $pais = Auth::user()->paisFacturacion();
         $monto = Precios::montoRenovacion($pais, Auth::user());
         $moneda = Precios::moneda($pais);
 

@@ -29,7 +29,10 @@ class ProfileController extends Controller
         // Estado de la agenda para el bloque "Botón Agendar cita" del editor
         $agendaEstado = \App\Services\Agenda\Agenda::estado(Auth::id());
 
-        return view('editor', compact('perfil', 'mercados', 'agendaEstado'));
+        // País de pagos para un perfil nuevo: el de sus otros perfiles o el de su conexión
+        $paisSugerido = MediosPago::sugerido($request, Auth::id());
+
+        return view('editor', compact('perfil', 'mercados', 'agendaEstado', 'paisSugerido'));
     }
 
     public function validarNickname(Request $request)
@@ -139,6 +142,8 @@ class ProfileController extends Controller
             // País y medios de pago: solo los del país elegido (Nequi y Llave Bre-B en CO; Zelle, Cash App y Venmo en US)
             if ($request->has('pais')) {
                 $perfil->pais = MediosPago::pais($request->input('pais'));
+            } elseif (!$perfil->exists) {
+                $perfil->pais = MediosPago::pais(MediosPago::sugerido($request, $usuario->id));
             }
             if ($request->has('payment_methods')) {
                 $perfil->payment_methods = MediosPago::sanear($request->input('payment_methods'), $perfil->pais) ?: null;
@@ -157,6 +162,11 @@ class ProfileController extends Controller
                 $perfil->galeria = Galeria::guardar($request->galeria, (array) $perfil->galeria);
             }
             $perfil->save();
+
+            // País de facturación (moneda de las renovaciones): se fija una sola vez, con la ubicación al crear el primer perfil
+            if ($usuario->pais_facturacion === null) {
+                $usuario->forceFill(['pais_facturacion' => MediosPago::porConexion($request) ?? $perfil->pais])->save();
+            }
 
             // Chip escaneado antes de tener perfil: va al perfil activo, igual que en NfcController
             ActivarTarjetaController::enlazarPendiente($usuario->id);
