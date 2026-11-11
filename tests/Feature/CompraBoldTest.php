@@ -79,6 +79,24 @@ class CompraBoldTest extends TestCase
         $this->get(route('pedido.ver', $pedido))->assertOk()->assertSee('Crear mi perfil');
     }
 
+    public function test_si_el_correo_de_compra_falla_se_reintenta_despues(): void
+    {
+        $pedido = $this->pedido();
+        Mail::swap(new \Illuminate\Mail\MailManager($this->app));
+        config(['mail.default' => 'smtp', 'mail.mailers.smtp.host' => '127.0.0.1', 'mail.mailers.smtp.port' => 1]); // nadie contesta: correo caído
+        $this->webhook($this->evento('SALE_APPROVED'))->assertOk();
+        $this->assertSame('pagado', $pedido->refresh()->estado);
+        $this->assertNull($pedido->correo_enviado_en);
+
+        Mail::fake();
+        $this->artisan('pedidos:reintentar-correos')->assertSuccessful();
+        $this->artisan('pedidos:reintentar-correos')->assertSuccessful();
+
+        $this->assertNotNull($pedido->refresh()->correo_enviado_en);
+        Mail::assertSent(PedidoConfirmado::class, 1);
+        Mail::assertNotSent(PedidoNuevo::class);
+    }
+
     public function test_pago_rechazado_no_envia_correo(): void
     {
         Mail::fake();

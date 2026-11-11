@@ -12,7 +12,7 @@ use Illuminate\Mail\Mailables\Envelope;
 
 /**
  * Correos de la agenda. Al cliente (en el idioma de su cita): recibida, confirmada, rechazada, cambio_propuesto,
- * cambio_aceptado, cambio_rechazado, cancelada, recordatorio y codigo. Al dueño (en español): nueva, cambio_pedido,
+ * cambio_aceptado, cambio_rechazado, cancelada, vencida, recordatorio y codigo. Al dueño (en español): nueva, cambio_pedido,
  * cambio_aceptado, cambio_rechazado y cancelada.
  */
 class AgendaCorreo extends Mailable
