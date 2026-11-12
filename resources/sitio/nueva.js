@@ -217,7 +217,18 @@
   // Si no hay compras recientes no se muestra nada. Salen de a uno, con pausas, y se pueden cerrar.
   const caja = $('[data-compras]');
   const cerrado = function () { try { return sessionStorage.getItem('dt-compras') === 'no'; } catch (e) { return false; } };
-  if (caja && window.fetch && !cerrado()) {
+  // Modo demostración (solo con ?demo=avisos en la dirección): nombres de EJEMPLO para enseñar cómo se ven los avisos.
+  // Cada aviso lleva la etiqueta «Demostración»; un visitante normal nunca los ve.
+  const demo = /[?&]demo=avisos(&|$)/.test(location.search);
+  const ejemplos = function () {
+    const nombres = ['Luis P.', 'Carolina R.', 'Andrés M.', 'Valentina G.', 'Juan D.', 'Daniela C.', 'Santiago H.', 'Laura V.', 'Camilo T.', 'Natalia B.', 'Felipe O.', 'Paula S.', 'Sebastián L.', 'Mariana Z.', 'Diego A.', 'Sara E.', 'Mateo J.', 'Isabella N.', 'Julián Q.', 'Manuela F.', 'Nicolás U.', 'Gabriela I.', 'Esteban K.', 'Juliana W.', 'David Y.', 'Catalina P.', 'Alejandro R.', 'Luisa M.', 'Jorge G.', 'Ana D.', 'Ricardo C.', 'Angélica H.', 'Óscar V.', 'Tatiana T.', 'Mauricio B.', 'Lina O.', 'Germán S.', 'Yuliana L.', 'Fabián Z.', 'Marcela A.', 'Hernán E.', 'Viviana J.', 'Cristian N.', 'Diana Q.', 'Iván F.', 'Mónica U.', 'Wilson I.', 'Adriana K.'];
+    const ciudades = ['Bogotá', 'Medellín', 'Cali', 'Barranquilla', 'Cartagena', 'Bucaramanga', 'Pereira', 'Manizales', 'Cúcuta', 'Ibagué', 'Santa Marta', 'Villavicencio', 'Armenia', 'Pasto', 'Neiva', 'Montería', 'Popayán', 'Tunja', 'Envigado', 'Rionegro'];
+    const ahora = Date.now() / 1000;
+    return nombres.map(function (nombre, n) {
+      return { nombre: nombre, ciudad: ciudades[(n * 7) % ciudades.length], producto: n % 3 === 1 ? 'Crystal' : 'Matte Black', t: ahora - n * 12 * 60 };
+    });
+  };
+  if (caja && window.fetch && (demo || !cerrado())) {
     const hace = function (t) {
       const s = Math.max(0, Date.now() / 1000 - t), min = Math.floor(s / 60), h = Math.floor(min / 60), dias = Math.floor(h / 24);
       if (min < 3) return 'hace un instante';
@@ -244,12 +255,15 @@
         relojCompras = setTimeout(function () {
           ocultar();
           // Pausa de 20 a 35 segundos entre un aviso y el siguiente
-          relojCompras = setTimeout(siguiente, 20000 + Math.random() * 15000);
-        }, 7000);
+          relojCompras = setTimeout(siguiente, demo ? 5000 : 20000 + Math.random() * 15000);
+        }, demo ? 5000 : 7000);
       };
-      relojCompras = setTimeout(siguiente, 9000);
+      relojCompras = setTimeout(siguiente, demo ? 2500 : 9000);
     };
-    fetch(caja.dataset.compras, { headers: { Accept: 'application/json' } })
+    if (demo) {
+      caja.classList.add('es-demo');
+      rotar(ejemplos());
+    } else fetch(caja.dataset.compras, { headers: { Accept: 'application/json' } })
       .then(function (r) { return r.ok ? r.json() : { compras: [] }; })
       .then(function (datos) { if (datos && datos.compras && datos.compras.length) rotar(datos.compras); })
       .catch(function () {});

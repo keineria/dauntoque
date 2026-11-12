@@ -381,6 +381,7 @@ h3 { font-size: 19px; font-weight: 600; letter-spacing: -.01em; line-height: 1.2
 .compra-aviso p { font-size: 13.5px; line-height: 1.35; display: grid; }
 .compra-aviso b { font-size: 14.5px; }
 .compra-aviso small { font-size: 12px; color: #6a665c; display: flex; align-items: center; gap: 6px; margin-top: 2px; }
+.compra-aviso.es-demo::after { content: "Demostración"; position: absolute; top: -9px; left: 14px; padding: 3px 9px; border-radius: 999px; background: #131311; color: var(--oro-2); font: 700 10px/1.2 var(--f-texto); letter-spacing: .1em; text-transform: uppercase; }
 .compra-aviso small::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--verde); }
 .compra-aviso button { position: absolute; top: 6px; right: 6px; width: 28px; height: 28px; border-radius: 50%; border: 0; background: none; color: #6a665c; display: grid; place-items: center; }
 

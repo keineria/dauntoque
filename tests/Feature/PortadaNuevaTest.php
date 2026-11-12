@@ -91,6 +91,11 @@ class PortadaNuevaTest extends TestCase
         $this->assertStringContainsString('"@type":"FAQPage"', $nueva);
         $this->assertMatchesRegularExpression('#/nueva\.css\?v=[a-f0-9]{8}#', $nueva);
         $this->assertStringNotContainsString('/nueva/', File::get($carpeta . '/sitemap.xml'));
+        // Los nombres de ejemplo solo existen en el modo demostración (?demo=avisos) y van rotulados
+        $js = File::get($carpeta . '/nueva.js');
+        $this->assertStringContainsString("demo=avisos", $js);
+        $this->assertStringContainsString('es-demo', $js);
+        $this->assertStringContainsString('Demostración', File::get($carpeta . '/nueva.css'));
         // La portada actual sigue igual
         $this->assertStringContainsString('sitio.css', File::get($carpeta . '/es-co/index.html'));
         $this->assertFileDoesNotExist($carpeta . '/en-us/nueva/index.html');
