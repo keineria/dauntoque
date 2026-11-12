@@ -57,6 +57,29 @@
             </details>
         </section>
 
+        <section class="dt-panel" aria-labelledby="avisos-h">
+            <div class="dt-panel-h"><h2 id="avisos-h">Avisos de compras en el sitio</h2></div>
+            <p class="dt-sub" style="font-size:13px;line-height:1.6;margin:0 0 12px">
+                La portada nueva muestra avisos del tipo «Luis P. · Medellín compró la tarjeta Matte Black». Salen solo de <b>pedidos pagados reales</b>
+                de los últimos {{ $avisos['dias'] }} días, con el nombre y la inicial del apellido. Si no hay compras en esos días, el sitio no muestra nada.
+                Enciéndelos cuando Bold esté en producción y hayas borrado los pedidos de prueba.
+            </p>
+            <form method="POST" action="/admin/pagos/avisos-compras" class="ad-acciones">
+                @csrf
+                <input type="hidden" name="activos" value="{{ $avisos['activos'] ? 0 : 1 }}">
+                <button type="submit" class="dt-btn {{ $avisos['activos'] ? '' : 'pri' }}">{{ $avisos['activos'] ? 'Apagar avisos' : 'Encender avisos' }}</button>
+                <small class="dt-sub">Estado: <b class="{{ $avisos['activos'] ? 'ad-ok' : 'ad-aviso' }}">{{ $avisos['activos'] ? 'encendidos' : 'apagados' }}</b></small>
+            </form>
+            <p class="dt-sub" style="font-size:13px;margin:14px 0 6px">Lo que vería hoy un visitante ({{ count($avisos['compras']) }}):</p>
+            <ul class="dt-sub" style="font-size:13px;line-height:1.7;margin:0;padding-left:18px">
+                @forelse ($avisos['compras'] as $c)
+                    <li><b>{{ $c['nombre'] }}</b>@if ($c['ciudad']) · {{ $c['ciudad'] }}@endif · {{ $c['producto'] }} · {{ \Illuminate\Support\Carbon::createFromTimestamp($c['t'])->locale('es')->diffForHumans() }}</li>
+                @empty
+                    <li>Ninguna compra pagada en los últimos {{ $avisos['dias'] }} días: no se muestra ningún aviso.</li>
+                @endforelse
+            </ul>
+        </section>
+
         <section class="dt-panel" aria-labelledby="listo-h">
             <div class="dt-panel-h"><h2 id="listo-h">Listo para vender</h2></div>
             @include('admin._listo')

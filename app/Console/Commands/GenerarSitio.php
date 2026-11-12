@@ -23,7 +23,8 @@ class GenerarSitio extends Command
         {--portal=https://portal.dauntoque.com : Portal donde se compra en línea (/comprar)}
         {--indexar : Permite que Google indexe (solo para la publicación final)}
         {--dentro-de-laravel : El destino es la carpeta public/ de Laravel: no la vacía entera ni crea .htaccess/portal.php}
-        {--fuente= : Carpeta con textos, CSS, JS y media (por defecto resources/sitio)}';
+        {--fuente= : Carpeta con textos, CSS, JS y media (por defecto resources/sitio)}
+        {--portada=clasica : "nueva" pone la portada nueva (vista sitio.nueva) como inicio de /es-co/; si no, queda de prueba en /es-co/nueva/}';
 
     protected $description = 'Genera el sitio estático de ventas por país e idioma';
 
@@ -35,6 +36,9 @@ class GenerarSitio extends Command
     ];
 
     public const ACABADOS = ['matte-black', 'crystal'];
+
+    /** Versiones que tienen la portada nueva (vista sitio.nueva, por ahora solo en español de Colombia). */
+    public const CON_PORTADA_NUEVA = ['es-co'];
 
     public function handle(): int
     {
@@ -85,7 +89,14 @@ class GenerarSitio extends Command
                     : $wa($mensaje ?? $t['wa']),
             ];
 
-            $paginas[] = $this->pagina('inicio', $comun);
+            // Portada nueva: de prueba en /es-co/nueva/ (sin indexar) o, con --portada=nueva, como inicio de la versión
+            $conNueva = in_array($codigo, self::CON_PORTADA_NUEVA, true);
+            $nuevaDeInicio = $conNueva && $this->option('portada') === 'nueva';
+            $comun += ['portal' => $portal, 'prueba' => !$nuevaDeInicio];
+            $paginas[] = $this->pagina('inicio', $comun, $nuevaDeInicio ? 'nueva' : null);
+            if ($conNueva && !$nuevaDeInicio) {
+                $paginas[] = $this->pagina('nueva', $comun);
+            }
             foreach (self::ACABADOS as $acabado) {
                 $paginas[] = $this->pagina('tarjeta', $comun + ['acabado' => $acabado]);
             }
@@ -104,7 +115,11 @@ class GenerarSitio extends Command
         File::copyDirectory($fuente . '/media', $destino . '/media');
         File::put($destino . '/sitio.css', $this->minificarCss(File::get($fuente . '/sitio.css')));
         File::put($destino . '/sitio.js', File::get($fuente . '/sitio.js'));
-        File::put($destino . '/sitemap.xml', view('sitio.sitemap', ['paginas' => $paginas, 'dominio' => $dominio, 'base' => $base, 'fecha' => now()->toDateString()])->render());
+        File::put($destino . '/nueva.css', $this->minificarCss(File::get($fuente . '/nueva.css')));
+        File::put($destino . '/nueva.js', File::get($fuente . '/nueva.js'));
+        // La portada de prueba no va en el mapa del sitio (no se indexa)
+        $enMapa = array_values(array_filter($paginas, fn ($p) => $p['vista'] !== 'nueva'));
+        File::put($destino . '/sitemap.xml', view('sitio.sitemap', ['paginas' => $enMapa, 'dominio' => $dominio, 'base' => $base, 'fecha' => now()->toDateString()])->render());
         File::put($destino . '/robots.txt', $indexar ? self::robots($dominio, $base) : "User-agent: *\nDisallow: /\n");
 
         // En la raíz del dominio, dauntoque.com/keiner muestra el perfil: lo que no es del sitio de ventas
@@ -173,7 +188,7 @@ class GenerarSitio extends Command
     /** Carpetas y archivos que genera este comando en la raíz del destino (nada más se toca en public/). */
     public function generados(): array
     {
-        return [...array_keys(self::VERSIONES), 'media', 'sitio.css', 'sitio.js', 'index.html', 'sitemap.xml', 'robots.txt'];
+        return [...array_keys(self::VERSIONES), 'media', 'sitio.css', 'sitio.js', 'nueva.css', 'nueva.js', 'index.html', 'sitemap.xml', 'robots.txt'];
     }
 
     private function limpiarGenerados(string $destino): void
@@ -190,7 +205,7 @@ class GenerarSitio extends Command
     private function versionarEnlaces(string $destino, string $base, ?array $solo = null): void
     {
         $huellas = [];
-        $patron = '#(?<=["\'(])' . preg_quote($base, '#') . '/((?:media/[^"\'()?\s]+)|sitio\.css|sitio\.js)(?=["\')])#';
+        $patron = '#(?<=["\'(])' . preg_quote($base, '#') . '/((?:media/[^"\'()?\s]+)|sitio\.css|sitio\.js|nueva\.css|nueva\.js)(?=["\')])#';
 
         $archivos = $solo === null ? File::allFiles($destino) : collect($solo)->flatMap(function ($nombre) use ($destino) {
             if (File::isDirectory("$destino/$nombre")) {
@@ -250,11 +265,13 @@ class GenerarSitio extends Command
         return match ($vista) {
             'tarjeta' => $v['tarjetas'] . '/' . ($acabado ?? self::ACABADOS[0]),
             'preguntas' => $v['preguntas'],
+            'nueva' => 'nueva',
             default => '',
         };
     }
 
-    private function pagina(string $vista, array $datos): array
+    /** $plantilla = vista Blade que dibuja la página cuando no es la de su mismo nombre (portada nueva como inicio). */
+    private function pagina(string $vista, array $datos, ?string $plantilla = null): array
     {
         $acabado = $datos['acabado'] ?? null;
         $base = $datos['base'];
@@ -273,7 +290,7 @@ class GenerarSitio extends Command
             return $base . '/' . $codigo . '/' . ($ruta === '' ? '' : $ruta . '/');
         };
 
-        return ['codigo' => $datos['codigo'], 'ruta' => $datos['ruta'], 'vista' => $vista, 'acabado' => $acabado, 'html' => view("sitio.$vista", $datos)->render()];
+        return ['codigo' => $datos['codigo'], 'ruta' => $datos['ruta'], 'vista' => $vista, 'acabado' => $acabado, 'html' => view('sitio.' . ($plantilla ?? $vista), $datos)->render()];
     }
 
     private function ruta(string $ruta): string
