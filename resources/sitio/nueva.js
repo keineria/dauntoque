@@ -155,7 +155,7 @@
       this.setAttribute('aria-pressed', String(musica.classList.toggle('suena')));
     });
 
-    // Dos perfiles: ejecutivo o personal
+    // Dos perfiles: el ejecutivo o el personal con cada pasión (motos, escalada, gimnasio)
     $$('[data-cara]', exp).forEach(function (b) {
       b.addEventListener('click', function () {
         $$('[data-cara]', exp).forEach(function (o) { o.setAttribute('aria-pressed', String(o === b)); });
