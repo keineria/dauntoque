@@ -26,7 +26,7 @@
         'calificame' => ['star', 'Califícame', 'Disponible', 'Tu reputación trabaja por ti', 'Después de atenderlo, tu cliente te califica de 1 a 5 estrellas. Las buenas se muestran en tu perfil y lo invitan a dejar su reseña en Google; las demás te llegan en privado.', ['Sello de calificación en tu perfil', 'Invitación a reseñar en Google', 'Los comentarios malos llegan solo a ti']],
         'musica' => ['music', 'Música', 'Disponible', 'Que tu perfil suene a ti', 'Para DJ, artistas y marcas con estilo: pon tu canción destacada y tu lista de Spotify dentro del perfil, con el reproductor oficial.', ['Canción destacada', 'Lista, álbum, artista o pódcast', 'Reproductor oficial de Spotify']],
         'cobros' => ['cash', 'Cobros', 'Incluido', 'Te pagan ahí mismo', "Tu perfil muestra tus medios de pago. Tu cliente toca, el dato se copia y te paga en el momento con $medio1 o $medio2.", ['Botones de pago en tu perfil', 'El dato se copia con un toque', 'Sin comisiones de DaUnToque']],
-        'dos' => ['swap', 'Dos perfiles', 'Regalo de lanzamiento', 'Una tarjeta, dos versiones de ti', 'De lunes a viernes, el profesional que cierra negocios. El fin de semana, lo que te apasiona. Cambias el perfil activo desde tu panel en segundos.', ['Perfil ejecutivo y perfil personal', 'Cambias el activo cuando quieras', 'Incluido por tiempo limitado']],
+        'dos' => ['swap', 'Dos perfiles', 'Regalo de lanzamiento', 'Una tarjeta, dos versiones de ti', 'De lunes a viernes, el profesional que cierra negocios. El fin de semana, lo que te apasiona: motos, escalada, gimnasio o lo que te mueva. Cambias el perfil activo desde tu panel en segundos.', ['Perfil ejecutivo y perfil personal', 'Cambias el activo cuando quieras', 'Incluido por tiempo limitado']],
     ];
     // Apps y funciones: [icono, nombre, estado (ok = ya existe, pronto = próximamente), texto]
     $apps = [
@@ -211,7 +211,6 @@
                         <div class="tarjeta" data-tarjeta data-acabado="matte-black">
                             <span class="brillo" aria-hidden="true"></span>
                             <div class="t-fila"><span class="t-marca">dauntoque</span>{!! $ico('nfc', 26) !!}</div>
-                            <div class="t-chip" aria-hidden="true"></div>
                             <div><div class="t-nombre" data-nombre data-vacio="Tu nombre aquí">Tu nombre aquí</div><div class="t-acabado"><span data-acabado-txt>Matte Black</span> · NFC</div></div>
                         </div>
                         {{-- Lo que pasa después del toque (ejemplos de la plataforma, no datos reales) --}}
@@ -295,16 +294,18 @@
                             <div class="pan" data-pan="perfil">
                                 <div class="pf-cab">
                                     <img src="{{ $base }}/media/caso-kathe-sm.webp" width="84" height="84" alt="Foto de perfil de ejemplo" loading="lazy">
-                                    <b>Kathe Glam &amp; Nails</b><span>Uñas, pestañas y cejas · Medellín</span>
+                                    <b>Kathe Glam &amp; Nails</b><span>Uñas en acrílico y gel · Trenzas infantiles</span>
                                     <em class="pf-sello">{!! $ico('star', 12) !!}4,9 · 37 calificaciones</em>
                                 </div>
+                                <p class="pf-bio">Realza tu belleza con uñas hermosas, delicadas y duraderas. Acrílico, gel y peinados infantiles hechos con amor.</p>
                                 <button type="button" class="pb pri" data-toque="Contacto guardado en la agenda">{!! $ico('user', 16) !!}Guardar contacto</button>
                                 <button type="button" class="pb" data-toque="Se abre WhatsApp con tu número">{!! $ico('wa', 16) !!}Escribir por WhatsApp</button>
                                 <div class="pb-fila">
                                     <button type="button" class="pb" data-ir="agenda">{!! $ico('cal', 16) !!}Agendar</button>
                                     <button type="button" class="pb" data-ir="cobros">{!! $ico('cash', 16) !!}Pagar</button>
                                 </div>
-                                <div class="pf-gal" aria-hidden="true"><i></i><i></i><i></i></div>
+                                <div class="pf-lbl">Mis trabajos</div>
+                                <div class="pf-gal">@for ($f = 1; $f <= 3; $f++)<img src="{{ $base }}/media/kathe-trabajo-{{ $f }}.webp" width="360" height="360" alt="Trabajo de uñas de Kathe Glam &amp; Nails" loading="lazy">@endfor</div>
                             </div>
                             {{-- Agenda --}}
                             <div class="pan" data-pan="agenda" hidden>
@@ -353,20 +354,41 @@
                                     <button type="button" class="pb cobro" data-toque="Copiado: {{ $m }}">{!! $ico('cash', 16) !!}{{ $m }}<small>Copiar</small></button>
                                 @endforeach
                             </div>
-                            {{-- Dos perfiles --}}
+                            {{-- Dos perfiles: el ejecutivo completo y el personal con la pasión que se elija --}}
+                            @php $ej = $i['dosEjecutivo']; @endphp
                             <div class="pan pan-dos" data-pan="dos" hidden>
                                 <div class="dos-conm" role="group" aria-label="Perfil activo">
                                     <button type="button" data-cara="ejec" aria-pressed="true">Ejecutivo</button>
-                                    <button type="button" data-cara="pers" aria-pressed="false">Personal</button>
+                                    @foreach ($i['dosPasiones'] as $clave => $pasion)
+                                        <button type="button" data-cara="{{ $clave }}" aria-pressed="false" aria-label="Perfil personal: {{ trim(preg_replace('/[^\p{L} ]/u', '', $pasion['boton'])) }}">{{ mb_substr($pasion['boton'], 0, 2) }}</button>
+                                    @endforeach
                                 </div>
-                                <div class="dos-cara" data-vista-cara="ejec">
-                                    <img src="{{ $base }}/media/dp-ejec-portada.webp" width="640" height="400" alt="Perfil ejecutivo de ejemplo" loading="lazy">
-                                    <b>Andrés Gómez</b><span>Director comercial · lunes a viernes</span>
+                                <div class="dos-cara ejec" data-vista-cara="ejec">
+                                    <img class="dos-portada" src="{{ $base }}/media/dp-ejec-portada.webp" width="640" height="400" alt="" loading="lazy">
+                                    <div class="dos-cuerpo">
+                                        <img class="dos-avatar" src="{{ $base }}/media/dp-ejec-avatar.webp" width="220" height="220" alt="{{ $ej['nombre'] }}" loading="lazy">
+                                        <b class="dos-nombre">{{ $ej['nombre'] }} <i aria-hidden="true">✓</i></b>
+                                        <span class="dos-rol">{{ $ej['rol'] }}</span>
+                                        <div class="dos-cifras">@foreach ($ej['cifras'] as $c)<div><b>{{ $c[0] }}</b><span>{{ $c[1] }}</span></div>@endforeach</div>
+                                        <span class="pb pri">{!! $ico('user', 16) !!}{{ $ej['botones'][0] }}</span>
+                                        <div class="pb-fila"><span class="pb">{{ $ej['botones'][1] }}</span><span class="pb">{{ $ej['botones'][2] }}</span></div>
+                                        <div class="pf-lbl">{{ $ej['galeria'] }}</div>
+                                        <div class="pf-gal">@for ($f = 1; $f <= 3; $f++)<img src="{{ $base }}/media/dp-ejec-{{ $f }}.webp" width="240" height="240" alt="" loading="lazy">@endfor</div>
+                                    </div>
                                 </div>
-                                <div class="dos-cara" data-vista-cara="pers" hidden>
-                                    <img src="{{ $base }}/media/dp-moto-portada.webp" width="640" height="760" alt="Perfil personal de ejemplo" loading="lazy">
-                                    <b>Andrés en dos ruedas</b><span>Rodadas y pista · fin de semana</span>
-                                </div>
+                                @foreach ($i['dosPasiones'] as $clave => $pasion)
+                                    <div class="dos-cara pers" data-vista-cara="{{ $clave }}" hidden>
+                                        <div class="dos-heroe">
+                                            <img src="{{ $base }}/media/dp-{{ $clave }}-portada.webp" width="640" height="760" alt="{{ $pasion['alt'] }}" loading="lazy">
+                                            <div><small>{{ $i['dosFinde'] }}</small><b class="dos-nombre">{{ $pasion['nombre'] }}</b><span class="dos-rol">{{ $pasion['lema'] }}</span></div>
+                                        </div>
+                                        <div class="dos-cuerpo">
+                                            <div class="dos-tags">@foreach ($pasion['tags'] as $etiqueta)<span>{{ $etiqueta }}</span>@endforeach</div>
+                                            <div class="pb-fila"><span class="pb pri">{{ $pasion['cta'] }}</span><span class="pb">Instagram</span></div>
+                                            <div class="pf-gal">@for ($f = 1; $f <= 3; $f++)<img src="{{ $base }}/media/dp-{{ $clave }}-{{ $f }}.webp" width="240" height="240" alt="" loading="lazy">@endfor</div>
+                                        </div>
+                                    </div>
+                                @endforeach
                             </div>
                             <div class="tel-aviso" role="status" aria-live="polite" data-aviso><i>{!! $ico('ok', 14) !!}</i><span></span></div>
                         </div>
