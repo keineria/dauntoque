@@ -127,6 +127,8 @@
 
         <button class="btn" type="submit" @disabled(!$enLinea)>Pagar {{ $fmt($precio->amount) }} {{ $moneda }}</button>
         <p class="mut" style="margin:-10px 0 0;font-size:13px;text-align:center">Te llevamos al pago seguro de Bold: tarjeta, PSE, Nequi o Botón Bancolombia.</p>
+        {{-- Avisos de compras del sitio de ventas (ComprasRecientes): solo nombre, inicial del apellido y ciudad --}}
+        <p class="mut" style="margin:0;font-size:12px;text-align:center">Al comprar, tu nombre con la inicial de tu apellido y tu ciudad pueden aparecer en dauntoque.com como compra reciente (por ejemplo, «Luis P. · Medellín»). Si prefieres que no, escríbenos y lo quitamos.</p>
     </form>
 
     <aside class="resumen" aria-label="Resumen de tu compra">

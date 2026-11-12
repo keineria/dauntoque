@@ -8,6 +8,10 @@ return [
     // Correo que recibe el aviso de cada pedido pagado (para despachar la tarjeta)
     'aviso_correo' => env('PEDIDOS_CORREO_AVISO'),
 
+    // Avisos «X compró la tarjeta» del sitio de ventas: solo pedidos pagados reales, con nombre e inicial.
+    // Se encienden en /admin/pagos (ajuste avisos_compras). Sin compras en estos días, el sitio no muestra nada.
+    'avisos' => ['dias' => 15, 'maximo' => 8],
+
     'departamentos' => [
         'Amazonas', 'Antioquia', 'Arauca', 'Atlántico', 'Bogotá D.C.', 'Bolívar', 'Boyacá', 'Caldas', 'Caquetá',
         'Casanare', 'Cauca', 'Cesar', 'Chocó', 'Córdoba', 'Cundinamarca', 'Guainía', 'Guaviare', 'Huila',

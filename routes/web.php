@@ -24,15 +24,19 @@ Route::post('/webhooks/bold', App\Http\Controllers\WebhookBoldController::class)
 
 // Centro de mando: píxeles conectados (/etiquetas.js) y medición propia de visitas del sitio de ventas.
 // Sin sesión ni galletas de Laravel: así Cloudflare puede guardar el script en caché y las visitas no crean sesiones.
-Route::withoutMiddleware([
+$sinSesion = [
     \Illuminate\Session\Middleware\StartSession::class,
     \Illuminate\View\Middleware\ShareErrorsFromSession::class,
     \Illuminate\Foundation\Http\Middleware\PreventRequestForgery::class,
     \App\Http\Middleware\CambiarClaveTemporal::class,
-])->controller(App\Http\Controllers\EtiquetasController::class)->group(function () {
+];
+Route::withoutMiddleware($sinSesion)->controller(App\Http\Controllers\EtiquetasController::class)->group(function () {
     Route::get('/etiquetas.js', 'script');
     Route::post('/etiquetas/visita', 'visita')->middleware('throttle:120,1');
 });
+// Avisos de compras reales de la portada del sitio de ventas (anónimos y solo si están encendidos en /admin/pagos)
+Route::get('/compras-recientes.json', App\Http\Controllers\ComprasRecientesController::class)
+    ->withoutMiddleware($sinSesion)->middleware('throttle:60,1');
 
 // Compra de la tarjeta en línea (Colombia, Bold) y página privada del pedido
 Route::get('/comprar', [App\Http\Controllers\CompraController::class, 'formulario']);
@@ -165,6 +169,7 @@ Route::middleware(['auth'])->group(function () {
         // Centro de mando: pagos y marketing
         Route::get('/pagos', [App\Http\Controllers\AdminPagosController::class, 'index']);
         Route::post('/pagos/probar-bold', [App\Http\Controllers\AdminPagosController::class, 'probarBold'])->middleware('throttle:6,1');
+        Route::post('/pagos/avisos-compras', [App\Http\Controllers\AdminPagosController::class, 'avisosCompras']);
         Route::controller(App\Http\Controllers\AdminMarketingController::class)->group(function () {
             Route::get('/pixeles', 'pixeles');
             Route::post('/pixeles', 'guardarPixeles');
