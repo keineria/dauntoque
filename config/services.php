@@ -55,6 +55,8 @@ return [
         'api_key' => env('BOLD_API_KEY'),
         // Llave secreta: firma los webhooks. En modo de pruebas Bold firma con una llave vacía.
         'secret' => env('BOLD_SECRET_KEY', ''),
+        // Solo para el modo de pruebas de Bold (firma con llave vacía). En producción debe quedar en false.
+        'firma_vacia' => (bool) env('BOLD_FIRMA_VACIA', false),
         'url' => env('BOLD_API_URL', 'https://integrations.api.bold.co'),
         'timeout' => 15,
     ],
