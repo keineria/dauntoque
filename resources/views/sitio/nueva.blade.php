@@ -57,7 +57,7 @@
 
     $esquemas = [
         ['@context' => 'https://schema.org', '@graph' => [
-            ['@type' => 'Organization', '@id' => $dominio . '/#org', 'name' => 'DaUnToque', 'alternateName' => ['Da Un Toque', 'dauntoque.com'], 'url' => $dominio . '/', 'logo' => $dominio . $base . '/media/logo-512.png', 'image' => $imagen, 'description' => $descripcion, 'areaServed' => ['CO', 'US'],
+            ['@type' => 'Organization', '@id' => $dominio . '/#org', 'name' => 'DaUnToque', 'alternateName' => ['Da Un Toque', 'dauntoque.com'], 'url' => $dominio . '/', 'logo' => $dominio . $base . '/media/logo-512.png', 'sameAs' => \App\Console\Commands\GenerarSitio::REDES, 'image' => $imagen, 'description' => $descripcion, 'areaServed' => ['CO', 'US'],
                 'contactPoint' => ['@type' => 'ContactPoint', 'contactType' => 'sales', 'telephone' => '+' . $mercado['whatsapp'], 'areaServed' => $mercado['code'], 'availableLanguage' => ['es']]],
             ['@type' => 'WebSite', '@id' => $dominio . '/#web', 'name' => 'DaUnToque', 'url' => $dominio . '/', 'inLanguage' => $version['hreflang'], 'publisher' => ['@id' => $dominio . '/#org']],
             ['@type' => 'WebPage', '@id' => $url . '#pagina', 'url' => $url, 'name' => $titulo, 'description' => $descripcion, 'inLanguage' => $version['hreflang'], 'isPartOf' => ['@id' => $dominio . '/#web'], 'about' => ['@id' => $url . '#producto'], 'primaryImageOfPage' => $imagen],

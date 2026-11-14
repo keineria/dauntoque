@@ -91,7 +91,9 @@ class SeoTest extends TestCase
 
         $this->assertStringContainsString('<meta name="twitter:image"', $inicio);
         $this->assertStringContainsString('max-image-preview:large', $inicio);
-        $this->assertStringContainsString('class="selector menu-movil"', $inicio);
+        $this->assertStringContainsString('class="selector menu-movil"', $inicioUsa);
+        $this->assertStringContainsString('"sameAs":["https://www.instagram.com/dauntoqueof/"', $inicio);
+        $this->assertStringContainsString('"sameAs":["https://www.instagram.com/dauntoqueof/"', $inicioUsa);
         $this->assertStringContainsString('"merchantReturnDays":30', $tarjeta);
         $this->assertStringContainsString('"sku":"DT-NFC-CRYSTAL"', $tarjeta);
         $this->assertStringContainsString('<lastmod>' . now()->toDateString() . '</lastmod>', $mapa);

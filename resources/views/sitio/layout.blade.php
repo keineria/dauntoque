@@ -2,7 +2,7 @@
 @php
     $inicioUrl = $ir($codigo, 'inicio');
     // En el inicio las anclas son locales; en las demás páginas llevan al inicio
-    $ancla = fn (string $id) => ($vista === 'inicio' ? '' : $inicioUrl) . '#' . $id;
+    $ancla = fn (string $id) => (in_array($vista, ['inicio', 'clasica'], true) ? '' : $inicioUrl) . '#' . $id;
 @endphp
 <!doctype html>
 <html lang="{{ $version['hreflang'] }}" data-version="{{ $codigo }}">
@@ -43,7 +43,7 @@
     @include('sitio._iconos')
     @php
         $org = ['@context' => 'https://schema.org', '@graph' => [
-            ['@type' => 'Organization', '@id' => $dominio . '/#org', 'name' => 'DaUnToque', 'alternateName' => ['Da Un Toque', 'dauntoque.com'], 'url' => $dominio . '/', 'logo' => $dominio . $base . '/media/logo-512.png',
+            ['@type' => 'Organization', '@id' => $dominio . '/#org', 'name' => 'DaUnToque', 'alternateName' => ['Da Un Toque', 'dauntoque.com'], 'url' => $dominio . '/', 'logo' => $dominio . $base . '/media/logo-512.png', 'sameAs' => \App\Console\Commands\GenerarSitio::REDES,
                 'image' => $dominio . $base . '/media/og-' . $version['idioma'] . '.jpg', 'description' => $x($t['inicio']['descripcion']),
                 'areaServed' => ['CO', 'US'],
                 'contactPoint' => ['@type' => 'ContactPoint', 'contactType' => 'sales', 'telephone' => '+' . $mercado['whatsapp'], 'areaServed' => $mercado['code'], 'availableLanguage' => [$version['idioma']]]],
