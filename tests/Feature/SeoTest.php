@@ -60,6 +60,10 @@ class SeoTest extends TestCase
 
         $this->assertStringContainsString('<loc>' . Profile::urlPublica('sofia') . '</loc>', $xml);
         $this->assertStringNotContainsString('sofia-personal', $xml);
+        // Un perfil vacío (de prueba) no entra al mapa
+        Profile::create(['user_id' => User::factory()->create()->id, 'nickname' => 'prueba-vacia', 'tipo_perfil' => 'corporativo', 'nombre' => 'Prueba']);
+        \Illuminate\Support\Facades\Cache::forget('seo.mapa-perfiles');
+        $this->assertStringNotContainsString('prueba-vacia', $this->get('/sitemap-perfiles.xml')->getContent());
         $this->assertNotFalse(simplexml_load_string($xml));
     }
 
@@ -81,6 +85,8 @@ class SeoTest extends TestCase
         $inicio = File::get($carpeta . '/es-co/index.html');
         $tarjeta = File::get($carpeta . '/es-co/tarjetas/crystal/index.html');
         $mapa = File::get($carpeta . '/sitemap.xml');
+        $inicioUsa = File::get($carpeta . '/es-us/index.html');
+        $hayLogo = File::exists($carpeta . '/media/logo-512.png') && File::exists($carpeta . '/media/favicon.svg');
         File::deleteDirectory($carpeta);
 
         $this->assertStringContainsString('<meta name="twitter:image"', $inicio);
@@ -89,6 +95,19 @@ class SeoTest extends TestCase
         $this->assertStringContainsString('"merchantReturnDays":30', $tarjeta);
         $this->assertStringContainsString('"sku":"DT-NFC-CRYSTAL"', $tarjeta);
         $this->assertStringContainsString('<lastmod>' . now()->toDateString() . '</lastmod>', $mapa);
+        // Título propio por país, H1 con la palabra clave, envío gratis en la oferta e icono en archivo real
+        $this->assertStringContainsString('<title>Tarjeta de presentación NFC con IA en Colombia | DaUnToque</title>', $inicio);
+        $this->assertStringContainsString('en EE. UU. | DaUnToque</title>', $inicioUsa);
+        $this->assertStringContainsString('<h1>Tarjeta NFC Crystal</h1>', $tarjeta);
+        $this->assertStringContainsString('"shippingDetails"', $tarjeta);
+        $this->assertStringContainsString('<link rel="icon" href="/favicon.ico"', $inicio);
+        $this->assertStringContainsString('/media/logo-512.png', $inicio);
+        $this->assertTrue($hayLogo);
+        // hreflang: el idioma sin país y x-default llevan a páginas que sí se indexan (no a la raíz)
+        $this->assertStringContainsString('<link rel="alternate" hreflang="x-default" href="https://dauntoque.com/en-us/cards/crystal/">', $tarjeta);
+        $this->assertStringContainsString('<link rel="alternate" hreflang="es" href="https://dauntoque.com/es-us/">', $inicio);
+        $this->assertStringContainsString('hreflang="x-default" href="https://dauntoque.com/en-us/cards/crystal/"/>', $mapa);
+        $this->assertStringNotContainsString('href="https://dauntoque.com/"', $mapa);
         // Todos los bloques de datos estructurados son JSON válido
         preg_match_all('#<script type="application/ld\+json">(.+?)</script>#s', $inicio . $tarjeta, $bloques);
         $this->assertGreaterThanOrEqual(5, count($bloques[1]));

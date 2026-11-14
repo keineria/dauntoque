@@ -10,7 +10,10 @@
     @foreach ($versiones as $c => $v)
         <link rel="alternate" hreflang="{{ $v['hreflang'] }}" href="{{ $dominio }}/{{ $c }}/">
     @endforeach
-    <link rel="alternate" hreflang="x-default" href="{{ $dominio }}/">
+    @foreach (\App\Console\Commands\GenerarSitio::GENERICOS as $idiomaGenerico => $c)
+        <link rel="alternate" hreflang="{{ $idiomaGenerico }}" href="{{ $dominio }}/{{ $c }}/">
+    @endforeach
+    @include('sitio._iconos')
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Figtree:wght@400;600;700&display=swap">

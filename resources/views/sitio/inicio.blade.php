@@ -38,7 +38,7 @@
         'step' => array_map(fn ($p, $n) => ['@type' => 'HowToStep', 'position' => $n + 1, 'name' => $p[0], 'text' => $x($p[1], [':envio' => $envio])], $i['viaje'], array_keys($i['viaje']))];
 @endphp
 
-@section('titulo', $i['titulo'])
+@section('titulo', $x($i['titulo']))
 @section('descripcion', $x($i['descripcion']))
 @section('precarga')
     <link rel="preload" as="image" href="{{ $base }}/media/caso-kathe-sm.webp">

@@ -16,7 +16,7 @@
     @foreach ($versiones as $c => $v)
         <link rel="alternate" hreflang="{{ $v['hreflang'] }}" href="{{ $canonica($c) }}">
     @endforeach
-    <link rel="alternate" hreflang="x-default" href="{{ $dominio }}/">
+    @include('sitio._hreflang')
     <meta name="theme-color" content="#0d0f10">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="DaUnToque">
@@ -40,10 +40,10 @@
     <noscript><link rel="stylesheet" href="{{ $fuentes }}"></noscript>
     @yield('precarga')
     <link rel="stylesheet" href="{{ $base }}/sitio.css">
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230d0f10'/%3E%3Cpath d='M11 10.5a7.5 7.5 0 0 1 0 11M15 8a11 11 0 0 1 0 16M19 6a14.5 14.5 0 0 1 0 20' stroke='%232fae6e' stroke-width='2.4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+    @include('sitio._iconos')
     @php
         $org = ['@context' => 'https://schema.org', '@graph' => [
-            ['@type' => 'Organization', '@id' => $dominio . '/#org', 'name' => 'DaUnToque', 'alternateName' => ['Da Un Toque', 'dauntoque.com'], 'url' => $dominio . '/',
+            ['@type' => 'Organization', '@id' => $dominio . '/#org', 'name' => 'DaUnToque', 'alternateName' => ['Da Un Toque', 'dauntoque.com'], 'url' => $dominio . '/', 'logo' => $dominio . $base . '/media/logo-512.png',
                 'image' => $dominio . $base . '/media/og-' . $version['idioma'] . '.jpg', 'description' => $x($t['inicio']['descripcion']),
                 'areaServed' => ['CO', 'US'],
                 'contactPoint' => ['@type' => 'ContactPoint', 'contactType' => 'sales', 'telephone' => '+' . $mercado['whatsapp'], 'areaServed' => $mercado['code'], 'availableLanguage' => [$version['idioma']]]],

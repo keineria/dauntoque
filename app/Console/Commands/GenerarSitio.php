@@ -35,6 +35,15 @@ class GenerarSitio extends Command
         'en-us' => ['mercado' => 'US', 'idioma' => 'en', 'hreflang' => 'en-US', 'tarjetas' => 'cards', 'preguntas' => 'faq'],
     ];
 
+    /**
+     * hreflang sin país y x-default: fuera de Colombia y Estados Unidos, quien busca en español ve la versión
+     * en español con precio en dólares y el resto la versión en inglés (la raíz / no sirve: solo redirige y no se indexa).
+     */
+    public const GENERICOS = ['es' => 'es-us', 'en' => 'en-us', 'x-default' => 'en-us'];
+
+    /** Nombre del país de cada versión para títulos y textos (:pais). */
+    public const PAISES = ['es' => ['CO' => 'Colombia', 'US' => 'EE. UU.'], 'en' => ['CO' => 'Colombia', 'US' => 'the US']];
+
     public const ACABADOS = ['matte-black', 'crystal'];
 
     /** Versiones que tienen la portada nueva (vista sitio.nueva, por ahora solo en español de Colombia). */
@@ -71,7 +80,7 @@ class GenerarSitio extends Command
             // Compra en línea con Bold en los países de config/pedidos.php; en los demás, por WhatsApp
             $enLinea = in_array($mercado['code'], config('pedidos.paises_en_linea', []), true);
             $modo = $enLinea ? 'linea' : 'whatsapp';
-            $reemplazos = [':precio' => $mercado['precioTexto'] . ' ' . $mercado['moneda'], ':antes' => (string) $mercado['antesTexto'], ':ahorro' => $mercado['ahorroTexto'] . ' ' . $mercado['moneda'], ':pagos' => $pagos,
+            $reemplazos = [':precio' => $mercado['precioTexto'] . ' ' . $mercado['moneda'], ':antes' => (string) $mercado['antesTexto'], ':ahorro' => $mercado['ahorroTexto'] . ' ' . $mercado['moneda'], ':pagos' => $pagos, ':pais' => self::PAISES[$version['idioma']][$mercado['code']] ?? $mercado['code'],
                 ':comprarCon' => strtr($t['comprarCon'][$modo], [':pagos' => $pagos]), ':comoPago' => strtr($t['comoPago'][$modo], [':pagos' => $pagos])];
             $wa = fn (string $mensaje) => 'https://wa.me/' . $mercado['whatsapp'] . '?text=' . rawurlencode($mensaje);
             $comun = compact('codigo', 'version', 'mercado', 't', 'base', 'dominio', 'indexar') + [
@@ -249,6 +258,12 @@ class GenerarSitio extends Command
             'availability' => 'https://schema.org/InStock', 'itemCondition' => 'https://schema.org/NewCondition', 'url' => $url,
             'eligibleRegion' => ['@type' => 'Country', 'name' => $mercado['code']],
             'seller' => ['@type' => 'Organization', 'name' => 'DaUnToque'],
+            // Envío gratis al país de la versión (lo que promete el sitio)
+            'shippingDetails' => [
+                '@type' => 'OfferShippingDetails',
+                'shippingRate' => ['@type' => 'MonetaryAmount', 'value' => 0, 'currency' => $mercado['moneda']],
+                'shippingDestination' => ['@type' => 'DefinedRegion', 'addressCountry' => $mercado['code']],
+            ],
             'hasMerchantReturnPolicy' => [
                 '@type' => 'MerchantReturnPolicy', 'applicableCountry' => $mercado['code'],
                 'returnPolicyCategory' => 'https://schema.org/MerchantReturnFiniteReturnWindow', 'merchantReturnDays' => 30,
