@@ -80,7 +80,7 @@ class PortadaNuevaTest extends TestCase
     public function test_la_portada_de_prueba_se_genera_sin_indexar_y_fuera_del_mapa(): void
     {
         $carpeta = sys_get_temp_dir() . '/sitio-nueva-' . uniqid();
-        $this->artisan('sitio:generar', ['--destino' => $carpeta, '--base' => '', '--indexar' => true])->assertSuccessful();
+        $this->artisan('sitio:generar', ['--destino' => $carpeta, '--base' => '', '--indexar' => true, '--portada' => 'clasica'])->assertSuccessful();
 
         $nueva = File::get($carpeta . '/es-co/nueva/index.html');
         $this->assertStringContainsString('<meta name="robots" content="noindex, follow">', $nueva);
@@ -105,13 +105,22 @@ class PortadaNuevaTest extends TestCase
     public function test_con_portada_nueva_reemplaza_el_inicio_y_se_indexa(): void
     {
         $carpeta = sys_get_temp_dir() . '/sitio-nueva-' . uniqid();
-        $this->artisan('sitio:generar', ['--destino' => $carpeta, '--base' => '', '--indexar' => true, '--portada' => 'nueva'])->assertSuccessful();
+        $this->artisan('sitio:generar', ['--destino' => $carpeta, '--base' => '', '--indexar' => true])->assertSuccessful();
 
         $inicio = File::get($carpeta . '/es-co/index.html');
         $this->assertStringContainsString('nueva.css', $inicio);
         $this->assertStringContainsString('content="index, follow', $inicio);
         $this->assertStringContainsString('hreflang="en-US"', $inicio);
-        $this->assertFileDoesNotExist($carpeta . '/es-co/nueva/index.html');
+        // La portada anterior queda de respaldo: sin indexar, con canónica al inicio, fuera del mapa y con sus enlaces sanos
+        $respaldo = File::get($carpeta . '/es-co/clasica/index.html');
+        $this->assertStringContainsString('sitio.css', $respaldo);
+        $this->assertStringContainsString('<meta name="robots" content="noindex, nofollow">', $respaldo);
+        $this->assertStringContainsString('<link rel="canonical" href="https://dauntoque.com/es-co/">', $respaldo);
+        $this->assertStringNotContainsString('/en-us/clasica/', $respaldo);
+        $this->assertStringNotContainsString('/clasica/', File::get($carpeta . '/sitemap.xml'));
+        $this->assertFileDoesNotExist($carpeta . '/es-us/clasica/index.html');
+        // El enlace de prueba ya compartido lleva al inicio
+        $this->assertStringContainsString('url=/es-co/', File::get($carpeta . '/es-co/nueva/index.html'));
         File::deleteDirectory($carpeta);
     }
 }

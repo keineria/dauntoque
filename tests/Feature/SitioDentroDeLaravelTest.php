@@ -51,7 +51,7 @@ class SitioDentroDeLaravelTest extends TestCase
             $this->assertFileExists($this->carpeta . '/' . $archivo, $archivo);
         }
         $this->assertStringContainsString('Sitemap: https://dauntoque.com/sitemap.xml', File::get($this->carpeta . '/robots.txt'));
-        $this->assertMatchesRegularExpression('#/sitio\.css\?v=[0-9a-f]{8}#', File::get($this->carpeta . '/es-co/index.html'));
+        $this->assertMatchesRegularExpression('#/sitio\.css\?v=[0-9a-f]{8}#', File::get($this->carpeta . '/es-us/index.html'));
     }
 
     public function test_sin_la_opcion_sigue_reemplazando_la_carpeta_y_creando_el_puente(): void

@@ -57,7 +57,7 @@
 
     $esquemas = [
         ['@context' => 'https://schema.org', '@graph' => [
-            ['@type' => 'Organization', '@id' => $dominio . '/#org', 'name' => 'DaUnToque', 'alternateName' => ['Da Un Toque', 'dauntoque.com'], 'url' => $dominio . '/', 'image' => $imagen, 'description' => $descripcion, 'areaServed' => ['CO', 'US'],
+            ['@type' => 'Organization', '@id' => $dominio . '/#org', 'name' => 'DaUnToque', 'alternateName' => ['Da Un Toque', 'dauntoque.com'], 'url' => $dominio . '/', 'logo' => $dominio . $base . '/media/logo-512.png', 'sameAs' => \App\Console\Commands\GenerarSitio::REDES, 'image' => $imagen, 'description' => $descripcion, 'areaServed' => ['CO', 'US'],
                 'contactPoint' => ['@type' => 'ContactPoint', 'contactType' => 'sales', 'telephone' => '+' . $mercado['whatsapp'], 'areaServed' => $mercado['code'], 'availableLanguage' => ['es']]],
             ['@type' => 'WebSite', '@id' => $dominio . '/#web', 'name' => 'DaUnToque', 'url' => $dominio . '/', 'inLanguage' => $version['hreflang'], 'publisher' => ['@id' => $dominio . '/#org']],
             ['@type' => 'WebPage', '@id' => $url . '#pagina', 'url' => $url, 'name' => $titulo, 'description' => $descripcion, 'inLanguage' => $version['hreflang'], 'isPartOf' => ['@id' => $dominio . '/#web'], 'about' => ['@id' => $url . '#producto'], 'primaryImageOfPage' => $imagen],
@@ -93,7 +93,7 @@
         @foreach ($versiones as $c => $v)
             <link rel="alternate" hreflang="{{ $v['hreflang'] }}" href="{{ $canonica($c) }}">
         @endforeach
-        <link rel="alternate" hreflang="x-default" href="{{ $dominio }}/">
+        @include('sitio._hreflang')
     @endunless
     <meta name="theme-color" content="#09090a">
     <meta name="geo.region" content="{{ $mercado['code'] }}">
@@ -117,7 +117,7 @@
     <link rel="stylesheet" href="{{ $fuentes }}" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="{{ $fuentes }}"></noscript>
     <link rel="stylesheet" href="{{ $base }}/nueva.css">
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230d0f10'/%3E%3Cpath d='M11 10.5a7.5 7.5 0 0 1 0 11M15 8a11 11 0 0 1 0 16M19 6a14.5 14.5 0 0 1 0 20' stroke='%232fae6e' stroke-width='2.4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+    @include('sitio._iconos')
     @foreach ($esquemas as $esquema)
         <script type="application/ld+json">{!! json_encode($esquema, $json) !!}</script>
     @endforeach

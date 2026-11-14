@@ -8,7 +8,10 @@
 @php $r = \App\Console\Commands\GenerarSitio::rutaDe($c, $p['vista'], $p['acabado']); @endphp
         <xhtml:link rel="alternate" hreflang="{{ $v['hreflang'] }}" href="{{ $dominio }}/{{ $c }}/{{ $r === '' ? '' : $r . '/' }}"/>
 @endforeach
-        <xhtml:link rel="alternate" hreflang="x-default" href="{{ $dominio }}/"/>
+@foreach (\App\Console\Commands\GenerarSitio::GENERICOS as $idiomaGenerico => $c)
+@php $r = \App\Console\Commands\GenerarSitio::rutaDe($c, $p['vista'], $p['acabado']); @endphp
+        <xhtml:link rel="alternate" hreflang="{{ $idiomaGenerico }}" href="{{ $dominio }}/{{ $c }}/{{ $r === '' ? '' : $r . '/' }}"/>
+@endforeach
     </url>
 @endforeach
 </urlset>

@@ -28,7 +28,7 @@ return [
         'envio' => ['CO' => 'Envío gratis a toda Colombia', 'US' => 'Envío gratis en EE. UU.'],
 
         'inicio' => [
-            'titulo' => 'Tarjeta de presentación NFC con IA | DaUnToque',
+            'titulo' => 'Tarjeta de presentación NFC con IA en :pais | DaUnToque',
             'descripcion' => 'Un toque y tu contacto queda guardado: perfil web, WhatsApp, portafolio y cobros con :pagos. Pago único de :precio, sin mensualidades.',
             'oferta' => 'Precio de lanzamiento · Ahorras :ahorro',
             'ahorroCorto' => 'Ahorras :ahorro',
@@ -291,12 +291,13 @@ return [
         ],
 
         'acabados' => [
-            'matte-black' => ['nombre' => 'Matte Black', 'corto' => 'Para el que lidera la mesa.', 'texto' => 'Negro mate, sobrio y con autoridad. Se siente sólida en la mano y no deja huellas.', 'titulo' => 'Tarjeta NFC Matte Black | DaUnToque', 'video' => 'tienda'],
-            'crystal' => ['nombre' => 'Crystal', 'corto' => 'El rompehielos que nadie olvida.', 'texto' => 'Transparente y moderna. Llama la atención apenas la sacas y abre la conversación sola.', 'titulo' => 'Tarjeta NFC Crystal | DaUnToque', 'video' => 'florista'],
+            'matte-black' => ['nombre' => 'Matte Black', 'corto' => 'Para el que lidera la mesa.', 'texto' => 'Negro mate, sobrio y con autoridad. Se siente sólida en la mano y no deja huellas.', 'titulo' => 'Tarjeta NFC Matte Black en :pais | DaUnToque', 'video' => 'tienda'],
+            'crystal' => ['nombre' => 'Crystal', 'corto' => 'El rompehielos que nadie olvida.', 'texto' => 'Transparente y moderna. Llama la atención apenas la sacas y abre la conversación sola.', 'titulo' => 'Tarjeta NFC Crystal en :pais | DaUnToque', 'video' => 'florista'],
         ],
 
         'tarjeta' => [
             'descripcion' => 'Tarjeta :acabado con chip NFC y perfil web incluido. Guarda tu contacto, recibe WhatsApp y cobra con :pagos. Pago único de :precio.',
+            'h1' => 'Tarjeta NFC :acabado',
             'migas' => 'Tarjetas',
             'incluyeH' => 'Qué incluye',
             'detallesH' => 'Detalles',
@@ -311,7 +312,7 @@ return [
         ],
 
         'preguntas' => [
-            'titulo' => 'Preguntas frecuentes | DaUnToque',
+            'titulo' => 'Preguntas frecuentes: tarjeta NFC en :pais | DaUnToque',
             'descripcion' => 'Todo sobre la tarjeta DaUnToque: cómo funciona, compatibilidad, pagos con :pagos, perfil web y pedidos. Pago único de :precio.',
             'h1' => 'Preguntas frecuentes',
             'sub' => '¿No encuentras tu respuesta? Escríbenos y te ayudamos.',
@@ -613,6 +614,7 @@ return [
 
         'tarjeta' => [
             'descripcion' => ':acabado card with NFC chip and web profile included. Save your contact, get WhatsApp messages and get paid with :pagos. One-time :precio.',
+            'h1' => ':acabado NFC card',
             'migas' => 'Cards',
             'incluyeH' => 'What\'s included',
             'detallesH' => 'Details',
@@ -627,7 +629,7 @@ return [
         ],
 
         'preguntas' => [
-            'titulo' => 'Frequently asked questions | DaUnToque',
+            'titulo' => 'NFC business card FAQ | DaUnToque',
             'descripcion' => 'Everything about the DaUnToque card: how it works, compatibility, payments with :pagos, web profile and orders. One-time :precio.',
             'h1' => 'Frequently asked questions',
             'sub' => 'Can\'t find your answer? Message us and we\'ll help.',

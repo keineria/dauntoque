@@ -15,7 +15,7 @@
     ]];
 @endphp
 
-@section('titulo', $a['titulo'])
+@section('titulo', $x($a['titulo']))
 @section('descripcion', $x($t['tarjeta']['descripcion'], $rep))
 @section('schema')
     <script type="application/ld+json">{!! json_encode($producto, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG) !!}</script>
@@ -40,7 +40,7 @@
                 </div>
                 <div class="producto-txt">
                     @if ($mercado['ahorroTexto'])<span class="badge"><svg width="14" height="14" aria-hidden="true"><use href="#spark"/></svg>{{ $x($t['inicio']['oferta']) }}</span>@endif
-                    <h1>{{ $a['nombre'] }}</h1>
+                    <h1>{{ $x($t['tarjeta']['h1'], $rep) }}</h1>
                     <p class="lead mut">{{ $a['texto'] }}</p>
                     <div class="precio-hero"><strong class="num">{{ $mercado['precioTexto'] }}</strong><small>{{ $mercado['moneda'] }}</small>@if ($mercado['antesTexto'])<s class="price-old num">{{ $mercado['antesTexto'] }}</s>@endif</div>
                     <a class="btn btn-pri btn-ancho" data-compra href="{{ $comprar($acabado, $x($t['waAcabado'], $rep + [':precio' => $mercado['precioTexto'] . ' ' . $mercado['moneda']])) }}" @if($compraExterna) target="_blank" rel="noopener" @endif>{{ $x($t['tarjeta']['cta'], $rep) }}</a>

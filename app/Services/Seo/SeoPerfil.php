@@ -113,6 +113,10 @@ class SeoPerfil
             return DB::table('profiles')
                 ->joinSub($cambios, 'c', 'c.maestro_id', '=', 'profiles.id')
                 ->whereNotNull('profiles.nombre')->where('profiles.nombre', '!=', '')
+                // Solo perfiles con contenido: los de prueba o vacíos (sin foto y sin profesión ni descripción) le restan calidad al sitio
+                ->where(fn ($q) => $q->where(fn ($f) => $f->whereNotNull('profiles.foto_perfil')->where('profiles.foto_perfil', '!=', ''))
+                    ->orWhere(fn ($f) => $f->whereNotNull('profiles.profesion')->where('profiles.profesion', '!=', ''))
+                    ->orWhere(fn ($f) => $f->whereNotNull('profiles.bio')->where('profiles.bio', '!=', '')))
                 ->orderBy('profiles.id')
                 ->limit(self::LIMITE_MAPA)
                 ->get(['profiles.nickname', 'c.cambio'])

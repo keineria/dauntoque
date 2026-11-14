@@ -6,7 +6,7 @@
     ], $t['faq'])];
 @endphp
 
-@section('titulo', $p['titulo'])
+@section('titulo', $x($p['titulo']))
 @section('descripcion', $x($p['descripcion']))
 @section('schema')
     <script type="application/ld+json">{!! json_encode($faq, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG) !!}</script>

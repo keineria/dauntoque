@@ -24,7 +24,7 @@ class GenerarSitio extends Command
         {--indexar : Permite que Google indexe (solo para la publicación final)}
         {--dentro-de-laravel : El destino es la carpeta public/ de Laravel: no la vacía entera ni crea .htaccess/portal.php}
         {--fuente= : Carpeta con textos, CSS, JS y media (por defecto resources/sitio)}
-        {--portada=clasica : "nueva" pone la portada nueva (vista sitio.nueva) como inicio de /es-co/; si no, queda de prueba en /es-co/nueva/}';
+        {--portada=nueva : "nueva" pone la portada nueva (vista sitio.nueva) como inicio de /es-co/ y deja la anterior de respaldo en /es-co/clasica/; "clasica" vuelve a la anterior y deja la nueva de prueba en /es-co/nueva/}';
 
     protected $description = 'Genera el sitio estático de ventas por país e idioma';
 
@@ -34,6 +34,21 @@ class GenerarSitio extends Command
         'es-us' => ['mercado' => 'US', 'idioma' => 'es', 'hreflang' => 'es-US', 'tarjetas' => 'tarjetas', 'preguntas' => 'preguntas'],
         'en-us' => ['mercado' => 'US', 'idioma' => 'en', 'hreflang' => 'en-US', 'tarjetas' => 'cards', 'preguntas' => 'faq'],
     ];
+
+    /**
+     * hreflang sin país y x-default: fuera de Colombia y Estados Unidos, quien busca en español ve la versión
+     * en español con precio en dólares y el resto la versión en inglés (la raíz / no sirve: solo redirige y no se indexa).
+     */
+    public const GENERICOS = ['es' => 'es-us', 'en' => 'en-us', 'x-default' => 'en-us'];
+
+    /** Redes oficiales de la marca (sameAs de la organización en schema.org). */
+    public const REDES = ['https://www.instagram.com/dauntoqueof/', 'https://www.tiktok.com/@dauntoque.com', 'https://www.facebook.com/dauntoque.com'];
+
+    /** Nombre del país de cada versión para títulos y textos (:pais). */
+    public const PAISES = ['es' => ['CO' => 'Colombia', 'US' => 'EE. UU.'], 'en' => ['CO' => 'Colombia', 'US' => 'the US']];
+
+    /** Portadas que viven junto al inicio sin indexarse: la de prueba y la de respaldo. Su canónica es el inicio. */
+    public const SIN_INDEXAR = ['nueva', 'clasica'];
 
     public const ACABADOS = ['matte-black', 'crystal'];
 
@@ -52,6 +67,7 @@ class GenerarSitio extends Command
         $mercados = $this->mercados();
         $textos = require $fuente . '/textos.php';
         $paginas = [];
+        $redirigir = [];
 
         $dentroDeLaravel = (bool) $this->option('dentro-de-laravel');
         if ($dentroDeLaravel) {
@@ -71,7 +87,7 @@ class GenerarSitio extends Command
             // Compra en línea con Bold en los países de config/pedidos.php; en los demás, por WhatsApp
             $enLinea = in_array($mercado['code'], config('pedidos.paises_en_linea', []), true);
             $modo = $enLinea ? 'linea' : 'whatsapp';
-            $reemplazos = [':precio' => $mercado['precioTexto'] . ' ' . $mercado['moneda'], ':antes' => (string) $mercado['antesTexto'], ':ahorro' => $mercado['ahorroTexto'] . ' ' . $mercado['moneda'], ':pagos' => $pagos,
+            $reemplazos = [':precio' => $mercado['precioTexto'] . ' ' . $mercado['moneda'], ':antes' => (string) $mercado['antesTexto'], ':ahorro' => $mercado['ahorroTexto'] . ' ' . $mercado['moneda'], ':pagos' => $pagos, ':pais' => self::PAISES[$version['idioma']][$mercado['code']] ?? $mercado['code'],
                 ':comprarCon' => strtr($t['comprarCon'][$modo], [':pagos' => $pagos]), ':comoPago' => strtr($t['comoPago'][$modo], [':pagos' => $pagos])];
             $wa = fn (string $mensaje) => 'https://wa.me/' . $mercado['whatsapp'] . '?text=' . rawurlencode($mensaje);
             $comun = compact('codigo', 'version', 'mercado', 't', 'base', 'dominio', 'indexar') + [
@@ -89,13 +105,19 @@ class GenerarSitio extends Command
                     : $wa($mensaje ?? $t['wa']),
             ];
 
-            // Portada nueva: de prueba en /es-co/nueva/ (sin indexar) o, con --portada=nueva, como inicio de la versión
+            // Portada nueva: inicio de la versión (la anterior queda de respaldo en /clasica/, sin indexar)
+            // o, con --portada=clasica, de prueba en /es-co/nueva/ (sin indexar)
             $conNueva = in_array($codigo, self::CON_PORTADA_NUEVA, true);
             $nuevaDeInicio = $conNueva && $this->option('portada') === 'nueva';
             $comun += ['portal' => $portal, 'prueba' => !$nuevaDeInicio];
             $paginas[] = $this->pagina('inicio', $comun, $nuevaDeInicio ? 'nueva' : null);
             if ($conNueva && !$nuevaDeInicio) {
                 $paginas[] = $this->pagina('nueva', $comun);
+            }
+            if ($nuevaDeInicio) {
+                $paginas[] = $this->pagina('clasica', array_merge($comun, ['indexar' => false]), 'inicio');
+                // El enlace de prueba que ya se compartió (/es-co/nueva/) lleva al inicio
+                $redirigir[$codigo . '/nueva'] = $base . '/' . $codigo . '/';
             }
             foreach (self::ACABADOS as $acabado) {
                 $paginas[] = $this->pagina('tarjeta', $comun + ['acabado' => $acabado]);
@@ -109,6 +131,13 @@ class GenerarSitio extends Command
             File::put($archivo, $p['html']);
         }
 
+        foreach ($redirigir as $ruta => $a) {
+            File::ensureDirectoryExists($destino . '/' . $ruta);
+            File::put($destino . '/' . $ruta . '/index.html', '<!doctype html><html lang="es"><head><meta charset="utf-8"><title>DaUnToque</title><meta name="robots" content="noindex, follow">'
+                . '<link rel="canonical" href="' . $dominio . $a . '"><meta http-equiv="refresh" content="0;url=' . $a . '"><script>location.replace("' . $a . '" + location.search)</script></head>'
+                . '<body><a href="' . $a . '">dauntoque.com</a></body></html>');
+        }
+
         // Raíz: elige la versión por la elección guardada, la zona horaria o el idioma
         File::put($destino . '/index.html', view('sitio.raiz', ['base' => $base, 'dominio' => $dominio, 'indexar' => $indexar, 'versiones' => self::VERSIONES])->render());
 
@@ -117,8 +146,8 @@ class GenerarSitio extends Command
         File::put($destino . '/sitio.js', File::get($fuente . '/sitio.js'));
         File::put($destino . '/nueva.css', $this->minificarCss(File::get($fuente . '/nueva.css')));
         File::put($destino . '/nueva.js', File::get($fuente . '/nueva.js'));
-        // La portada de prueba no va en el mapa del sitio (no se indexa)
-        $enMapa = array_values(array_filter($paginas, fn ($p) => $p['vista'] !== 'nueva'));
+        // La portada de prueba y la de respaldo no van en el mapa del sitio (no se indexan)
+        $enMapa = array_values(array_filter($paginas, fn ($p) => !in_array($p['vista'], self::SIN_INDEXAR, true)));
         File::put($destino . '/sitemap.xml', view('sitio.sitemap', ['paginas' => $enMapa, 'dominio' => $dominio, 'base' => $base, 'fecha' => now()->toDateString()])->render());
         File::put($destino . '/robots.txt', $indexar ? self::robots($dominio, $base) : "User-agent: *\nDisallow: /\n");
 
@@ -249,6 +278,12 @@ class GenerarSitio extends Command
             'availability' => 'https://schema.org/InStock', 'itemCondition' => 'https://schema.org/NewCondition', 'url' => $url,
             'eligibleRegion' => ['@type' => 'Country', 'name' => $mercado['code']],
             'seller' => ['@type' => 'Organization', 'name' => 'DaUnToque'],
+            // Envío gratis al país de la versión (lo que promete el sitio)
+            'shippingDetails' => [
+                '@type' => 'OfferShippingDetails',
+                'shippingRate' => ['@type' => 'MonetaryAmount', 'value' => 0, 'currency' => $mercado['moneda']],
+                'shippingDestination' => ['@type' => 'DefinedRegion', 'addressCountry' => $mercado['code']],
+            ],
             'hasMerchantReturnPolicy' => [
                 '@type' => 'MerchantReturnPolicy', 'applicableCountry' => $mercado['code'],
                 'returnPolicyCategory' => 'https://schema.org/MerchantReturnFiniteReturnWindow', 'merchantReturnDays' => 30,
@@ -266,6 +301,7 @@ class GenerarSitio extends Command
             'tarjeta' => $v['tarjetas'] . '/' . ($acabado ?? self::ACABADOS[0]),
             'preguntas' => $v['preguntas'],
             'nueva' => 'nueva',
+            'clasica' => 'clasica',
             default => '',
         };
     }
@@ -279,13 +315,15 @@ class GenerarSitio extends Command
         $datos['ruta'] = self::rutaDe($datos['codigo'], $vista, $acabado);
         // URL pública definitiva (canonical y hreflang), aunque la prueba viva en otra ruta
         $datos['canonica'] = function (string $codigo) use ($vista, $acabado, $datos) {
-            $ruta = self::rutaDe($codigo, $vista, $acabado);
+            $ruta = self::rutaDe($codigo, in_array($vista, self::SIN_INDEXAR, true) ? 'inicio' : $vista, $acabado);
 
             return $datos['dominio'] . '/' . $codigo . '/' . ($ruta === '' ? '' : $ruta . '/');
         };
         // $ir('en-us') = esta misma página en otra versión; $ir('es-co', 'preguntas') = otra página
-        $datos['ir'] = function (string $codigo, ?string $otraVista = null, ?string $otroAcabado = null) use ($vista, $acabado, $base) {
-            $ruta = self::rutaDe($codigo, $otraVista ?? $vista, $otroAcabado ?? $acabado);
+        $datos['ir'] = function (string $codigo, ?string $otraVista = null, ?string $otroAcabado = null) use ($vista, $acabado, $base, $datos) {
+            // La portada de prueba o de respaldo solo existe en su versión: en las demás, lleva al inicio
+            $misma = in_array($vista, self::SIN_INDEXAR, true) && $codigo !== $datos['codigo'] ? 'inicio' : $vista;
+            $ruta = self::rutaDe($codigo, $otraVista ?? $misma, $otroAcabado ?? $acabado);
 
             return $base . '/' . $codigo . '/' . ($ruta === '' ? '' : $ruta . '/');
         };
